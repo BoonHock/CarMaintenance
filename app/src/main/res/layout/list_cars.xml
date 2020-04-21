@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:padding="16dp">
+
+	<TextView
+		android:id="@+id/txt_reg_no"
+		style="@style/item_title"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAllCaps="true"
+		tools:text="WWX 123" />
+
+	<TextView
+		android:id="@+id/txt_brand_model"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAllCaps="true"
+		tools:text="perodua axia" />
+
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingRight="8dp"
+			android:text="@string/added_on" />
+
+		<TextView
+			android:id="@+id/txt_added_on"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			tools:text="29 Aug 2019 15:43" />
+
+	</LinearLayout>
+
+	<!--	<Button-->
+	<!--		android:id="@+id/btn_view_service"-->
+	<!--		android:layout_width="wrap_content"-->
+	<!--		android:layout_height="wrap_content"-->
+	<!--		android:text="@string/view_service_recommendations"-->
+	<!--		android:textAllCaps="false" />-->
+</LinearLayout>

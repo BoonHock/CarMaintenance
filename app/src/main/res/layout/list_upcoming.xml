@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:padding="16dp">
+
+	<TextView
+		android:id="@+id/txt_reg_no"
+		style="@style/item_title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		tools:text="WWX 123" />
+
+	<TextView
+		android:id="@+id/txt_brand_model"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAllCaps="true"
+		tools:text="perodua axia" />
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:id="@+id/txt_due_distance"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAllCaps="true"
+			tools:text="100,000" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="4dp"
+			android:text="@string/kilometer"
+			android:textAllCaps="true" />
+
+		<TextView
+			android:id="@+id/txt_due_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="16dp"
+			android:textAllCaps="true"
+			tools:text="10 feb 2018" />
+	</LinearLayout>
+
+	<TextView
+		android:id="@+id/txt_inspect"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/inspect"
+		android:textStyle="bold"
+		android:visibility="gone" />
+
+	<LinearLayout
+		android:id="@+id/ll_inspect_items"
+		style="@style/level1_details"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+		<!--		<LinearLayout-->
+		<!--			android:layout_width="match_parent"-->
+		<!--			android:layout_height="wrap_content"-->
+		<!--			android:orientation="horizontal">-->
+
+		<!--			<TextView-->
+		<!--				android:layout_width="wrap_content"-->
+		<!--				android:layout_height="wrap_content"-->
+		<!--				android:paddingRight="16dp"-->
+		<!--				android:text="-" />-->
+
+		<!--			<TextView-->
+		<!--				android:id="@+id/txt_item"-->
+		<!--				android:layout_width="0dp"-->
+		<!--				android:layout_height="wrap_content"-->
+		<!--				android:layout_weight="1"-->
+		<!--				tools:text="oil change" />-->
+		<!--		</LinearLayout>-->
+	</LinearLayout>
+
+	<TextView
+		android:id="@+id/txt_replace"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/replace"
+		android:textStyle="bold"
+		android:visibility="gone" />
+
+	<LinearLayout
+		android:id="@+id/ll_replace_items"
+		style="@style/level1_details"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+		<!--		<LinearLayout-->
+		<!--			android:layout_width="match_parent"-->
+		<!--			android:layout_height="wrap_content"-->
+		<!--			android:orientation="horizontal">-->
+
+		<!--			<TextView-->
+		<!--				android:layout_width="wrap_content"-->
+		<!--				android:layout_height="wrap_content"-->
+		<!--				android:paddingRight="16dp"-->
+		<!--				android:text="-" />-->
+
+		<!--			<TextView-->
+		<!--				android:id="@+id/txt_item"-->
+		<!--				android:layout_width="0dp"-->
+		<!--				android:layout_height="wrap_content"-->
+		<!--				android:layout_weight="1"-->
+		<!--				tools:text="oil change" />-->
+		<!--		</LinearLayout>-->
+	</LinearLayout>
+</LinearLayout>

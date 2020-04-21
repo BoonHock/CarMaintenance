@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".VehicleEditorActivity">
+
+	<ProgressBar
+		android:id="@+id/indeterminateBar"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerInParent="true" />
+
+	<LinearLayout
+		android:id="@+id/ll_content"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				android:id="@+id/txt_reg_no"
+				style="@style/CategoryStyle"
+				android:text="@string/registration_no" />
+			<!-- Name field -->
+			<EditText
+				android:id="@+id/edit_reg_no"
+				style="@style/EditorFieldStyle"
+				android:hint="@string/hint_vehicle_reg_no"
+				android:inputType="textCapCharacters|textNoSuggestions" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/brand" />
+
+			<Spinner
+				android:id="@+id/spinner_brand"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:paddingRight="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/model" />
+
+			<Spinner
+				android:id="@+id/spinner_model"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:clickable="false"
+				android:paddingRight="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/variant" />
+
+			<Spinner
+				android:id="@+id/spinner_variant"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:clickable="false"
+				android:paddingRight="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/usage" />
+
+			<Spinner
+				android:id="@+id/spinner_usage"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:clickable="false"
+				android:paddingRight="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:text="@string/severe_usage_conditions" />
+
+	</LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,92 @@
+<resources>
+	<string name="app_name">Car Maintenance</string>
+	<string name="tab_upcoming">Upcoming</string>
+	<string name="tab_history">History</string>
+	<string name="odometer">Odometer</string>
+	<string name="tab_vehicles">Vehicles</string>
+	<string name="tab_settings">Settings</string>
+
+	<string name="kilometer">KM</string>
+	<string name="myr">MYR</string>
+	<string name="view_service_recommendations">View service recommendations</string>
+	<string name="added_on">Added on:</string>
+	<string name="registration_no">Registration no.</string>
+	<string name="hint_vehicle_reg_no">Vehicle registration number</string>
+
+	<string name="car_editor_title_add_vehicle">Add Vehicle</string>
+	<string name="car_editor_title_edit_vehicle">Edit Vehicle</string>
+	<string name="action_save">Save</string>
+	<string name="action_delete">Delete</string>
+	<string name="action_insert_dummy_data">Insert dummy data</string>
+	<string name="action_delete_all_entries">Delete all entries</string>
+	<string name="action_add_vehicle_brand">Add vehicleTemplate brand</string>
+	<string name="action_edit_vehicle_brand">Edit vehicleTemplate brand</string>
+	<string name="brand">Brand</string>
+	<string name="model">Model</string>
+	<string name="manufacturing_year">Manufacturing Year</string>
+	<string name="discard">Discard</string>
+	<string name="keep_editing">Keep Editing</string>
+	<string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+	<string name="are_you_sure">Are you sure?</string>
+	<string name="delete">Delete</string>
+	<string name="cancel">Cancel</string>
+	<string name="vehicle_brand_required">Brand name is required</string>
+	<string name="error_has_occurred">Operation failed. An error has occurred.</string>
+	<string name="saved_successfully">Saved successfully</string>
+	<string name="added_vehicle_brands">Added vehicleTemplate brands</string>
+	<string name="vehicle_deleted">Vehicle deleted</string>
+	<string name="vehicle_brand">Vehicle brand</string>
+	<string name="add_new">Add new</string>
+	<string name="upload_file">Upload file</string>
+	<string name="vehicle_template">Vehicle template</string>
+	<string name="variant">Variant</string>
+	<!--	<string name="delete_vehicle_dialog_msg">Delete vehicle?</string>-->
+	<string name="no_user_vehicle">You have not added any vehicle</string>
+	<string name="duplicate_reg_no_message">Vehicle registration number already exists. Try again with new registration number.</string>
+	<string name="duplicate_record">Duplicate Record</string>
+	<string name="close">Close</string>
+	<string name="add_odometer">Add odometer</string>
+	<string name="edit_odometer">Edit odometer</string>
+	<string name="add_vehicle">Add vehicle</string>
+	<string name="vehicle">Vehicle</string>
+	<string name="date">Date</string>
+	<string name="hint_odometer">Odometer reading</string>
+	<string name="no_vehicle_found">No vehicle found. Add a vehicle and retry.</string>
+	<string name="odometer_not_provided">Odometer value not provided</string>
+	<string name="odometer_deleted">Odometer deleted</string>
+	<string name="empty_here">It\'s empty here...</string>
+	<string name="add_vehicle_to_get_started">Add a vehicle to get started</string>
+	<string name="usage">Usage</string>
+	<string name="usage_severe">Severe</string>
+	<string name="usage_normal">Normal</string>
+	<string name="severe_usage_conditions">
+		Severe conditions include but are not limited to the following:\n
+		1. Driving on dusty roads or in an area which the vehicle is likely to be exposed to salty air\n
+		2. Driving on rough roads, on submerged roads, or hilly areas\n
+		3. Engine idling for long periods of time or short distances travelled during cold weather\n
+		4. Frequent, suddenly application of brakes\n
+		5. Use as rental userVehicle or as a taxi\n
+		6. Operation under excessive load\n
+		7. More than 50% of operation in heavy city traffic in hot temperature of 32&#176;C or higher\n
+		8. Frequent overloading\n
+		9. Operation in extremely hot weather condition
+	</string>
+	<string name="inspect">Inspect</string>
+	<string name="replace">Replace</string>
+	<string name="odometer_input_too_large">Odometer value too large. Please retry.</string>
+	<string name="add_maintenance">Add maintenance</string>
+	<string name="items_only_save_checked">Items (only checked items will be saved)</string>
+	<string name="price">Price</string>
+	<string name="remarks">Remarks</string>
+	<string name="add_with_symbol">+ Add</string>
+	<string name="total">Total</string>
+	<string name="item">Item</string>
+	<string name="item_name_required">Item name is required</string>
+	<string name="add">Add</string>
+	<string name="select_one_maintenance_item">Select at least one maintenance item</string>
+	<string name="maintenance_item_save_failed">Maintenance item could not be saved</string>
+	<string name="maintenance_details_save_failed">Maintenance details could not be saved</string>
+	<string name="maintenance_deleted">Maintenance record deleted</string>
+	<string name="total2">Total:</string>
+	<string name="item_already_exists">Item already exists</string>
+</resources>

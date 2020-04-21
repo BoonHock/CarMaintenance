@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/ll_maintenance_item"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal">
+
+	<TextView
+		android:id="@+id/txt_item"
+		style="@style/maintenanceEditorTxtItem"
+		android:text="air conditioner performance conditioner performance" />
+
+	<TextView style="@style/maintenanceEditorTxtCurrency" />
+
+	<!-- maximum input length is 8. therefore max value is 99999.99 -->
+	<EditText
+		android:id="@+id/edit_price"
+		style="@style/maintenanceEditorEditPrice" />
+
+	<CheckBox
+		android:id="@+id/cb_item"
+		style="@style/maintenanceEditorCbItem" />
+</LinearLayout>

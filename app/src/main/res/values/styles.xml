@@ -1,0 +1,100 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+	<!-- Base application theme. -->
+	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<!-- Customize your theme here. -->
+		<item name="colorPrimary">@color/colorPrimary</item>
+		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+		<!--		<item name="colorAccent">@color/colorAccent</item>-->
+		<item name="colorAccent">@android:color/holo_red_light</item>
+	</style>
+
+	<style name="main_activity_fab">
+		<item name="android:layout_alignParentEnd">true</item>
+		<item name="android:layout_alignParentRight">true</item>
+		<item name="android:layout_gravity">right</item>
+		<item name="android:layout_marginRight">@dimen/fab_margin</item>
+		<item name="android:layout_marginBottom">@dimen/fab_margin</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+	</style>
+
+	<style name="tab_test">
+		<item name="android:padding">16dp</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:gravity">center_vertical</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textAppearance">?android:textAppearanceMedium</item>
+	</style>
+
+	<style name="item_title">
+		<item name="android:textAllCaps">true</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">@android:color/holo_red_dark</item>
+		<item name="android:textAppearance">?android:textAppearanceMedium</item>
+	</style>
+
+	<style name="level1_details">
+		<item name="android:paddingLeft">24dp</item>
+	</style>
+	<!-- Style for a category in the editor -->
+	<style name="CategoryStyle">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">0dp</item>
+		<item name="android:layout_weight">1</item>
+		<item name="android:paddingTop">16dp</item>
+		<item name="android:textColor">@android:color/holo_red_dark</item>
+		<item name="android:fontFamily">sans-serif-medium</item>
+		<item name="android:textAppearance">?android:textAppearanceSmall</item>
+	</style>
+
+	<!-- Style for an EditText field in the editor -->
+	<style name="EditorFieldStyle">
+		<item name="android:layout_weight">2</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">0dp</item>
+		<item name="android:fontFamily">sans-serif-light</item>
+		<item name="android:textAppearance">?android:textAppearanceMedium</item>
+	</style>
+
+	<style name="maintenanceEditorTxtItem">
+		<item name="android:layout_width">0dp</item>
+		<item name="android:layout_height">match_parent</item>
+		<item name="android:layout_weight">2</item>
+		<item name="android:gravity">center_vertical</item>
+	</style>
+
+	<style name="maintenanceEditorTxtCurrency">
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">match_parent</item>
+		<item name="android:gravity">center_vertical</item>
+		<item name="android:paddingLeft">8dp</item>
+		<item name="android:paddingRight">8dp</item>
+		<item name="android:text">@string/myr</item>
+	</style>
+
+	<style name="maintenanceEditorEditPrice">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">0dp</item>
+		<item name="android:layout_marginRight">8dp</item>
+		<item name="android:layout_weight">1</item>
+		<item name="android:hint">$$</item>
+		<item name="android:importantForAutofill" tools:targetApi="o">no</item>
+		<item name="android:inputType">numberDecimal</item>
+		<item name="android:maxLength">8</item>
+		<item name="android:textAlignment">viewEnd</item>
+	</style>
+
+	<style name="maintenanceEditorCbItem">
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+	</style>
+
+	<style name="editTextPrice">
+		<item name="android:hint">@string/price</item>
+		<item name="android:importantForAutofill" tools:targetApi="o">no</item>
+		<item name="android:inputType">numberDecimal</item>
+		<item name="android:maxLength">8</item>
+	</style>
+</resources>
