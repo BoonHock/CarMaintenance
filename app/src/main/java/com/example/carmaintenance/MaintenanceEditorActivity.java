@@ -162,13 +162,9 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 			}
 			getDbMaintenanceItems();
 		}
-		if (getIntent().getStringArrayListExtra("inspect_items") != null
-				&& getIntent().getStringArrayListExtra("replace_items") != null
-				&& getIntent().getStringExtra("vehicle_id") != null) {
+		if (getIntent().getStringExtra("vehicle_id") != null) {
 			// user setting specific vehicle's maintenance. disable spinner
 			_editVehicleId = Integer.parseInt(getIntent().getStringExtra("vehicle_id"));
-			_preCheckInspect = getIntent().getStringArrayListExtra("inspect_items");
-			_preCheckReplace = getIntent().getStringArrayListExtra("replace_items");
 			_spinnerVehicle.setEnabled(false);
 		}
 

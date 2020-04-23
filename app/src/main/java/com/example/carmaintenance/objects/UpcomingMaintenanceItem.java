@@ -2,7 +2,6 @@ package com.example.carmaintenance.objects;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
 import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
@@ -12,13 +11,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class UpcomingMaintenanceItem extends MaintenanceItem {
+public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparable<UpcomingMaintenanceItem> {
 	private int _latestServiceDistance = 0;
 	// use int instead of date type for latest service date
 	// so that when value is 0, we know no record of service
 	private long _latestServiceDate = 0;
 	private int _distanceLeft = 0;
 	private long _durationDaysLeft = 0;
+
+	public static final int URGENCY_NOT_URGENT = 0;
+	public static final int URGENCY_URGENT = 1;
+	public static final int URGENCY_VERY_URGENT = 2;
+	public static final int URGENCY_VERY2_URGENT = 3;
+	public static final int URGENCY_VERY3_URGENT = 4;
 
 	public UpcomingMaintenanceItem(
 			Context context, MaintenanceItem maintenanceItem, int vehicleId) {
@@ -44,8 +49,6 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 		} else {
 			nextDistance = _latestServiceDistance + this.getDistance_interval();
 		}
-		Log.v("CHECK_ME", this.getItem() + " " + currentOdometer
-				+ " " + _latestServiceDistance + " " + nextDistance);
 
 		_distanceLeft = nextDistance - currentOdometer;
 
@@ -115,5 +118,48 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 
 	public long get_durationDaysLeft() {
 		return _durationDaysLeft;
+	}
+
+	public int getUrgency() {
+		boolean hasDistanceInterval = this.getDistance_interval() != 0;
+		boolean hasDurationInterval = this.getDuration_interval() != 0;
+		boolean hasLastServiceDate = this._latestServiceDate != 0;
+		boolean hasDurationUrgency = hasDurationInterval && hasLastServiceDate;
+
+		if ((hasDistanceInterval && this.get_distanceLeft() < 100)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() < 5)) {
+			return URGENCY_VERY3_URGENT;
+		} else if ((hasDistanceInterval && this.get_distanceLeft() < 500)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() < 10)) {
+			return URGENCY_VERY2_URGENT;
+		} else if ((hasDistanceInterval && this.get_distanceLeft() < 1000)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() < 14)) {
+			return URGENCY_VERY_URGENT;
+		} else if ((hasDistanceInterval && this.get_distanceLeft() < 1500)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() < 21)) {
+			return URGENCY_URGENT;
+		}
+		return URGENCY_NOT_URGENT;
+	}
+
+	@Override
+	public int compareTo(UpcomingMaintenanceItem compareItem) {
+		int compareResults = compareItem.getUrgency() - this.getUrgency(); // descending
+
+		// if both same urgency, then arrange by distance left
+		// make sure both have distance interval first
+		if (compareResults == 0 && this.getDistance_interval() != 0
+				&& compareItem.getDistance_interval() != 0) {
+			compareResults = this.get_distanceLeft() - compareItem.get_distanceLeft(); // ascending
+		}
+		// if still same, then arrange by name alphabetically
+		if (compareResults == 0) {
+			String compareName = compareItem.getItem();
+			String thisName = this.getItem();
+
+			compareResults = thisName.compareTo(compareName);
+		}
+
+		return compareResults;
 	}
 }

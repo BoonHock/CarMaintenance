@@ -2,7 +2,7 @@ package com.example.carmaintenance.cursoradapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +20,9 @@ import com.example.carmaintenance.objects.MaintenanceItem;
 import com.example.carmaintenance.objects.UpcomingMaintenanceItem;
 import com.example.carmaintenance.objects.VehicleTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -89,22 +92,28 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		llInspect.removeAllViews();
 		llReplace.removeAllViews();
 
+		List<UpcomingMaintenanceItem> upcomingMaintenanceItems = new ArrayList<>();
+
 		if (maintenanceItems != null) {
 			for (MaintenanceItem maintenanceItem : maintenanceItems) {
-				UpcomingMaintenanceItem upcomingMaintenanceItem =
-						new UpcomingMaintenanceItem(context, maintenanceItem, vehicleId);
+				upcomingMaintenanceItems.add(new UpcomingMaintenanceItem(
+						context, maintenanceItem, vehicleId));
+			}
+			Collections.sort(upcomingMaintenanceItems);
 
-				if (upcomingMaintenanceItem.getInspect_replace()
+			for (UpcomingMaintenanceItem maintenanceItem : upcomingMaintenanceItems) {
+				if (maintenanceItem.getInspect_replace()
 						== FirebaseMaintenanceDetailsEntry.INSPECT) {
 
-					addMaintenanceItem(context, llInspect, upcomingMaintenanceItem);
-				} else if (upcomingMaintenanceItem.getInspect_replace()
+					addMaintenanceItem(context, llInspect, maintenanceItem);
+				} else if (maintenanceItem.getInspect_replace()
 						== FirebaseMaintenanceDetailsEntry.REPLACE) {
 
-					addMaintenanceItem(context, llReplace, upcomingMaintenanceItem);
+					addMaintenanceItem(context, llReplace, maintenanceItem);
 				}
 			}
 		}
+
 		if (llInspect.getChildCount() == 0) {
 			txtInspect.setVisibility(View.GONE);
 		} else {
@@ -123,6 +132,7 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		LinearLayout llItem = view.findViewById(R.id.ll_item);
 		TextView txtItem = view.findViewById(R.id.txt_item);
 		TextView txtUpcomingDue = view.findViewById(R.id.txt_upcoming_due);
+
 		boolean hasDistanceInterval = false;
 		boolean hasDurationInterval = false;
 
@@ -152,27 +162,10 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		}
 		txtUpcomingDue.setText(upcomingDue);
 
-		if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 100)
-				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 5)) {
-			llItem.setBackgroundColor(getMagnitudeColor(context, 4));
-			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
-			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+		int urgency = upcomingMaintenanceItem.getUrgency();
 
-		} else if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 500)
-				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 10)) {
-			llItem.setBackgroundColor(getMagnitudeColor(context, 3));
-			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
-			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
-
-		} else if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 1000)
-				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 14)) {
-			llItem.setBackgroundColor(getMagnitudeColor(context, 2));
-			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
-			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
-
-		} else if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 1500)
-				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 21)) {
-			llItem.setBackgroundColor(getMagnitudeColor(context, 1));
+		if (urgency != UpcomingMaintenanceItem.URGENCY_NOT_URGENT) {
+			llItem.setBackgroundColor(getUrgencyColour(context, urgency));
 			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
 			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
 		}
@@ -180,22 +173,25 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		llParent.addView(view);
 	}
 
-	private int getMagnitudeColor(Context context, double mag) {
+	private int getUrgencyColour(Context context, double mag) {
 		int magnitudeColorResourceId;
 		int magFloor = (int) Math.floor(mag);
 
 		switch (magFloor) {
-			case 1:
-				magnitudeColorResourceId = R.color.magnitude4;
+			case UpcomingMaintenanceItem.URGENCY_VERY3_URGENT:
+				magnitudeColorResourceId = R.color.urgency1;
 				break;
-			case 2:
-				magnitudeColorResourceId = R.color.magnitude6;
+			case UpcomingMaintenanceItem.URGENCY_VERY2_URGENT:
+				magnitudeColorResourceId = R.color.urgency2;
 				break;
-			case 3:
-				magnitudeColorResourceId = R.color.magnitude7;
+			case UpcomingMaintenanceItem.URGENCY_VERY_URGENT:
+				magnitudeColorResourceId = R.color.urgency3;
+				break;
+			case UpcomingMaintenanceItem.URGENCY_URGENT:
+				magnitudeColorResourceId = R.color.urgency4;
 				break;
 			default:
-				magnitudeColorResourceId = R.color.magnitude10plus;
+				magnitudeColorResourceId = Color.TRANSPARENT;
 				break;
 		}
 		return ContextCompat.getColor(context, magnitudeColorResourceId);
