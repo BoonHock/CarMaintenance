@@ -83,10 +83,10 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 		return new CursorLoader(getContext(),
 				MaintenanceEntry.CONTENT_URI,
+				MaintenanceEntry.FULL_PROJECTION,
 				null,
 				null,
-				null,
-				null);
+				MaintenanceEntry.COLUMN_DATE + " DESC");
 	}
 
 	@Override

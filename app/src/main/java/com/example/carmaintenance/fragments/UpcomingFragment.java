@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -25,9 +24,8 @@ import androidx.loader.content.Loader;
 import com.example.carmaintenance.MaintenanceEditorActivity;
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.cursoradapter.UpcomingMaintenanceCursorAdapter;
-import com.example.carmaintenance.data.UpcomingMaintenanceContract;
-
-import java.util.ArrayList;
+import com.example.carmaintenance.data.MaintenanceItemContract;
+import com.example.carmaintenance.data.UserVehicleContract;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -77,23 +75,22 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent intent = new Intent(getContext(), MaintenanceEditorActivity.class);
 				intent.putExtra("vehicle_id", String.valueOf(id));
-
-				ArrayList<String> inspectItems = new ArrayList<>();
-				ArrayList<String> replaceItems = new ArrayList<>();
-
-				LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
-				LinearLayout llReplace = view.findViewById(R.id.ll_replace_items);
-
-				for (int i = 0, j = llInspect.getChildCount(); i < j; i++) {
-					inspectItems.add(((TextView) llInspect.getChildAt(i)
-							.findViewById(R.id.txt_item)).getText().toString());
-				}
-				for (int i = 0, j = llReplace.getChildCount(); i < j; i++) {
-					replaceItems.add(((TextView) llReplace.getChildAt(i)
-							.findViewById(R.id.txt_item)).getText().toString());
-				}
-				intent.putStringArrayListExtra("inspect_items", inspectItems);
-				intent.putStringArrayListExtra("replace_items", replaceItems);
+//				ArrayList<String> inspectItems = new ArrayList<>();
+//				ArrayList<String> replaceItems = new ArrayList<>();
+//
+//				LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
+//				LinearLayout llReplace = view.findViewById(R.id.ll_replace_items);
+//
+//				for (int i = 0, j = llInspect.getChildCount(); i < j; i++) {
+//					inspectItems.add(((TextView) llInspect.getChildAt(i)
+//							.findViewById(R.id.txt_item)).getText().toString());
+//				}
+//				for (int i = 0, j = llReplace.getChildCount(); i < j; i++) {
+//					replaceItems.add(((TextView) llReplace.getChildAt(i)
+//							.findViewById(R.id.txt_item)).getText().toString());
+//				}
+//				intent.putStringArrayListExtra("inspect_items", inspectItems);
+//				intent.putStringArrayListExtra("replace_items", replaceItems);
 				startActivity(intent);
 			}
 		});
@@ -105,8 +102,8 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 		// This loader will execute the ContentProvider's query method on a background thread
 		return new CursorLoader(getContext(),   // Parent activity context
-				UpcomingMaintenanceContract.UpcomingMaintenanceEntry.CONTENT_URI,   // Provider content URI to query
-				null,    // Columns to include in the resulting Cursor
+				UserVehicleContract.UserVehicleEntry.CONTENT_URI,   // Provider content URI to query
+				UserVehicleContract.UserVehicleEntry.FULL_PROJECTION,    // Columns to include in the resulting Cursor
 				null,                   // No selection clause
 				null,                   // No selection arguments
 				null);                  // Default sort order

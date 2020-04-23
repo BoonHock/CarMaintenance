@@ -20,40 +20,13 @@
 		android:textAllCaps="true"
 		tools:text="perodua axia" />
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-
-		<TextView
-			android:id="@+id/txt_due_distance"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textAllCaps="true"
-			tools:text="100,000" />
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingLeft="4dp"
-			android:text="@string/kilometer"
-			android:textAllCaps="true" />
-
-		<TextView
-			android:id="@+id/txt_due_date"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingLeft="16dp"
-			android:textAllCaps="true"
-			tools:text="10 feb 2018" />
-	</LinearLayout>
-
 	<TextView
 		android:id="@+id/txt_inspect"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="8dp"
 		android:text="@string/inspect"
-		android:textStyle="bold"
-		android:visibility="gone" />
+		android:textStyle="bold" />
 
 	<LinearLayout
 		android:id="@+id/ll_inspect_items"
@@ -62,33 +35,20 @@
 		android:layout_height="wrap_content"
 		android:orientation="vertical">
 
-		<!--		<LinearLayout-->
-		<!--			android:layout_width="match_parent"-->
-		<!--			android:layout_height="wrap_content"-->
-		<!--			android:orientation="horizontal">-->
+		<!--		<include layout="@layout/template_upcoming_item" />-->
 
-		<!--			<TextView-->
-		<!--				android:layout_width="wrap_content"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:paddingRight="16dp"-->
-		<!--				android:text="-" />-->
+		<!--		<include layout="@layout/template_upcoming_item" />-->
 
-		<!--			<TextView-->
-		<!--				android:id="@+id/txt_item"-->
-		<!--				android:layout_width="0dp"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:layout_weight="1"-->
-		<!--				tools:text="oil change" />-->
-		<!--		</LinearLayout>-->
+		<!--		<include layout="@layout/template_upcoming_item" />-->
 	</LinearLayout>
 
 	<TextView
 		android:id="@+id/txt_replace"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="8dp"
 		android:text="@string/replace"
-		android:textStyle="bold"
-		android:visibility="gone" />
+		android:textStyle="bold" />
 
 	<LinearLayout
 		android:id="@+id/ll_replace_items"
@@ -97,23 +57,10 @@
 		android:layout_height="wrap_content"
 		android:orientation="vertical">
 
-		<!--		<LinearLayout-->
-		<!--			android:layout_width="match_parent"-->
-		<!--			android:layout_height="wrap_content"-->
-		<!--			android:orientation="horizontal">-->
+		<!--		<include layout="@layout/template_upcoming_item" />-->
 
-		<!--			<TextView-->
-		<!--				android:layout_width="wrap_content"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:paddingRight="16dp"-->
-		<!--				android:text="-" />-->
+		<!--		<include layout="@layout/template_upcoming_item" />-->
 
-		<!--			<TextView-->
-		<!--				android:id="@+id/txt_item"-->
-		<!--				android:layout_width="0dp"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:layout_weight="1"-->
-		<!--				tools:text="oil change" />-->
-		<!--		</LinearLayout>-->
+		<!--		<include layout="@layout/template_upcoming_item" />-->
 	</LinearLayout>
 </LinearLayout>

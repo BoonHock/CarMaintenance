@@ -155,6 +155,8 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 				if (cursor.moveToFirst()) {
 					_editOdometer.setText(String.valueOf(cursor.getInt(cursor
 							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_ODOMETER))));
+					_calendarOdometer.setTime(new Date(cursor.getLong(cursor
+							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE))));
 				}
 				cursor.close();
 			}

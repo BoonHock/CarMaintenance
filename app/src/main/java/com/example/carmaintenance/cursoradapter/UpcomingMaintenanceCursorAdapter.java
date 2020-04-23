@@ -2,6 +2,7 @@ package com.example.carmaintenance.cursoradapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,19 +10,18 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.data.FirebaseContract.FirebaseMaintenanceDetailsEntry;
-import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 import com.example.carmaintenance.objects.FirebaseObj;
 import com.example.carmaintenance.objects.MaintenanceItem;
+import com.example.carmaintenance.objects.UpcomingMaintenanceItem;
 import com.example.carmaintenance.objects.VehicleTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 	public UpcomingMaintenanceCursorAdapter(Context context, Cursor c) {
@@ -36,7 +36,7 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 
 	@Override
 	public void bindView(final View view, final Context context, Cursor cursor) {
-		int vehicleId = cursor.getInt(cursor
+		final int vehicleId = cursor.getInt(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry._ID));
 		String regNo = cursor.getString(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_REG_NO));
@@ -48,8 +48,9 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_VARIANT));
 		final int currentUsage = cursor.getInt(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
-		final int currentOdometer = cursor.getInt(cursor
-				.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
+
+		view.findViewById(R.id.txt_replace).setVisibility(View.GONE);
+		view.findViewById(R.id.txt_inspect).setVisibility(View.GONE);
 
 		TextView txtRegNo = view.findViewById(R.id.txt_reg_no);
 		TextView txtBrandModel = view.findViewById(R.id.txt_brand_model);
@@ -68,91 +69,136 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 			@Override
 			public void callback() {
 				displayUpcomingMaintenance(context, view,
-						firebaseVehicleId, currentOdometer, currentUsage);
+						firebaseVehicleId, vehicleId, currentUsage);
 			}
 		});
 	}
 
 	private void displayUpcomingMaintenance(
-			Context context, View view,
-			String firebaseVehicleId, int currentOdometer, int usage) {
-		TextView txtDueDistance = view.findViewById(R.id.txt_due_distance);
-		TextView txtDueDate = view.findViewById(R.id.txt_due_date);
+			Context context, View view, String firebaseVehicleId,
+			int vehicleId, int usage) {
+
+		LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
+		LinearLayout llReplace = view.findViewById(R.id.ll_replace_items);
+
 		TextView txtInspect = view.findViewById(R.id.txt_inspect);
 		TextView txtReplace = view.findViewById(R.id.txt_replace);
-		LinearLayout llInspectItems = view.findViewById(R.id.ll_inspect_items);
-		LinearLayout llReplaceItems = view.findViewById(R.id.ll_replace_items);
 
 		List<MaintenanceItem> maintenanceItems = FirebaseObj._maintenanceItems.get(firebaseVehicleId);
 
-		// map of recommended odometer by vehicle company to list of items to change
-		Map<Integer, Map<Integer, List<String>>> upcomingItems = new HashMap<>();
+		llInspect.removeAllViews();
+		llReplace.removeAllViews();
 
-		// loop though each maintenance items and put in @upcomingItems according to
-		// their distance recommendation
 		if (maintenanceItems != null) {
-			for (MaintenanceItem item : maintenanceItems) {
-				int itemUsage = item.getUsage();
+			for (MaintenanceItem maintenanceItem : maintenanceItems) {
+				UpcomingMaintenanceItem upcomingMaintenanceItem =
+						new UpcomingMaintenanceItem(context, maintenanceItem, vehicleId);
 
-				// -1 usage means apply to all usage type
-				// if not -1 then check if maintenance's usage type is
-				// same with user vehicle's usage type
-				if (itemUsage == -1 || itemUsage == usage) {
-					int cumulativeDistance = item.getFirst_distance();
-					// some items may not have distance interval
-					if (item.getDistance_interval() > 0) {
-						// if got, loop until cumulative distance is more than
-						// user's current odometer
-						while (cumulativeDistance <= currentOdometer) {
-							cumulativeDistance += item.getDistance_interval();
-						}
-					}
-					// if cumulative distance key not created in map yet, create
-					if (upcomingItems.get(cumulativeDistance) == null) {
-						upcomingItems.put(cumulativeDistance, new HashMap<Integer, List<String>>());
-						upcomingItems.get(cumulativeDistance).put(FirebaseMaintenanceDetailsEntry.INSPECT, new ArrayList<String>());
-						upcomingItems.get(cumulativeDistance).put(FirebaseMaintenanceDetailsEntry.REPLACE, new ArrayList<String>());
-					}
-					upcomingItems.get(cumulativeDistance).get(item.getInspect_replace()).add(item.getItem());
-				}
-			}
+				if (upcomingMaintenanceItem.getInspect_replace()
+						== FirebaseMaintenanceDetailsEntry.INSPECT) {
 
-			if (upcomingItems.size() > 0) {
-				// get minimum upcoming distance, which is next service
-				int minUpcomingDistance = Collections.min(upcomingItems.keySet());
-				txtDueDistance.setText(String.valueOf(minUpcomingDistance));
+					addMaintenanceItem(context, llInspect, upcomingMaintenanceItem);
+				} else if (upcomingMaintenanceItem.getInspect_replace()
+						== FirebaseMaintenanceDetailsEntry.REPLACE) {
 
-				if (upcomingItems.get(minUpcomingDistance).
-						get(FirebaseMaintenanceDetailsEntry.INSPECT).size() > 0) {
-					txtInspect.setVisibility(View.VISIBLE);
-					addMaintenanceItemViews(context,
-							llInspectItems,
-							upcomingItems.get(minUpcomingDistance)
-									.get(FirebaseMaintenanceDetailsEntry.INSPECT));
-				}
-				if (upcomingItems.get(minUpcomingDistance)
-						.get(FirebaseMaintenanceDetailsEntry.REPLACE).size() > 0) {
-					txtReplace.setVisibility(View.VISIBLE);
-					addMaintenanceItemViews(context,
-							llReplaceItems,
-							upcomingItems.get(minUpcomingDistance)
-									.get(FirebaseMaintenanceDetailsEntry.REPLACE));
+					addMaintenanceItem(context, llReplace, upcomingMaintenanceItem);
 				}
 			}
 		}
-	}
-
-	private void addMaintenanceItemViews(Context context,
-										 LinearLayout llParent,
-										 List<String> listItems) {
-		llParent.removeAllViews(); // remove all child views and re-add
-		Collections.sort(listItems);
-		for (String strItem : listItems) {
-			View newView = LayoutInflater.from(context)
-					.inflate(R.layout.template_maintenance_item, null);
-			TextView txtItem = newView.findViewById(R.id.txt_item);
-			txtItem.setText(strItem);
-			llParent.addView(newView);
+		if (llInspect.getChildCount() == 0) {
+			txtInspect.setVisibility(View.GONE);
+		} else {
+			txtInspect.setVisibility(View.VISIBLE);
+		}
+		if (llReplace.getChildCount() == 0) {
+			txtReplace.setVisibility(View.GONE);
+		} else {
+			txtReplace.setVisibility(View.VISIBLE);
 		}
 	}
+
+	private void addMaintenanceItem(Context context, LinearLayout llParent,
+									UpcomingMaintenanceItem upcomingMaintenanceItem) {
+		View view = LayoutInflater.from(context).inflate(R.layout.template_upcoming_item, null);
+		LinearLayout llItem = view.findViewById(R.id.ll_item);
+		TextView txtItem = view.findViewById(R.id.txt_item);
+		TextView txtUpcomingDue = view.findViewById(R.id.txt_upcoming_due);
+		boolean hasDistanceInterval = false;
+		boolean hasDurationInterval = false;
+
+		txtItem.setText(upcomingMaintenanceItem.getItem());
+
+		String upcomingDue = "";
+
+		if (upcomingMaintenanceItem.getDistance_interval() != 0) {
+			hasDistanceInterval = true;
+			upcomingDue = String.format(Locale.getDefault(), "%,d",
+					upcomingMaintenanceItem.get_distanceLeft())
+					+ " " + context.getString(R.string.kilometer);
+			if (upcomingMaintenanceItem.get_durationDaysLeft() != 0) {
+				hasDurationInterval = true;
+				upcomingDue += " or ";
+			}
+		}
+		if (upcomingMaintenanceItem.get_durationDaysLeft() != 0) {
+			hasDurationInterval = true;
+			upcomingDue += upcomingMaintenanceItem.get_durationDaysLeft() + " days";
+		}
+		if (hasDistanceInterval || hasDurationInterval) {
+			upcomingDue += " left. ";
+		}
+		if (hasDistanceInterval && hasDurationInterval) {
+			upcomingDue += "Whichever comes first.";
+		}
+		txtUpcomingDue.setText(upcomingDue);
+
+		if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 100)
+				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 5)) {
+			llItem.setBackgroundColor(getMagnitudeColor(context, 4));
+			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
+			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+
+		} else if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 500)
+				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 10)) {
+			llItem.setBackgroundColor(getMagnitudeColor(context, 3));
+			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
+			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+
+		} else if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 1000)
+				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 14)) {
+			llItem.setBackgroundColor(getMagnitudeColor(context, 2));
+			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
+			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+
+		} else if ((hasDistanceInterval && upcomingMaintenanceItem.get_distanceLeft() < 1500)
+				|| (hasDurationInterval && upcomingMaintenanceItem.get_durationDaysLeft() < 21)) {
+			llItem.setBackgroundColor(getMagnitudeColor(context, 1));
+			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
+			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+		}
+
+		llParent.addView(view);
+	}
+
+	private int getMagnitudeColor(Context context, double mag) {
+		int magnitudeColorResourceId;
+		int magFloor = (int) Math.floor(mag);
+
+		switch (magFloor) {
+			case 1:
+				magnitudeColorResourceId = R.color.magnitude4;
+				break;
+			case 2:
+				magnitudeColorResourceId = R.color.magnitude6;
+				break;
+			case 3:
+				magnitudeColorResourceId = R.color.magnitude7;
+				break;
+			default:
+				magnitudeColorResourceId = R.color.magnitude10plus;
+				break;
+		}
+		return ContextCompat.getColor(context, magnitudeColorResourceId);
+	}
+
 }

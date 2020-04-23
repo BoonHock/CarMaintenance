@@ -126,8 +126,4 @@ public class HistoryCursorAdapter extends CursorAdapter {
 			txtReplace.setVisibility(View.VISIBLE);
 		}
 	}
-
-	private void addMaintenanceDetailsView() {
-
-	}
 }

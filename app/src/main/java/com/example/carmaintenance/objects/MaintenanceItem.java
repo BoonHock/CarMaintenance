@@ -1,5 +1,11 @@
 package com.example.carmaintenance.objects;
 
+import android.content.ContentUris;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
+
 public class MaintenanceItem {
 	private String firebase_item_id;
 	private String item;
@@ -10,7 +16,21 @@ public class MaintenanceItem {
 	private int first_duration;
 	private int duration_interval;
 
+	// required for firebase
 	public MaintenanceItem() {
+	}
+
+	public MaintenanceItem(String cFirebaseId, String cItem, int cInspectReplace,
+						   int cUsage, int cFirstDistance, int cDistanceInterval,
+						   int cFirstDuration, int cDurationInterval) {
+		firebase_item_id = cFirebaseId;
+		item = cItem;
+		inspect_replace = cInspectReplace;
+		usage = cUsage;
+		first_distance = cFirstDistance;
+		distance_interval = cDistanceInterval;
+		first_duration = cFirstDuration;
+		duration_interval = cDurationInterval;
 	}
 
 	public String getFirebase_item_id() {
@@ -75,5 +95,32 @@ public class MaintenanceItem {
 
 	public void setDuration_interval(int duration_interval) {
 		this.duration_interval = duration_interval;
+	}
+
+	/*
+	 * if got latest service record, will return array with 2 elements
+	 * array[0] = distance
+	 * array[1] = date
+	 * if not record, return null
+	 * */
+	public int[] getLatestService(Context context, int vehicleId) {
+		Cursor cursor = context.getContentResolver().query(
+				ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, vehicleId),
+				MaintenanceEntry.FULL_PROJECTION,
+				null,
+				null,
+				MaintenanceEntry.COLUMN_DATE + " DESC");
+
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int serviceDistance = cursor.getInt(cursor
+						.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_ODOMETER));
+				int serviceDate = cursor.getInt(cursor
+						.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE));
+				return new int[]{serviceDistance, serviceDate};
+			}
+			cursor.close();
+		}
+		return null;
 	}
 }

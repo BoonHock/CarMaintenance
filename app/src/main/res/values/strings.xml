@@ -54,7 +54,7 @@
 	<string name="no_vehicle_found">No vehicle found. Add a vehicle and retry.</string>
 	<string name="odometer_not_provided">Odometer value not provided</string>
 	<string name="odometer_deleted">Odometer deleted</string>
-	<string name="empty_here">It\'s empty here...</string>
+	<string name="empty_here">It\'s empty here…</string>
 	<string name="add_vehicle_to_get_started">Add a vehicle to get started</string>
 	<string name="usage">Usage</string>
 	<string name="usage_severe">Severe</string>
@@ -89,4 +89,10 @@
 	<string name="maintenance_deleted">Maintenance record deleted</string>
 	<string name="total2">Total:</string>
 	<string name="item_already_exists">Item already exists</string>
+	<string name="every">Every</string>
+	<string name="left">left</string>
+	<string name="or">or</string>
+	<string name="months">months</string>
+	<string name="on">on</string>
+	<string name="whichever_comes_first">Whichever comes first</string>
 </resources>

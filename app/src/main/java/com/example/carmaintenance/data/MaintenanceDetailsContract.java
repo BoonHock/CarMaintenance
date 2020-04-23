@@ -20,6 +20,9 @@ public class MaintenanceDetailsContract {
 		public static final Uri CONTENT_URI_MAINTENANCE = Uri
 				.withAppendedPath(CONTENT_URI, "maintenance");
 
+		public static final Uri CONTENT_URI_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
+				Uri.withAppendedPath(CONTENT_URI, "latest_by_item");
+
 		public static final String TABLE_NAME = "maintenance_details";
 		public static final String _ID = BaseColumns._ID;
 		public static final String COLUMN_MAINTENANCE_ID = "maintenance";
@@ -40,7 +43,28 @@ public class MaintenanceDetailsContract {
 				+ COLUMN_ITEM + "));";
 
 		// select maintenance details and also its item name
-		public static final String SELECT_JOIN_MAINTENANCE_ITEM =
+		public static final String SELECT_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
+				"SELECT " + MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_DATE + ", "
+						+ MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_ODOMETER
+						+ " FROM " + TABLE_NAME
+						+ " JOIN " + MaintenanceEntry.TABLE_NAME
+						+ " ON " + TABLE_NAME + "." + COLUMN_MAINTENANCE_ID
+						+ " = " + MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry._ID
+						+ " JOIN " + MaintenanceItemEntry.TABLE_NAME
+						+ " ON " + TABLE_NAME + "." + MaintenanceDetailsEntry.COLUMN_ITEM
+						+ " = " + MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry._ID
+						+ " WHERE "
+						+ MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_VEHICLE
+						+ " =? AND "
+						+ MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_ITEM
+						+ " =? AND "
+						+ MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_INSPECT_REPLACE
+						+ " =? ORDER BY "
+						+ MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_DATE
+						+ " DESC LIMIT 1;";
+
+		// select maintenance details and also its item name by maintenance id
+		public static final String SELECT_JOIN_MAINTENANCE_ITEM_ID =
 				"SELECT " + TABLE_NAME + "." + _ID + ", "
 						+ TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + ", "
 						+ TABLE_NAME + "." + COLUMN_PRICE + ", "

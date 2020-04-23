@@ -44,6 +44,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private static final int MAINTENANCE_DETAILS = 40;
 	private static final int MAINTENANCE_DETAILS_ID = 41;
 	private static final int MAINTENANCE_DETAILS_MAINTENANCE_ID = 42;
+	private static final int LATEST_MAINTENANCE_DETAILS_BY_ITEM = 43;
 
 	private static final int MAINTENANCE_ITEM = 50;
 	private static final int MAINTENANCE_ITEM_ID = 51;
@@ -86,6 +87,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				MaintenanceDetailsContract.PATH_MAINTENANCE_DETAILS + "/maintenance/#",
 				MAINTENANCE_DETAILS_MAINTENANCE_ID);
+		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
+				MaintenanceDetailsContract.PATH_MAINTENANCE_DETAILS + "/latest_by_item",
+				LATEST_MAINTENANCE_DETAILS_BY_ITEM);
 
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				MaintenanceItemContract.PATH_MAINTENANCE_ITEM,
@@ -143,8 +147,12 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				break;
 			case ODOMETER:
 				cursor = database.query(OdometerEntry.TABLE_NAME,
-						projection, selection, selectionArgs,
-						null, null, null);
+						projection,
+						selection,
+						selectionArgs,
+						null,
+						null,
+						sortOrder);
 				break;
 			case ODOMETER_ID:
 				selection = OdometerEntry._ID + "=?";
@@ -195,7 +203,12 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			case MAINTENANCE_DETAILS_MAINTENANCE_ID:
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				cursor = database.rawQuery(
-						MaintenanceDetailsEntry.SELECT_JOIN_MAINTENANCE_ITEM,
+						MaintenanceDetailsEntry.SELECT_JOIN_MAINTENANCE_ITEM_ID,
+						selectionArgs);
+				break;
+			case LATEST_MAINTENANCE_DETAILS_BY_ITEM:
+				cursor = database.rawQuery(
+						MaintenanceDetailsEntry.SELECT_LATEST_MAINTENANCE_DETAILS_BY_ITEM,
 						selectionArgs);
 				break;
 			case MAINTENANCE_ITEM:
@@ -316,10 +329,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		// Notify all listeners that the data has changed for the content URI
-		getContext().getContentResolver().notifyChange(uri, null);
-		// user insert new vehicle. notify so that it appears in upcoming tab
-		getContext().getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
+		notifyVehicleChanged();
 
 		return ContentUris.withAppendedId(uri, id);
 	}
@@ -386,10 +396,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		// Notify all listeners that the data has changed for the content URI
-		getContext().getContentResolver().notifyChange(uri, null);
-		// need to update upcoming maintenance items too
-		getContext().getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
+		notifyVehicleChanged();
 
 		return ContentUris.withAppendedId(OdometerEntry.CONTENT_URI, id);
 	}
@@ -408,9 +415,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				values, selection, selectionArgs);
 
 		if (rowsUpdated != 0) {
-			getContext().getContentResolver().notifyChange(OdometerEntry.CONTENT_URI, null);
-			// need to refresh upcoming maintenance items too
-			getContext().getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
+			notifyVehicleChanged();
 		}
 		// Return the number of rows updated
 		return rowsUpdated;
@@ -420,11 +425,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsDeleted = deleteById(uri, OdometerEntry._ID, OdometerEntry.TABLE_NAME);
 
 		if (rowsDeleted != 0) {
-			getContext().getContentResolver().notifyChange(
-					OdometerEntry.CONTENT_URI, null);
-			// notify so that change upcoming maintenance details too
-			getContext().getContentResolver().notifyChange(
-					UpcomingMaintenanceEntry.CONTENT_URI, null);
+			notifyVehicleChanged();
 		}
 
 		return rowsDeleted;
@@ -439,8 +440,8 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			Log.e(LOG_TAG, "Failed to insert row for " + uri);
 			return null;
 		}
-		// Notify all listeners that the data has changed for the content URI
-		getContext().getContentResolver().notifyChange(uri, null);
+
+		notifyVehicleChanged();
 
 		return ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, id);
 	}
@@ -448,11 +449,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private int deleteMaintenance(Uri uri) {
 		int rowsDeleted = deleteById(uri, MaintenanceEntry._ID, MaintenanceEntry.TABLE_NAME);
 		if (rowsDeleted != 0) {
-			getContext().getContentResolver().notifyChange(
-					MaintenanceEntry.CONTENT_URI, null);
-			// notify so that change upcoming maintenance details too
-			getContext().getContentResolver().notifyChange(
-					UpcomingMaintenanceEntry.CONTENT_URI, null);
+			notifyVehicleChanged();
 		}
 		return rowsDeleted;
 	}
@@ -468,9 +465,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 					"Failed to insert row for insertMaintenanceDetails: " + uri);
 			return null;
 		}
-		// Notify all listeners that the data has changed for the content URI
-		getContext().getContentResolver().notifyChange(uri, null);
-		getContext().getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
+		notifyVehicleChanged();
 
 		return ContentUris.withAppendedId(MaintenanceDetailsEntry.CONTENT_URI, id);
 	}
@@ -496,7 +491,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		getContext().getContentResolver().notifyChange(uri, null);
+		notifyVehicleChanged();
 
 		return ContentUris.withAppendedId(MaintenanceItemEntry.CONTENT_URI, id);
 	}
@@ -534,7 +529,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private void notifyVehicleChanged() {
 		getContext().getContentResolver().notifyChange(UserVehicleEntry.CONTENT_URI, null);
 		getContext().getContentResolver().notifyChange(OdometerEntry.CONTENT_URI, null);
+		getContext().getContentResolver().notifyChange(MaintenanceDetailsEntry.CONTENT_URI, null);
 		getContext().getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
+		getContext().getContentResolver().notifyChange(MaintenanceEntry.CONTENT_URI, null);
 	}
 
 //	private long utcNow() {
