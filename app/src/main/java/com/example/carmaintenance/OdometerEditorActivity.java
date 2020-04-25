@@ -30,6 +30,8 @@ import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 import com.example.carmaintenance.utilities.DateUtilities;
 import com.example.carmaintenance.utilities.SetupViews;
 import com.example.carmaintenance.utilities.UserDialog;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,6 +70,11 @@ public class OdometerEditorActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_odometer_editor);
+
+		// Load an ad into the AdMob banner view.
+		AdView adView = (AdView) findViewById(R.id.adView);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		adView.loadAd(adRequest);
 
 		Intent intent = getIntent();
 		_currentUri = intent.getData();
@@ -161,8 +168,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 			}
 		});
 		_editOdometer.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length()),
-				new InputFilter.AllCaps()
+				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
 		});
 	}
 

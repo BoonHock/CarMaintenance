@@ -1,6 +1,7 @@
 package com.example.carmaintenance.fragments;
 
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -24,10 +25,13 @@ import com.example.carmaintenance.OdometerEditorActivity;
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.cursoradapter.OdometerCursorAdapter;
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
+import com.example.carmaintenance.utilities.UserDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class OdometerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private OdometerCursorAdapter _odometerAdapter;
 	private static final int LOADER_ID = 0;
+	private long _longClickId = 0;
 
 	public OdometerFragment() {
 	}
@@ -51,6 +55,11 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 		listView.setEmptyView(emptyView);
 		listView.setAdapter(_odometerAdapter);
 
+		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+		final View sheetView = getActivity().getLayoutInflater()
+				.inflate(R.layout.bottom_sheet_edit_delete, container, false);
+		bottomSheetDialog.setContentView(sheetView);
+
 		// TODO: fix deprecated call
 		// Kick off the loader
 		getLoaderManager().initLoader(LOADER_ID, null, this);
@@ -64,6 +73,46 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 				startActivity(intent);
 			}
 		});
+		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				_longClickId = id;
+				bottomSheetDialog.show();
+				return true;
+			}
+		});
+
+		sheetView.findViewById(R.id.bottom_sheet_ll_edit)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(getContext(), OdometerEditorActivity.class);
+						Uri currentUri = ContentUris.withAppendedId(OdometerEntry.CONTENT_URI, _longClickId);
+						intent.setData(currentUri);
+						startActivity(intent);
+						bottomSheetDialog.hide();
+					}
+				});
+
+		sheetView.findViewById(R.id.bottom_sheet_ll_delete)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						UserDialog.showDeleteConfirmationDialog(getContext(),
+								getString(R.string.are_you_sure),
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										getContext().getContentResolver().delete(
+												ContentUris.withAppendedId(
+														OdometerEntry.CONTENT_URI, _longClickId),
+												null,
+												null);
+										bottomSheetDialog.hide();
+									}
+								});
+					}
+				});
 
 		rootView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
 

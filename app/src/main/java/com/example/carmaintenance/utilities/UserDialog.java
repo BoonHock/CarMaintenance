@@ -36,7 +36,7 @@ public class UserDialog {
 	public static void showDeleteConfirmationDialog(
 			Context context, String message, DialogInterface.OnClickListener deleteListener) {
 		// Create an AlertDialog.Builder and set the message, and click listeners
-		// for the postivie and negative buttons on the dialog.
+		// for the positive and negative buttons on the dialog.
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(message);
 		builder.setPositiveButton(R.string.delete, deleteListener);

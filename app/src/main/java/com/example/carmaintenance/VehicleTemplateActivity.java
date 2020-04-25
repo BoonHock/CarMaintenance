@@ -29,7 +29,8 @@ public class VehicleTemplateActivity extends AppCompatActivity {
 		ListView listView = findViewById(R.id.ll_vehicle_template);
 
 		final List<VehicleTemplate> vehicleTemplates = new ArrayList<>();
-		final VehicleTemplateAdapter vehicleTemplateAdapter = new VehicleTemplateAdapter(this, R.layout.list_vehicle_template, vehicleTemplates);
+		final VehicleTemplateAdapter vehicleTemplateAdapter = new VehicleTemplateAdapter(
+				this, R.layout.list_vehicle_template, vehicleTemplates);
 		listView.setAdapter(vehicleTemplateAdapter);
 
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();

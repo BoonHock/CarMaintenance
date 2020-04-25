@@ -6,12 +6,14 @@ import android.database.Cursor;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
 import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
+import com.example.carmaintenance.data.PreferenceContract;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparable<UpcomingMaintenanceItem> {
+	private final String LOG_TAG = this.getClass().getSimpleName();
 	private int _latestServiceDistance = 0;
 	// use int instead of date type for latest service date
 	// so that when value is 0, we know no record of service
@@ -44,12 +46,17 @@ public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparab
 			currentOdometer = _latestServiceDistance;
 		}
 
+		int odoStartFrom = PreferenceContract.getStartUpcomingMaintenanceFrom(context);
+
 		if (_latestServiceDistance == 0) {
-			nextDistance = this.getFirst_distance();
+			if (odoStartFrom == 0) {
+				nextDistance = this.getFirst_distance();
+			} else {
+				nextDistance = odoStartFrom + this.getDistance_interval();
+			}
 		} else {
 			nextDistance = _latestServiceDistance + this.getDistance_interval();
 		}
-
 		_distanceLeft = nextDistance - currentOdometer;
 
 		if (_latestServiceDate != 0) {

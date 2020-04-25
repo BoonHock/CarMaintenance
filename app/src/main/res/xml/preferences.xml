@@ -1,0 +1,43 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<!--	<PreferenceCategory app:title="@string/messages_header">-->
+
+	<!--		<EditTextPreference-->
+	<!--			android:inputType="number"-->
+	<!--			app:defaultValue="0"-->
+	<!--			app:key="ignore_odometer_before"-->
+	<!--			app:title="@string/signature_title"-->
+	<!--			app:useSimpleSummaryProvider="true" />-->
+
+	<!--		<ListPreference-->
+	<!--			app:defaultValue="reply"-->
+	<!--			app:entries="@array/reply_entries"-->
+	<!--			app:entryValues="@array/reply_values"-->
+	<!--			app:key="reply"-->
+	<!--			app:title="@string/reply_title"-->
+	<!--			app:useSimpleSummaryProvider="true" />-->
+
+	<!--	</PreferenceCategory>-->
+
+	<!--	<PreferenceCategory app:title="@string/sync_header">-->
+
+	<!--		<SwitchPreferenceCompat-->
+	<!--			app:key="sync"-->
+	<!--			app:title="@string/sync_title" />-->
+
+	<!--		<SwitchPreferenceCompat-->
+	<!--			app:dependency="sync"-->
+	<!--			app:key="attachment"-->
+	<!--			app:summaryOff="@string/attachment_summary_off"-->
+	<!--			app:summaryOn="@string/attachment_summary_on"-->
+	<!--			app:title="@string/attachment_title" />-->
+
+	<!--	</PreferenceCategory>-->
+	<EditTextPreference
+		android:inputType="number"
+		app:defaultValue="0"
+		app:key="@string/pref_key_start_upcoming_maintenance_from"
+		app:title="Start maintenance recommendation from (KM):"
+		app:useSimpleSummaryProvider="true" />
+</PreferenceScreen>

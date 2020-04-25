@@ -1,6 +1,7 @@
 package com.example.carmaintenance.fragments;
 
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -26,14 +27,14 @@ import com.example.carmaintenance.MaintenanceEditorActivity;
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.cursoradapter.HistoryCursorAdapter;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
+import com.example.carmaintenance.utilities.UserDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class HistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int LOADER_ID = 0;
 
 	private HistoryCursorAdapter _historyCursorAdapter;
-
-	private ProgressBar _progressBar;
-	private RelativeLayout _content;
+	private long _longClickId = 0;
 
 	public HistoryFragment() {
 		// Required empty public constructor
@@ -46,8 +47,8 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 		View rootView = inflater.inflate(R.layout.listview_with_empty_view, container, false);
 		View emptyView = rootView.findViewById(R.id.empty_view);
 
-		_progressBar = rootView.findViewById(R.id.progress_bar);
-		_content = rootView.findViewById(R.id.rl_content);
+		ProgressBar _progressBar = rootView.findViewById(R.id.progress_bar);
+		RelativeLayout _content = rootView.findViewById(R.id.rl_content);
 		ListView listView = rootView.findViewById(R.id.item_list);
 
 		_progressBar.setVisibility(View.VISIBLE);
@@ -55,6 +56,11 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 
 		listView.setEmptyView(emptyView);
 		listView.setAdapter(_historyCursorAdapter);
+
+		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+		final View sheetView = getActivity().getLayoutInflater()
+				.inflate(R.layout.bottom_sheet_edit_delete, container, false);
+		bottomSheetDialog.setContentView(sheetView);
 
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
@@ -72,6 +78,47 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 				startActivity(intent);
 			}
 		});
+
+		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				_longClickId = id;
+				bottomSheetDialog.show();
+				return true;
+			}
+		});
+
+		sheetView.findViewById(R.id.bottom_sheet_ll_edit)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(getContext(), MaintenanceEditorActivity.class);
+						Uri currentUri = ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, _longClickId);
+						intent.setData(currentUri);
+						startActivity(intent);
+						bottomSheetDialog.hide();
+					}
+				});
+
+		sheetView.findViewById(R.id.bottom_sheet_ll_delete)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						UserDialog.showDeleteConfirmationDialog(getContext(),
+								getString(R.string.are_you_sure),
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										getContext().getContentResolver().delete(
+												ContentUris.withAppendedId(
+														MaintenanceEntry.CONTENT_URI, _longClickId),
+												null,
+												null);
+										bottomSheetDialog.hide();
+									}
+								});
+					}
+				});
 
 		_progressBar.setVisibility(View.GONE);
 		_content.setVisibility(View.VISIBLE);

@@ -2,6 +2,7 @@ package com.example.carmaintenance;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,10 +14,13 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.carmaintenance.objects.FirebaseObj;
 import com.example.carmaintenance.objects.VehicleTemplate;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -38,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		// Load an ad into the AdMob banner view.
+		AdView adView = (AdView) findViewById(R.id.adView);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		adView.loadAd(adRequest);
 
 		final ProgressBar progressBar = findViewById(R.id.progress_bar);
 		final RelativeLayout rlContent = findViewById(R.id.rl_content);
@@ -144,17 +153,21 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+		Intent intent;
 		switch (item.getItemId()) {
 			case R.id.action_vehicle_template:
-				startVehicleTemplateActivity();
+				intent = new Intent(this, VehicleTemplateActivity.class);
+				startActivity(intent);
+				return true;
+			case R.id.action_settings:
+				intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
+//				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//				String test = prefs.getString("signature", "");
+//				Log.v("CHECK_ME", test);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	private void startVehicleTemplateActivity() {
-		Intent intent = new Intent(this, VehicleTemplateActivity.class);
-		startActivity(intent);
 	}
 
 	private void setupFabMenu() {

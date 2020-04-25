@@ -8,11 +8,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import com.example.carmaintenance.fragments.UserVehicleFragment;
 import com.example.carmaintenance.fragments.HistoryFragment;
 import com.example.carmaintenance.fragments.OdometerFragment;
-import com.example.carmaintenance.fragments.SettingsFragment;
 import com.example.carmaintenance.fragments.UpcomingFragment;
+import com.example.carmaintenance.fragments.UserVehicleFragment;
 
 public class CategoryAdapter extends FragmentPagerAdapter {
 	private Context _context;
@@ -32,10 +31,8 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 				return _context.getString(R.string.tab_history);
 			case 2:
 				return _context.getString(R.string.odometer);
-			case 3:
-				return _context.getString(R.string.tab_vehicles);
 			default:
-				return _context.getString(R.string.tab_settings);
+				return _context.getString(R.string.tab_vehicles);
 		}
 	}
 
@@ -48,15 +45,13 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 				return new HistoryFragment();
 			case 2:
 				return new OdometerFragment();
-			case 3:
-				return new UserVehicleFragment();
 			default:
-				return new SettingsFragment();
+				return new UserVehicleFragment();
 		}
 	}
 
 	@Override
 	public int getCount() {
-		return 5;
+		return 4;
 	}
 }

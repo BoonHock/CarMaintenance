@@ -33,6 +33,8 @@ import com.example.carmaintenance.objects.FirebaseObj;
 import com.example.carmaintenance.objects.UserVehicle;
 import com.example.carmaintenance.objects.VehicleTemplate;
 import com.example.carmaintenance.utilities.UserDialog;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.Date;
 
@@ -84,6 +86,11 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 		setContentView(R.layout.activity_vehicle_editor);
 		Intent intent = getIntent();
 		_currentUri = intent.getData();
+
+		// Load an ad into the AdMob banner view.
+		AdView adView = (AdView) findViewById(R.id.adView);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		adView.loadAd(adRequest);
 
 		_spinnerBrand = findViewById(R.id.spinner_brand);
 		_spinnerModel = findViewById(R.id.spinner_model);

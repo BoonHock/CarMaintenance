@@ -31,12 +31,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.carmaintenance.data.APP_MASTER_CONTRACT;
 import com.example.carmaintenance.data.FirebaseContract;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
 import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEntry;
-import com.example.carmaintenance.data.OdometerContract;
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 import com.example.carmaintenance.objects.FirebaseObj;
@@ -47,6 +45,8 @@ import com.example.carmaintenance.utilities.DateUtilities;
 import com.example.carmaintenance.utilities.Misc;
 import com.example.carmaintenance.utilities.SetupViews;
 import com.example.carmaintenance.utilities.UserDialog;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -112,6 +112,11 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_maintenance_editor);
+
+		// Load an ad into the AdMob banner view.
+		AdView adView = (AdView) findViewById(R.id.adView);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		adView.loadAd(adRequest);
 
 		Intent intent = getIntent();
 		_currentUri = intent.getData();
@@ -238,6 +243,9 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 		});
 		_editNewItemName.setFilters(new InputFilter[]{
 				new InputFilter.LengthFilter(MaintenanceItemEntry.ITEM_NAME_MAX_LENGTH)
+		});
+		_editRemarks.setFilters(new InputFilter[]{
+				new InputFilter.LengthFilter(MaintenanceEntry.REMARKS_MAX_LENGTH)
 		});
 
 		findViewById(R.id.btn_add_inspect).setOnClickListener(new View.OnClickListener() {
@@ -772,10 +780,11 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 		if (cursor != null) {
 			if (cursor.getCount() > 0 && cursor.moveToFirst()) {
 				// update odometer
-				Uri odometerUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
-						OdometerContract.PATH_ODOMETER + "/"
-								+ cursor.getLong(cursor.getColumnIndexOrThrow(OdometerEntry._ID)));
-				getContentResolver().update(odometerUri, values, null, null);
+				// update 20200424: don't update odometer. just insert if not record
+//				Uri odometerUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
+//						OdometerContract.PATH_ODOMETER + "/"
+//								+ cursor.getLong(cursor.getColumnIndexOrThrow(OdometerEntry._ID)));
+//				getContentResolver().update(odometerUri, values, null, null);
 			} else {
 				// insert odometer
 				getContentResolver().insert(OdometerEntry.CONTENT_URI, values);

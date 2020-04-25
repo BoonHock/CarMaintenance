@@ -6,321 +6,338 @@
 	android:orientation="vertical"
 	tools:context=".MaintenanceEditorActivity">
 
-	<ProgressBar
-		android:id="@+id/progress_bar"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerInParent="true" />
-
-	<ScrollView
-		android:id="@+id/content"
+	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:padding="16dp">
+		android:layout_above="@id/adView">
 
-		<LinearLayout
-			android:layout_width="match_parent"
+		<ProgressBar
+			android:id="@+id/progress_bar"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="vertical">
+			android:layout_centerInParent="true" />
+
+		<ScrollView
+			android:id="@+id/content"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="16dp">
 
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					style="@style/CategoryStyle"
-					android:text="@string/vehicle" />
-
-				<Spinner
-					android:id="@+id/spinner_vehicle"
-					style="@style/EditorFieldStyle"
-					android:layout_height="48dp"
-					android:paddingRight="16dp"
-					android:spinnerMode="dropdown" />
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					style="@style/CategoryStyle"
-					android:layout_gravity="center_vertical"
-					android:text="@string/date" />
-
-				<EditText
-					android:id="@+id/edit_date"
-					style="@style/EditorFieldStyle"
-					android:focusable="false"
-					android:hint="@string/date"
-					android:importantForAutofill="no"
-					android:inputType="textNoSuggestions" />
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					style="@style/CategoryStyle"
-					android:text="@string/odometer" />
+				android:orientation="vertical">
 
 				<LinearLayout
-					android:layout_width="0dp"
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_weight="2">
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/vehicle" />
+
+					<Spinner
+						android:id="@+id/spinner_vehicle"
+						style="@style/EditorFieldStyle"
+						android:layout_height="48dp"
+						android:paddingRight="16dp"
+						android:spinnerMode="dropdown" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:layout_gravity="center_vertical"
+						android:text="@string/date" />
 
 					<EditText
-						android:id="@+id/edit_odometer"
+						android:id="@+id/edit_date"
 						style="@style/EditorFieldStyle"
-						android:hint="@string/odometer"
+						android:focusable="false"
+						android:hint="@string/date"
 						android:importantForAutofill="no"
-						android:inputType="number"
-						android:maxLength="9" />
+						android:inputType="date|textNoSuggestions" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/odometer" />
+
+					<LinearLayout
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="2">
+
+						<EditText
+							android:id="@+id/edit_odometer"
+							style="@style/EditorFieldStyle"
+							android:hint="@string/odometer"
+							android:importantForAutofill="no"
+							android:inputType="number"
+							android:maxLength="9" />
+
+						<TextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:paddingLeft="4dp"
+							android:text="@string/kilometer"
+							android:textAppearance="?android:textAppearanceMedium" />
+					</LinearLayout>
+				</LinearLayout>
+
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="8dp"
+					android:fontFamily="sans-serif-medium"
+					android:text="@string/items_only_save_checked"
+					android:textAppearance="?android:textAppearanceSmall"
+					android:textColor="@android:color/holo_red_dark" />
+
+				<LinearLayout
+					android:id="@+id/ll_inspect"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
 
 					<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:paddingLeft="4dp"
-						android:text="@string/kilometer"
-						android:textAppearance="?android:textAppearanceMedium" />
+						android:layout_marginRight="16dp"
+						android:text="@string/inspect"
+						android:textStyle="bold" />
+
+					<Button
+						android:id="@+id/btn_add_inspect"
+						android:layout_width="wrap_content"
+						android:layout_height="40dp"
+						android:text="@string/add_with_symbol"
+						android:textAppearance="?android:textAppearanceSmall" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ll_inspect_items"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<!--				<LinearLayout-->
+					<!--					android:layout_width="match_parent"-->
+					<!--					android:layout_height="wrap_content"-->
+					<!--					android:orientation="horizontal">-->
+
+					<!--					<TextView-->
+					<!--						style="@style/maintenanceEditorTableRowItem1"-->
+					<!--						android:text="air conditioner performance conditioner performance" />-->
+
+					<!--					<TextView style="@style/maintenanceEditorTableRowItem2" />-->
+
+					<!--					<EditText style="@style/maintenanceEditorTableRowItem3" />-->
+
+					<!--					<CheckBox style="@style/maintenanceEditorTableRowItem4" />-->
+					<!--				</LinearLayout>-->
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ll_replace"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginRight="16dp"
+						android:text="@string/replace"
+						android:textStyle="bold" />
+
+					<Button
+						android:id="@+id/btn_add_replace"
+						android:layout_width="wrap_content"
+						android:layout_height="40dp"
+						android:text="@string/add_with_symbol"
+						android:textAppearance="?android:textAppearanceSmall" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ll_replace_items"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<!--				<LinearLayout-->
+					<!--					android:layout_width="match_parent"-->
+					<!--					android:layout_height="wrap_content"-->
+					<!--					android:orientation="horizontal">-->
+
+					<!--					<TextView-->
+					<!--						style="@style/maintenanceEditorTableRowItem1"-->
+					<!--						android:text="air conditioner performance conditioner performance" />-->
+
+					<!--					<TextView style="@style/maintenanceEditorTableRowItem2" />-->
+
+					<!--					<EditText style="@style/maintenanceEditorTableRowItem3" />-->
+
+					<!--					<CheckBox style="@style/maintenanceEditorTableRowItem4" />-->
+					<!--				</LinearLayout>-->
+				</LinearLayout>
+
+				<View
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginTop="8dp"
+					android:background="@android:color/darker_gray" />
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="8dp"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/maintenanceEditorTxtItem"
+						android:text="@string/total"
+						android:textAppearance="?android:textAppearanceMedium"
+						android:textStyle="bold" />
+
+					<TextView style="@style/maintenanceEditorTxtCurrency" />
+
+					<EditText
+						android:id="@+id/edit_total"
+						style="@style/maintenanceEditorEditPrice"
+						android:enabled="false" />
+
+					<CheckBox
+						style="@style/maintenanceEditorCbItem"
+						android:visibility="invisible" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/remarks" />
+
+					<EditText
+						android:id="@+id/edit_remarks"
+						style="@style/EditorFieldStyle"
+						android:hint="@string/remarks"
+						android:importantForAutofill="no"
+						android:inputType="textMultiLine"
+						android:minLines="3" />
 				</LinearLayout>
 			</LinearLayout>
+		</ScrollView>
+
+		<LinearLayout
+			android:id="@+id/ll_mask"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:alpha="0.5"
+			android:background="@android:color/black"
+			android:clickable="true"
+			android:focusable="true"
+			android:orientation="horizontal"
+			android:visibility="visible" />
+
+		<LinearLayout
+			android:id="@+id/ll_new_item"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_centerInParent="true"
+			android:layout_marginLeft="64dp"
+			android:layout_marginRight="64dp"
+			android:background="@android:color/white"
+			android:orientation="vertical"
+			android:padding="16dp">
 
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:fontFamily="sans-serif-medium"
-				android:text="@string/items_only_save_checked"
-				android:textAppearance="?android:textAppearanceSmall"
-				android:textColor="@android:color/holo_red_dark" />
-
-			<LinearLayout
-				android:id="@+id/ll_inspect"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginRight="16dp"
-					android:text="@string/inspect"
-					android:textStyle="bold" />
-
-				<Button
-					android:id="@+id/btn_add_inspect"
-					android:layout_width="wrap_content"
-					android:layout_height="40dp"
-					android:text="@string/add_with_symbol"
-					android:textAppearance="?android:textAppearanceSmall" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_inspect_items"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
-
-				<!--				<LinearLayout-->
-				<!--					android:layout_width="match_parent"-->
-				<!--					android:layout_height="wrap_content"-->
-				<!--					android:orientation="horizontal">-->
-
-				<!--					<TextView-->
-				<!--						style="@style/maintenanceEditorTableRowItem1"-->
-				<!--						android:text="air conditioner performance conditioner performance" />-->
-
-				<!--					<TextView style="@style/maintenanceEditorTableRowItem2" />-->
-
-				<!--					<EditText style="@style/maintenanceEditorTableRowItem3" />-->
-
-				<!--					<CheckBox style="@style/maintenanceEditorTableRowItem4" />-->
-				<!--				</LinearLayout>-->
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_replace"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginRight="16dp"
-					android:text="@string/replace"
-					android:textStyle="bold" />
-
-				<Button
-					android:id="@+id/btn_add_replace"
-					android:layout_width="wrap_content"
-					android:layout_height="40dp"
-					android:text="@string/add_with_symbol"
-					android:textAppearance="?android:textAppearanceSmall" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_replace_items"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
-
-				<!--				<LinearLayout-->
-				<!--					android:layout_width="match_parent"-->
-				<!--					android:layout_height="wrap_content"-->
-				<!--					android:orientation="horizontal">-->
-
-				<!--					<TextView-->
-				<!--						style="@style/maintenanceEditorTableRowItem1"-->
-				<!--						android:text="air conditioner performance conditioner performance" />-->
-
-				<!--					<TextView style="@style/maintenanceEditorTableRowItem2" />-->
-
-				<!--					<EditText style="@style/maintenanceEditorTableRowItem3" />-->
-
-				<!--					<CheckBox style="@style/maintenanceEditorTableRowItem4" />-->
-				<!--				</LinearLayout>-->
-			</LinearLayout>
-
-			<View
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:layout_marginTop="8dp"
-				android:background="@android:color/darker_gray" />
+				android:text="Add item"
+				android:textAppearance="?android:textAppearanceMedium" />
 
 			<LinearLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="8dp"
-				android:orientation="horizontal">
-
-				<TextView
-					style="@style/maintenanceEditorTxtItem"
-					android:text="@string/total"
-					android:textAppearance="?android:textAppearanceMedium"
-					android:textStyle="bold" />
-
-				<TextView style="@style/maintenanceEditorTxtCurrency" />
-
-				<EditText
-					android:id="@+id/edit_total"
-					style="@style/maintenanceEditorEditPrice"
-					android:enabled="false" />
-
-				<CheckBox
-					style="@style/maintenanceEditorCbItem"
-					android:visibility="invisible" />
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
+				android:layout_height="wrap_content">
 
 				<TextView
 					style="@style/CategoryStyle"
-					android:text="@string/remarks" />
+					android:text="Item" />
 
 				<EditText
-					android:id="@+id/edit_remarks"
+					android:id="@+id/edit_new_item_name"
 					style="@style/EditorFieldStyle"
-					android:hint="@string/remarks"
-					android:importantForAutofill="no"
-					android:minLines="3" />
+					android:hint="@string/item"
+					android:inputType="text" />
 			</LinearLayout>
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					style="@style/CategoryStyle"
+					android:text="@string/price" />
+
+				<EditText
+					android:id="@+id/edit_new_item_price"
+					style="@style/editTextPrice"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="2"
+					android:importantForAutofill="no" />
+			</LinearLayout>
+
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp">
+
+				<TextView
+					android:id="@+id/txt_close"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentLeft="true"
+					android:fontFamily="sans-serif-medium"
+					android:text="@string/close"
+					android:textAllCaps="true"
+					android:textColor="@android:color/holo_red_light" />
+
+				<TextView
+					android:id="@+id/txt_add"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentEnd="true"
+					android:fontFamily="sans-serif-medium"
+					android:text="@string/add"
+					android:textAllCaps="true"
+					android:textColor="@android:color/holo_red_light" />
+			</RelativeLayout>
 		</LinearLayout>
-	</ScrollView>
+	</RelativeLayout>
 
-	<LinearLayout
-		android:id="@+id/ll_mask"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:alpha="0.5"
-		android:background="@android:color/black"
-		android:clickable="true"
-		android:focusable="true"
-		android:orientation="horizontal"
-		android:visibility="visible" />
-
-	<LinearLayout
-		android:id="@+id/ll_new_item"
-		android:layout_width="match_parent"
+	<com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+		android:id="@+id/adView"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_centerInParent="true"
-		android:layout_marginLeft="64dp"
-		android:layout_marginRight="64dp"
-		android:background="@android:color/white"
-		android:orientation="vertical"
-		android:padding="16dp">
-
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Add item"
-			android:textAppearance="?android:textAppearanceMedium" />
-
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<TextView
-				style="@style/CategoryStyle"
-				android:text="Item" />
-
-			<EditText
-				android:id="@+id/edit_new_item_name"
-				style="@style/EditorFieldStyle"
-				android:hint="@string/item" />
-		</LinearLayout>
-
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<TextView
-				style="@style/CategoryStyle"
-				android:text="@string/price" />
-
-			<EditText
-				android:id="@+id/edit_new_item_price"
-				style="@style/editTextPrice"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="2"
-				android:importantForAutofill="no" />
-		</LinearLayout>
-
-		<RelativeLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp">
-
-			<TextView
-				android:id="@+id/txt_close"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentLeft="true"
-				android:fontFamily="sans-serif-medium"
-				android:text="@string/close"
-				android:textAllCaps="true"
-				android:textColor="@android:color/holo_red_light" />
-
-			<TextView
-				android:id="@+id/txt_add"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentEnd="true"
-				android:fontFamily="sans-serif-medium"
-				android:text="@string/add"
-				android:textAllCaps="true"
-				android:textColor="@android:color/holo_red_light" />
-		</RelativeLayout>
-	</LinearLayout>
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		ads:adSize="BANNER"
+		ads:adUnitId="@string/banner_ad_unit_id" />
 </RelativeLayout>

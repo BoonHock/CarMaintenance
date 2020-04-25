@@ -3,6 +3,7 @@ package com.example.carmaintenance.data;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -329,7 +330,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged();
+		notifyVehicleChanged(getContext());
 
 		return ContentUris.withAppendedId(uri, id);
 	}
@@ -361,7 +362,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 		if (rowsUpdated != 0) {
 //			getContext().getContentResolver().notifyChange(uri, null);
-			notifyVehicleChanged();
+			notifyVehicleChanged(getContext());
 		}
 		// Return the number of rows updated
 		return rowsUpdated;
@@ -371,19 +372,19 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsDeleted = deleteById(uri, UserVehicleEntry._ID, UserVehicleEntry.TABLE_NAME);
 		if (rowsDeleted != 0) {
 //			getContext().getContentResolver().notifyChange(uri, null);
-			notifyVehicleChanged();
+			notifyVehicleChanged(getContext());
 		}
 		return rowsDeleted;
 	}
 
 	private boolean isUserVehicleDataValid(String regNo, String brand, String model,
 										   String variant, int usage) {
-		return !(TextUtils.isEmpty(regNo)
-				|| TextUtils.isEmpty(brand)
-				|| TextUtils.isEmpty(model)
-				|| TextUtils.isEmpty(variant)
-				|| (usage != UserVehicleEntry.USAGE_NORMAL
-				&& usage != UserVehicleEntry.USAGE_SEVERE));
+		return !TextUtils.isEmpty(regNo)
+				&& !TextUtils.isEmpty(brand)
+				&& !TextUtils.isEmpty(model)
+				&& !TextUtils.isEmpty(variant)
+				&& (usage == UserVehicleEntry.USAGE_NORMAL
+				|| usage == UserVehicleEntry.USAGE_SEVERE);
 	}
 
 	private Uri insertOdometer(Uri uri, ContentValues values) {
@@ -396,7 +397,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged();
+		notifyVehicleChanged(getContext());
 
 		return ContentUris.withAppendedId(OdometerEntry.CONTENT_URI, id);
 	}
@@ -415,7 +416,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				values, selection, selectionArgs);
 
 		if (rowsUpdated != 0) {
-			notifyVehicleChanged();
+			notifyVehicleChanged(getContext());
 		}
 		// Return the number of rows updated
 		return rowsUpdated;
@@ -425,7 +426,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsDeleted = deleteById(uri, OdometerEntry._ID, OdometerEntry.TABLE_NAME);
 
 		if (rowsDeleted != 0) {
-			notifyVehicleChanged();
+			notifyVehicleChanged(getContext());
 		}
 
 		return rowsDeleted;
@@ -441,7 +442,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged();
+		notifyVehicleChanged(getContext());
 
 		return ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, id);
 	}
@@ -449,7 +450,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private int deleteMaintenance(Uri uri) {
 		int rowsDeleted = deleteById(uri, MaintenanceEntry._ID, MaintenanceEntry.TABLE_NAME);
 		if (rowsDeleted != 0) {
-			notifyVehicleChanged();
+			notifyVehicleChanged(getContext());
 		}
 		return rowsDeleted;
 	}
@@ -465,7 +466,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 					"Failed to insert row for insertMaintenanceDetails: " + uri);
 			return null;
 		}
-		notifyVehicleChanged();
+		notifyVehicleChanged(getContext());
 
 		return ContentUris.withAppendedId(MaintenanceDetailsEntry.CONTENT_URI, id);
 	}
@@ -491,7 +492,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged();
+		notifyVehicleChanged(getContext());
 
 		return ContentUris.withAppendedId(MaintenanceItemEntry.CONTENT_URI, id);
 	}
@@ -506,7 +507,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	}
 
 	private Cursor selectOdometerWithVehicle(SQLiteDatabase database) {
-		Cursor cursor = database.rawQuery("SELECT "
+		return database.rawQuery("SELECT "
 						+ OdometerEntry.TABLE_NAME + "." + OdometerEntry._ID + ", "
 						+ OdometerEntry.TABLE_NAME + "." + OdometerEntry.COLUMN_VEHICLE + ", "
 						+ OdometerEntry.TABLE_NAME + "." + OdometerEntry.COLUMN_DATE + ", "
@@ -519,19 +520,18 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 						+ " ORDER BY " + OdometerEntry.TABLE_NAME + "."
 						+ OdometerEntry.COLUMN_DATE + " DESC;",
 				null);
-		return cursor;
 	}
 
 	private Cursor selectUpcomingMaintenance(SQLiteDatabase database) {
 		return database.rawQuery(UpcomingMaintenanceEntry.SELECT_QUERY, null);
 	}
 
-	private void notifyVehicleChanged() {
-		getContext().getContentResolver().notifyChange(UserVehicleEntry.CONTENT_URI, null);
-		getContext().getContentResolver().notifyChange(OdometerEntry.CONTENT_URI, null);
-		getContext().getContentResolver().notifyChange(MaintenanceDetailsEntry.CONTENT_URI, null);
-		getContext().getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
-		getContext().getContentResolver().notifyChange(MaintenanceEntry.CONTENT_URI, null);
+	public static void notifyVehicleChanged(Context context) {
+		context.getContentResolver().notifyChange(UserVehicleEntry.CONTENT_URI, null);
+		context.getContentResolver().notifyChange(OdometerEntry.CONTENT_URI, null);
+		context.getContentResolver().notifyChange(MaintenanceDetailsEntry.CONTENT_URI, null);
+		context.getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
+		context.getContentResolver().notifyChange(MaintenanceEntry.CONTENT_URI, null);
 	}
 
 //	private long utcNow() {
