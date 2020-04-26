@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,8 +56,8 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 		listView.setEmptyView(emptyView);
 		listView.setAdapter(_odometerAdapter);
 
-		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
-		final View sheetView = getActivity().getLayoutInflater()
+		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+		final View sheetView = requireActivity().getLayoutInflater()
 				.inflate(R.layout.bottom_sheet_edit_delete, container, false);
 		bottomSheetDialog.setContentView(sheetView);
 
@@ -103,7 +104,7 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										getContext().getContentResolver().delete(
+										requireContext().getContentResolver().delete(
 												ContentUris.withAppendedId(
 														OdometerEntry.CONTENT_URI, _longClickId),
 												null,
@@ -116,13 +117,25 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 
 		rootView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
 
+		Cursor tmp = requireContext().getContentResolver().query(
+				OdometerEntry.CONTENT_URI,
+				OdometerEntry.FULL_PROJECTION,
+				null,
+				null,
+				null);
+
+		if (tmp != null) {
+			Log.v("VEHICLE_ID_CHECK", "ODOMETER COUNT: " + tmp.getCount());
+			tmp.close();
+		}
+
 		return rootView;
 	}
 
 	@NonNull
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-		return new CursorLoader(getContext(),
+		return new CursorLoader(requireContext(),
 				OdometerEntry.CONTENT_URI_VEHICLE,
 				null,
 				null,

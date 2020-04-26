@@ -6,7 +6,6 @@ import android.database.Cursor;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
 import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
-import com.example.carmaintenance.data.PreferenceContract;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -28,7 +27,7 @@ public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparab
 	public static final int URGENCY_VERY3_URGENT = 4;
 
 	public UpcomingMaintenanceItem(
-			Context context, MaintenanceItem maintenanceItem, int vehicleId) {
+			Context context, MaintenanceItem maintenanceItem, UserVehicle userVehicle) {
 		super(maintenanceItem.getFirebase_item_id(),
 				maintenanceItem.getItem(),
 				maintenanceItem.getInspect_replace(),
@@ -39,14 +38,14 @@ public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparab
 				maintenanceItem.getDuration_interval());
 
 		int nextDistance = 0;
-		int currentOdometer = getCurrentOdometer(context, vehicleId);
-		getLatestServiceData(context, vehicleId);
+		int currentOdometer = getCurrentOdometer(context, userVehicle.get_vehicleId());
+		getLatestServiceData(context, userVehicle.get_vehicleId());
 
 		if (currentOdometer < _latestServiceDistance) {
 			currentOdometer = _latestServiceDistance;
 		}
 
-		int odoStartFrom = PreferenceContract.getStartUpcomingMaintenanceFrom(context);
+		int odoStartFrom = userVehicle.get_upcomingStartFrom();
 
 		if (_latestServiceDistance == 0) {
 			if (odoStartFrom == 0) {

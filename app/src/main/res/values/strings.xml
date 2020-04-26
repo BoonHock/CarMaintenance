@@ -59,6 +59,7 @@
 	<string name="usage">Usage</string>
 	<string name="usage_severe">Severe</string>
 	<string name="usage_normal">Normal</string>
+	<string name="maintenance_may_vary">Maintenance recommendations may vary across different usage type.</string>
 	<string name="severe_usage_conditions">
 		Severe conditions include but are not limited to the following:\n
 		1. Driving on dusty roads or in an area which the vehicle is likely to be exposed to salty air\n
@@ -122,4 +123,18 @@
 	</string>
 	<string name="attachment_summary_off">Only download attachments when manually requested</string>
 	<string name="pref_key_start_upcoming_maintenance_from">start_upcoming_maintenance_from</string>
+	<string name="custom_maintenance_item">Custom maintenance item</string>
+	<string name="start_maintenance_recommendation_from">Start maintenance recommendation from (KM):</string>
+	<string name="odometer_start_upcoming">Odometer distance to start calculating upcoming
+		maintenance items from. For example, if 95,000 KM is set,
+		item with 5000 KM maintenance distance interval will need
+		to be serviced at 100,000 KM. Default value is 0 KM.</string>
+	<string name="distance_interval_label">Distance interval</string>
+	<string name="duration_interval_label">Duration interval</string>
+	<string name="add_item">Add item</string>
+	<string name="item_name">Item name</string>
+	<string name="duration_interval_month">Duration interval (month)</string>
+	<string name="distance_interval_km">Distance interval (KM)</string>
+	<string name="months_cap">Months</string>
+	<string name="inspect_or_replace">Inspect / replace</string>
 </resources>

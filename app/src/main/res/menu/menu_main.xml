@@ -8,6 +8,10 @@
 		android:title="@string/vehicle_template"
 		app:showAsAction="never" />
 	<item
+		android:id="@+id/action_custom_maintenance_item"
+		android:title="@string/custom_maintenance_item"
+		app:showAsAction="never" />
+	<item
 		android:id="@+id/action_settings"
 		android:title="@string/action_settings"
 		app:showAsAction="never" />

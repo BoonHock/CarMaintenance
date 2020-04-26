@@ -23,7 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.settings_activity);
+		setContentView(R.layout.activity_fragment);
 
 		// Load an ad into the AdMob banner view.
 		AdView adView = (AdView) findViewById(R.id.adView);
@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 		getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.settings, new SettingsFragment())
+				.replace(R.id.fragment_container, new SettingsFragment())
 				.commit();
 		ActionBar actionBar = getSupportActionBar();
 		if (actionBar != null) {

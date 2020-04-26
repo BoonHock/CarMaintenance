@@ -41,7 +41,8 @@
 						android:id="@+id/spinner_vehicle"
 						style="@style/EditorFieldStyle"
 						android:layout_height="48dp"
-						android:paddingRight="16dp"
+						android:paddingStart="0dp"
+						android:paddingEnd="16dp"
 						android:spinnerMode="dropdown" />
 				</LinearLayout>
 
@@ -89,7 +90,7 @@
 						<TextView
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:paddingLeft="4dp"
+							android:paddingStart="4dp"
 							android:text="@string/kilometer"
 							android:textAppearance="?android:textAppearanceMedium" />
 					</LinearLayout>
@@ -113,7 +114,7 @@
 					<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginRight="16dp"
+						android:layout_marginEnd="16dp"
 						android:text="@string/inspect"
 						android:textStyle="bold" />
 
@@ -158,7 +159,7 @@
 					<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginRight="16dp"
+						android:layout_marginEnd="16dp"
 						android:text="@string/replace"
 						android:textStyle="bold" />
 
@@ -217,7 +218,8 @@
 					<EditText
 						android:id="@+id/edit_total"
 						style="@style/maintenanceEditorEditPrice"
-						android:enabled="false" />
+						android:enabled="false"
+						android:importantForAutofill="no" />
 
 					<CheckBox
 						style="@style/maintenanceEditorCbItem"
@@ -253,10 +255,10 @@
 			android:clickable="true"
 			android:focusable="true"
 			android:orientation="horizontal"
-			android:visibility="visible" />
+			android:visibility="gone" />
 
 		<LinearLayout
-			android:id="@+id/ll_new_item"
+			android:id="@+id/ll_custom_item_edit"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_centerInParent="true"
@@ -264,12 +266,13 @@
 			android:layout_marginRight="64dp"
 			android:background="@android:color/white"
 			android:orientation="vertical"
+			android:visibility="invisible"
 			android:padding="16dp">
 
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="Add item"
+				android:text="@string/add_item"
 				android:textAppearance="?android:textAppearanceMedium" />
 
 			<LinearLayout
@@ -278,12 +281,13 @@
 
 				<TextView
 					style="@style/CategoryStyle"
-					android:text="Item" />
+					android:text="@string/item_name" />
 
 				<EditText
 					android:id="@+id/edit_new_item_name"
 					style="@style/EditorFieldStyle"
-					android:hint="@string/item"
+					android:hint="@string/item_name"
+					android:importantForAutofill="no"
 					android:inputType="text" />
 			</LinearLayout>
 
@@ -304,16 +308,17 @@
 					android:importantForAutofill="no" />
 			</LinearLayout>
 
-			<RelativeLayout
+			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="16dp">
+				android:layout_marginTop="16dp"
+				android:orientation="horizontal">
 
 				<TextView
 					android:id="@+id/txt_close"
-					android:layout_width="wrap_content"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
+					android:layout_weight="1"
 					android:fontFamily="sans-serif-medium"
 					android:text="@string/close"
 					android:textAllCaps="true"
@@ -321,14 +326,15 @@
 
 				<TextView
 					android:id="@+id/txt_add"
-					android:layout_width="wrap_content"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
-					android:layout_alignParentEnd="true"
+					android:layout_weight="1"
 					android:fontFamily="sans-serif-medium"
 					android:text="@string/add"
+					android:textAlignment="textEnd"
 					android:textAllCaps="true"
 					android:textColor="@android:color/holo_red_light" />
-			</RelativeLayout>
+			</LinearLayout>
 		</LinearLayout>
 	</RelativeLayout>
 

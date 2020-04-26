@@ -2,7 +2,6 @@ package com.example.carmaintenance;
 
 import android.animation.Animator;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,7 +13,6 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.carmaintenance.objects.FirebaseObj;
@@ -162,9 +160,10 @@ public class MainActivity extends AppCompatActivity {
 			case R.id.action_settings:
 				intent = new Intent(this, SettingsActivity.class);
 				startActivity(intent);
-//				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//				String test = prefs.getString("signature", "");
-//				Log.v("CHECK_ME", test);
+				return true;
+			case R.id.action_custom_maintenance_item:
+				intent = new Intent(this, CustomMaintenanceItemActivity.class);
+				startActivity(intent);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

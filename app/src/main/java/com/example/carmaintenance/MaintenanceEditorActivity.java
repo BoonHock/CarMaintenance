@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -124,7 +125,7 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 				.getCalendarAtMidnight(Calendar.getInstance()); // default value
 
 		_llMask = findViewById(R.id.ll_mask);
-		_llNewItem = findViewById(R.id.ll_new_item);
+		_llNewItem = findViewById(R.id.ll_custom_item_edit);
 		_editNewItemName = findViewById(R.id.edit_new_item_name);
 		_editNewItemPrice = findViewById(R.id.edit_new_item_price);
 		_txtCloseNewItem = findViewById(R.id.txt_close);
@@ -450,7 +451,7 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 
 						for (MaintenanceItem item : _maintenanceItems.get(firebaseVehicleId)) {
 							int itemUsage = item.getUsage();
-							if (itemUsage == -1 || itemUsage == userVehicle.get_usage()) {
+							if (itemUsage == UserVehicleEntry.USAGE_ALL || itemUsage == userVehicle.get_usage()) {
 								if (item.getInspect_replace() ==
 										FirebaseContract.FirebaseMaintenanceDetailsEntry.INSPECT) {
 									_listInspect.add(item.getItem());
@@ -633,12 +634,14 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 
 		saveOdometer(vehicleId, maintenanceDate, strOdometerDistance);
 
+		Log.v("VEHICLE_ID_CHECK", "CHECK: " + vehicleId);
+
 		ContentValues values = new ContentValues();
 		values.put(MaintenanceEntry.COLUMN_VEHICLE, vehicleId);
 		values.put(MaintenanceEntry.COLUMN_DATE, maintenanceDate);
 		values.put(MaintenanceEntry.COLUMN_ODOMETER, Integer.valueOf(strOdometerDistance));
 		values.put(MaintenanceEntry.COLUMN_REMARKS, remarks);
-		values.put(MaintenanceEntry.COLUMN_CREATED_ON, Calendar.getInstance().getTime().getTime());
+		values.put(MaintenanceEntry.COLUMN_CREATED_ON, Calendar.getInstance().getTimeInMillis());
 
 		if (_currentUri != null) {
 			getContentResolver().delete(_currentUri, null, null);

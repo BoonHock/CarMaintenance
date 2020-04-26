@@ -3,12 +3,14 @@ package com.example.carmaintenance.cursoradapter;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.cursoradapter.widget.CursorAdapter;
 
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
@@ -54,6 +56,8 @@ public class HistoryCursorAdapter extends CursorAdapter {
 				.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_VEHICLE));
 		Date date = new Date(cursor.getLong(cursor
 				.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE)));
+
+		Log.v("VEHICLE_ID_CHECK", "MAINTENANCE VEHICLE: " + vehicleId);
 
 		txtDate.setText(DateUtilities.dateToStringDate(date));
 

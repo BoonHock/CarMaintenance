@@ -1,7 +1,9 @@
 package com.example.carmaintenance.objects;
 
+import android.content.Context;
 import android.database.Cursor;
 
+import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 
 import java.util.Date;
@@ -13,14 +15,10 @@ public class UserVehicle {
 	private String _model;
 	private String _variant;
 	private int _usage;
+	private int _upcomingStartFrom;
 	private Date _addedOn = null;
 
-	public UserVehicle(String regNo, String brand, String model) {
-		_regNo = regNo;
-		_brand = brand;
-		_model = model;
-	}
-
+	// cursor is select data from user_vehicle table
 	public UserVehicle(Cursor cursor) {
 		if (cursor.getPosition() == -1) {
 			if (!cursor.moveToNext()) return;
@@ -37,15 +35,10 @@ public class UserVehicle {
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_VARIANT));
 		_usage = cursor.getInt(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
+		_upcomingStartFrom = cursor.getInt(cursor
+				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_UPCOMING_START_FROM));
 		_addedOn = new Date(cursor.getLong(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_CREATED_ON)));
-	}
-
-	public UserVehicle(String regNo, String brand, String model, Date addedOn) {
-		_regNo = regNo;
-		_brand = brand;
-		_model = model;
-		_addedOn = addedOn;
 	}
 
 	public String get_regNo() {
@@ -60,22 +53,8 @@ public class UserVehicle {
 		return _model;
 	}
 
-	public String get_brandModel() {
-		return get_brand() + " " + get_model();
-	}
-
 	public String get_brandModelVariant() {
 		return get_brand() + " " + get_model() + " " + get_variant();
-	}
-
-	// TODO: GET FROM DATABASE!!
-	public Date get_nextServiceDate() {
-		return new Date();
-	}
-
-	// TODO: GET FROM DATABASE!!
-	public int get_nextServiceDistance() {
-		return 100000;
 	}
 
 	public Date get_addedOn() {
@@ -90,13 +69,30 @@ public class UserVehicle {
 		return _usage;
 	}
 
-	public String get_usageString() {
-		switch (_usage) {
-			case UserVehicleEntry.USAGE_SEVERE:
-				return "Severe";
-			case UserVehicleEntry.USAGE_NORMAL:
-			default:
-				return "Normal";
+	public int get_vehicleId() {
+		return _vehicleId;
+	}
+
+	public int get_upcomingStartFrom() {
+		return _upcomingStartFrom;
+	}
+
+	public int getLatestOdometer(Context context) {
+		int latestOdo = 0;
+
+		Cursor cursor = context.getContentResolver().query(
+				OdometerEntry.CONTENT_URI,
+				OdometerEntry.FULL_PROJECTION,
+				OdometerEntry.COLUMN_VEHICLE + "=?",
+				new String[]{String.valueOf(this._vehicleId)},
+				OdometerEntry.COLUMN_DATE + " DESC LIMIT 1");
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				latestOdo = cursor.getInt(cursor
+						.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
+			}
+			cursor.close();
 		}
+		return latestOdo;
 	}
 }

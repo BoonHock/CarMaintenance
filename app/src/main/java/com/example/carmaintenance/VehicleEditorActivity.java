@@ -20,14 +20,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 import com.example.carmaintenance.objects.FirebaseObj;
 import com.example.carmaintenance.objects.UserVehicle;
@@ -44,11 +45,12 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 	 */
 	private static final int EXISTING_RECORD_LOADER = 0;
 
-	private TextView _txtRegNo;
+	private EditText _editRegNo;
 	private Spinner _spinnerBrand;
 	private Spinner _spinnerModel;
 	private Spinner _spinnerVariant;
 	private Spinner _spinnerUsage;
+	private EditText _editUpcomingStartFrom;
 
 	private ProgressBar _progressBar;
 
@@ -57,7 +59,6 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 	private boolean _initSpinners = false;
 	private boolean _initialising = true;
 	private UserVehicle _initUserVehicle = null;
-	private ArrayAdapter<String> _brandAdapter;
 	private ArrayAdapter<String> _modelAdapter;
 	private ArrayAdapter<String> _variantAdapter;
 
@@ -97,15 +98,19 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 		_spinnerVariant = findViewById(R.id.spinner_variant);
 		_spinnerUsage = findViewById(R.id.spinner_usage);
 
-		_txtRegNo = findViewById(R.id.edit_reg_no);
+		_editRegNo = findViewById(R.id.edit_reg_no);
 		_progressBar = findViewById(R.id.indeterminateBar);
+		_editUpcomingStartFrom = findViewById(R.id.edit_upcoming_start_from);
 
 		_progressBar.setVisibility(View.VISIBLE);
 		findViewById(R.id.ll_content).setVisibility(View.INVISIBLE);
 
-		_txtRegNo.setFilters(new InputFilter[]{
+		_editRegNo.setFilters(new InputFilter[]{
 				new InputFilter.LengthFilter(UserVehicleEntry.REG_NO_MAX_LENGTH),
 				new InputFilter.AllCaps()
+		});
+		_editUpcomingStartFrom.setFilters(new InputFilter[]{
+				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
 		});
 
 		ArrayAdapter usageSpinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -128,7 +133,7 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 		// tried adding these listeners in the end of onDataChange()
 		// in onLoadFinished() after setting up spinners
 		// but still fired. so have to use global variable as flag
-		_txtRegNo.addTextChangedListener(new TextWatcher() {
+		_editRegNo.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
@@ -146,7 +151,6 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				if (_initialising) return;
-				Log.v("HASCHANGES", "SPINNERBRAND");
 				_hasChanges = true;
 				setupSpinnerModel();
 			}
@@ -159,7 +163,6 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				if (_initialising) return;
-				Log.v("HASCHANGES", "SPINNERMODEL");
 				_hasChanges = true;
 				setupSpinnerVariant();
 			}
@@ -175,7 +178,6 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 					_initialising = false;
 					return;
 				}
-				Log.v("HASCHANGES", "SPINNERVARIANT");
 				_hasChanges = true;
 			}
 
@@ -245,11 +247,17 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 	}
 
 	private void saveVehicle() {
-		String regNo = _txtRegNo.getText().toString().trim().toUpperCase();
+		String regNo = _editRegNo.getText().toString().trim().toUpperCase();
 		String brand = _spinnerBrand.getSelectedItem().toString();
 		String model = _spinnerModel.getSelectedItem().toString();
 		String variant = _spinnerVariant.getSelectedItem().toString();
 		int usage = _spinnerUsage.getSelectedItemPosition();
+		int upcomingStartFrom = 0;
+		String strUpcomingStartFrom = _editUpcomingStartFrom.getText().toString().trim();
+
+		if (!TextUtils.isEmpty(strUpcomingStartFrom)) {
+			upcomingStartFrom = Integer.parseInt(strUpcomingStartFrom);
+		}
 
 		if (TextUtils.isEmpty(regNo) || TextUtils.isEmpty(brand)
 				|| TextUtils.isEmpty(model) || TextUtils.isEmpty(variant)) {
@@ -292,18 +300,16 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 		values.put(UserVehicleEntry.COLUMN_MODEL, model);
 		values.put(UserVehicleEntry.COLUMN_VARIANT, variant);
 		values.put(UserVehicleEntry.COLUMN_USAGE, usage);
+		values.put(UserVehicleEntry.COLUMN_UPCOMING_START_FROM, upcomingStartFrom);
 
 		boolean saveSuccess = false;
 
 		if (_currentUri == null) {
 			// insert new record
-
 			values.put(UserVehicleEntry.COLUMN_CREATED_ON, new Date().getTime());
-
-
 			Uri newUri = getContentResolver().insert(UserVehicleEntry.CONTENT_URI, values);
 			saveSuccess = newUri != null;
-
+			Log.v("VEHICLE_ID_CHECK", "CREATED: " + ContentUris.parseId(newUri));
 		} else {
 			// update existing record
 			int rowsAffected = getContentResolver().update(_currentUri,
@@ -367,7 +373,7 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 					_spinnerUsage.setSelection(0);
 				}
 
-				_txtRegNo.setText(_initUserVehicle.get_regNo());
+				_editRegNo.setText(_initUserVehicle.get_regNo());
 			}
 		}
 		initComponents();
@@ -375,11 +381,11 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		_txtRegNo.setText("");
+		_editRegNo.setText("");
 	}
 
 	private void initComponents() {
-		_brandAdapter = new ArrayAdapter<>(VehicleEditorActivity.this,
+		ArrayAdapter<String> _brandAdapter = new ArrayAdapter<>(VehicleEditorActivity.this,
 				android.R.layout.simple_spinner_item, VehicleTemplate.getBrands(FirebaseObj._vehicleTemplates));
 		_brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_spinnerBrand.setAdapter(_brandAdapter);
@@ -400,6 +406,9 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 			_spinnerVariant.setSelection(_variantAdapter
 					.getPosition(_initUserVehicle.get_variant()));
 		}
+
+		_editUpcomingStartFrom.setText(String
+				.valueOf(_initUserVehicle.get_upcomingStartFrom()));
 
 		_progressBar.setVisibility(View.GONE);
 		findViewById(R.id.ll_content).setVisibility(View.VISIBLE);

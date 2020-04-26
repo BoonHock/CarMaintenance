@@ -16,108 +16,142 @@
 			android:layout_height="wrap_content"
 			android:layout_centerInParent="true" />
 
-		<LinearLayout
-			android:id="@+id/ll_content"
+		<ScrollView
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:orientation="vertical"
-			android:padding="16dp">
+			android:layout_height="match_parent">
 
 			<LinearLayout
+				android:id="@+id/ll_content"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="horizontal">
+				android:orientation="vertical"
+				android:padding="16dp">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						android:id="@+id/txt_reg_no"
+						style="@style/CategoryStyle"
+						android:text="@string/registration_no" />
+					<!-- Name field -->
+					<EditText
+						android:id="@+id/edit_reg_no"
+						style="@style/EditorFieldStyle"
+						android:hint="@string/hint_vehicle_reg_no"
+						android:importantForAutofill="no"
+						android:inputType="textCapCharacters|textNoSuggestions" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/brand" />
+
+					<Spinner
+						android:id="@+id/spinner_brand"
+						style="@style/EditorFieldStyle"
+						android:layout_height="48dp"
+						android:paddingStart="0dp"
+						android:paddingEnd="16dp"
+						android:spinnerMode="dropdown" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/model" />
+
+					<Spinner
+						android:id="@+id/spinner_model"
+						style="@style/EditorFieldStyle"
+						android:layout_height="48dp"
+						android:clickable="false"
+						android:paddingStart="0dp"
+						android:paddingEnd="16dp"
+						android:spinnerMode="dropdown" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/variant" />
+
+					<Spinner
+						android:id="@+id/spinner_variant"
+						style="@style/EditorFieldStyle"
+						android:layout_height="48dp"
+						android:clickable="false"
+						android:paddingStart="0dp"
+						android:paddingEnd="16dp"
+						android:spinnerMode="dropdown" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
+						android:text="@string/usage" />
+
+					<Spinner
+						android:id="@+id/spinner_usage"
+						style="@style/EditorFieldStyle"
+						android:layout_height="48dp"
+						android:clickable="false"
+						android:paddingStart="0dp"
+						android:paddingEnd="16dp"
+						android:spinnerMode="dropdown" />
+				</LinearLayout>
 
 				<TextView
-					android:id="@+id/txt_reg_no"
-					style="@style/CategoryStyle"
-					android:text="@string/registration_no" />
-				<!-- Name field -->
-				<EditText
-					android:id="@+id/edit_reg_no"
-					style="@style/EditorFieldStyle"
-					android:hint="@string/hint_vehicle_reg_no"
-					android:inputType="textCapCharacters|textNoSuggestions" />
-			</LinearLayout>
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="8dp"
+					android:text="@string/maintenance_may_vary" />
 
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
 
-				<TextView
-					style="@style/CategoryStyle"
-					android:text="@string/brand" />
-
-				<Spinner
-					android:id="@+id/spinner_brand"
-					style="@style/EditorFieldStyle"
-					android:layout_height="48dp"
-					android:paddingRight="16dp"
-					android:spinnerMode="dropdown" />
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
+					<TextView
+						android:id="@+id/txt_ignore"
+						style="@style/CategoryStyle"
+						android:text="@string/start_maintenance_recommendation_from" />
+					<!-- Name field -->
+					<EditText
+						android:id="@+id/edit_upcoming_start_from"
+						style="@style/EditorFieldStyle"
+						android:layout_gravity="bottom"
+						android:hint="@string/kilometer"
+						android:importantForAutofill="no"
+						android:inputType="number" />
+				</LinearLayout>
 
 				<TextView
-					style="@style/CategoryStyle"
-					android:text="@string/model" />
-
-				<Spinner
-					android:id="@+id/spinner_model"
-					style="@style/EditorFieldStyle"
-					android:layout_height="48dp"
-					android:clickable="false"
-					android:paddingRight="16dp"
-					android:spinnerMode="dropdown" />
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="8dp"
+					android:text="@string/odometer_start_upcoming" />
 			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					style="@style/CategoryStyle"
-					android:text="@string/variant" />
-
-				<Spinner
-					android:id="@+id/spinner_variant"
-					style="@style/EditorFieldStyle"
-					android:layout_height="48dp"
-					android:clickable="false"
-					android:paddingRight="16dp"
-					android:spinnerMode="dropdown" />
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					style="@style/CategoryStyle"
-					android:text="@string/usage" />
-
-				<Spinner
-					android:id="@+id/spinner_usage"
-					style="@style/EditorFieldStyle"
-					android:layout_height="48dp"
-					android:clickable="false"
-					android:paddingRight="16dp"
-					android:spinnerMode="dropdown" />
-			</LinearLayout>
-
-			<TextView
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="16dp"
-				android:text="@string/severe_usage_conditions" />
-
-		</LinearLayout>
+		</ScrollView>
 	</RelativeLayout>
 
 	<com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
@@ -128,5 +162,4 @@
 		android:layout_centerHorizontal="true"
 		ads:adSize="BANNER"
 		ads:adUnitId="@string/banner_ad_unit_id" />
-
 </RelativeLayout>

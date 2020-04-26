@@ -20,6 +20,7 @@ import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEn
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 import com.example.carmaintenance.data.UpcomingMaintenanceContract.UpcomingMaintenanceEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
+import com.example.carmaintenance.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 
 public class VehicleMaintenanceProvider extends ContentProvider {
 	/**
@@ -49,6 +50,8 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	private static final int MAINTENANCE_ITEM = 50;
 	private static final int MAINTENANCE_ITEM_ID = 51;
+
+	private static final int CUSTOM_MAINTENANCE_ITEM = 60;
 
 	/**
 	 * UriMatcher object to match a content URI to a corresponding code.
@@ -98,6 +101,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				MaintenanceItemContract.PATH_MAINTENANCE_ITEM + "/#",
 				MAINTENANCE_ITEM_ID);
+
+		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
+				CustomMaintenanceItemContract.PATH_CUSTOM_MAINTENANCE_ITEM,
+				CUSTOM_MAINTENANCE_ITEM);
 	}
 
 	/**
@@ -221,6 +228,15 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 						null,
 						sortOrder);
 				break;
+			case CUSTOM_MAINTENANCE_ITEM:
+				cursor = database.query(CustomMaintenanceItemEntry.TABLE_NAME,
+						projection,
+						selection,
+						selectionArgs,
+						null,
+						null,
+						sortOrder);
+				break;
 			default:
 				throw new IllegalArgumentException("Cannot query unknown URI " + uri);
 		}
@@ -228,7 +244,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		// Set notification URI on the Cursor,
 		// so we know what content URI the Cursor was created for.
 		// If the data at this URI changes, then we know we need to update the Cursor.
-		cursor.setNotificationUri(getContext().getContentResolver(), uri);
+		if (getContext() != null) {
+			cursor.setNotificationUri(getContext().getContentResolver(), uri);
+		}
 
 		// Return the cursor
 		return cursor;
@@ -244,6 +262,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	@Override
 	public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
 		final int match = sUriMatcher.match(uri);
+
+		if (values == null) {
+			throw new IllegalArgumentException("NO VALUES PROVIDED: " + uri);
+		}
 
 		switch (match) {
 			case USER_VEHICLE:
@@ -263,9 +285,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	@Override
 	public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-		// Get writeable database
-		SQLiteDatabase database = _DbHelper.getWritableDatabase();
-
 		final int match = sUriMatcher.match(uri);
 		// Track the number of rows that were deleted
 		int rowsDeleted;
@@ -292,6 +311,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 					  @Nullable String selection, @Nullable String[] selectionArgs) {
 		final int match = sUriMatcher.match(uri);
 
+		if (values == null) {
+			throw new IllegalArgumentException("NO VALUES PROVIDED: " + uri);
+		}
+
 		switch (match) {
 			case USER_VEHICLE_ID:
 				selection = UserVehicleEntry._ID + "=?";
@@ -300,7 +323,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			case ODOMETER_ID:
 				selection = OdometerEntry._ID + "=?";
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-				return updateOdometer(uri, values, selection, selectionArgs);
+				return updateOdometer(values, selection, selectionArgs);
 			default:
 				throw new IllegalArgumentException("Deletion is not supported for " + uri);
 		}
@@ -330,7 +353,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged(getContext());
+		if (getContext() != null) {
+			notifyVehicleChanged(getContext());
+		}
 
 		return ContentUris.withAppendedId(uri, id);
 	}
@@ -360,7 +385,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsUpdated = database.update(UserVehicleEntry.TABLE_NAME,
 				values, selection, selectionArgs);
 
-		if (rowsUpdated != 0) {
+		if (rowsUpdated != 0 && getContext() != null) {
 //			getContext().getContentResolver().notifyChange(uri, null);
 			notifyVehicleChanged(getContext());
 		}
@@ -370,7 +395,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	private int deleteUserVehicle(Uri uri) {
 		int rowsDeleted = deleteById(uri, UserVehicleEntry._ID, UserVehicleEntry.TABLE_NAME);
-		if (rowsDeleted != 0) {
+		if (rowsDeleted != 0 && getContext() != null) {
 //			getContext().getContentResolver().notifyChange(uri, null);
 			notifyVehicleChanged(getContext());
 		}
@@ -397,12 +422,14 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged(getContext());
+		if (getContext() != null) {
+			notifyVehicleChanged(getContext());
+		}
 
 		return ContentUris.withAppendedId(OdometerEntry.CONTENT_URI, id);
 	}
 
-	private int updateOdometer(Uri uri, ContentValues values,
+	private int updateOdometer(ContentValues values,
 							   String selection, String[] selectionArgs) {
 		if (values.size() == 0
 				|| !values.containsKey(OdometerEntry.COLUMN_VEHICLE)
@@ -415,7 +442,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsUpdated = database.update(OdometerEntry.TABLE_NAME,
 				values, selection, selectionArgs);
 
-		if (rowsUpdated != 0) {
+		if (rowsUpdated != 0 && getContext() != null) {
 			notifyVehicleChanged(getContext());
 		}
 		// Return the number of rows updated
@@ -425,7 +452,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private int deleteOdometer(Uri uri) {
 		int rowsDeleted = deleteById(uri, OdometerEntry._ID, OdometerEntry.TABLE_NAME);
 
-		if (rowsDeleted != 0) {
+		if (rowsDeleted != 0 && getContext() != null) {
 			notifyVehicleChanged(getContext());
 		}
 
@@ -442,14 +469,16 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged(getContext());
+		if (getContext() != null) {
+			notifyVehicleChanged(getContext());
+		}
 
 		return ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, id);
 	}
 
 	private int deleteMaintenance(Uri uri) {
 		int rowsDeleted = deleteById(uri, MaintenanceEntry._ID, MaintenanceEntry.TABLE_NAME);
-		if (rowsDeleted != 0) {
+		if (rowsDeleted != 0 && getContext() != null) {
 			notifyVehicleChanged(getContext());
 		}
 		return rowsDeleted;
@@ -466,7 +495,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 					"Failed to insert row for insertMaintenanceDetails: " + uri);
 			return null;
 		}
-		notifyVehicleChanged(getContext());
+		if (getContext() != null) {
+			notifyVehicleChanged(getContext());
+		}
 
 		return ContentUris.withAppendedId(MaintenanceDetailsEntry.CONTENT_URI, id);
 	}
@@ -492,7 +523,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 
-		notifyVehicleChanged(getContext());
+		if (getContext() != null) {
+			notifyVehicleChanged(getContext());
+		}
 
 		return ContentUris.withAppendedId(MaintenanceItemEntry.CONTENT_URI, id);
 	}
@@ -533,7 +566,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		context.getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
 		context.getContentResolver().notifyChange(MaintenanceEntry.CONTENT_URI, null);
 	}
-
 //	private long utcNow() {
 //		return new Date().getTime();
 //	}

@@ -34,10 +34,17 @@
 	<!--			app:title="@string/attachment_title" />-->
 
 	<!--	</PreferenceCategory>-->
-	<EditTextPreference
-		android:inputType="number"
-		app:defaultValue="0"
-		app:key="@string/pref_key_start_upcoming_maintenance_from"
-		app:title="Start maintenance recommendation from (KM):"
-		app:useSimpleSummaryProvider="true" />
+<!--	<EditTextPreference-->
+<!--		android:inputType="number"-->
+<!--		app:defaultValue="0"-->
+<!--		app:key="@string/pref_key_start_upcoming_maintenance_from"-->
+<!--		app:title="Start maintenance recommendation from (KM):"-->
+<!--		app:useSimpleSummaryProvider="true" />-->
+<!--	<CheckBoxPreference-->
+<!--		app:isPreferenceVisible="false"-->
+<!--		android:inputType="number"-->
+<!--		app:defaultValue="0"-->
+<!--		app:key="test"-->
+<!--		app:title="Start maintenance recommendation from (KM):"-->
+<!--		app:useSimpleSummaryProvider="true" />-->
 </PreferenceScreen>

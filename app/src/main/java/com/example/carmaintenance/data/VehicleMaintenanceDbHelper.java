@@ -12,10 +12,16 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	 */
 	private static final String DATABASE_NAME = "car_maintenance.db";
 
+	@Override
+	public void onOpen(SQLiteDatabase db) {
+		db.setForeignKeyConstraintsEnabled(true);
+		super.onOpen(db);
+	}
+
 	/**
 	 * Database version. If you change the database schema, you must increment the database version.
 	 */
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 4;
 
 	/**
 	 * Constructs a new instance of {@link VehicleMaintenanceDbHelper}.
@@ -33,9 +39,9 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(UserVehicleContract.UserVehicleEntry.CREATE_TABLE);
 		db.execSQL(OdometerContract.OdometerEntry.CREATE_TABLE);
-		db.execSQL(MaintenanceItemContract.MaintenanceItemEntry.CREATE_TABLE);
 		db.execSQL(MaintenanceContract.MaintenanceEntry.CREATE_TABLE);
 		db.execSQL(MaintenanceDetailsContract.MaintenanceDetailsEntry.CREATE_TABLE);
+		db.execSQL(MaintenanceItemContract.MaintenanceItemEntry.CREATE_TABLE);
 	}
 
 	/**
@@ -43,8 +49,14 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// example of how this should be used:
 		if (oldVersion < 2) {
+			db.execSQL("DROP TABLE IF EXISTS user_maintenance_item");
+		}
+		if (oldVersion < 3) {
+			db.execSQL(CustomMaintenanceItemContract.CustomMaintenanceItemEntry.CREATE_TABLE);
+		}
+		if (oldVersion < 4) {
+			db.execSQL(UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V4);
 		}
 	}
 }

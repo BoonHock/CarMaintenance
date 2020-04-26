@@ -18,10 +18,10 @@ import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 import com.example.carmaintenance.objects.FirebaseObj;
 import com.example.carmaintenance.objects.MaintenanceItem;
 import com.example.carmaintenance.objects.UpcomingMaintenanceItem;
+import com.example.carmaintenance.objects.UserVehicle;
 import com.example.carmaintenance.objects.VehicleTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -39,47 +39,47 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 
 	@Override
 	public void bindView(final View view, final Context context, Cursor cursor) {
-		final int vehicleId = cursor.getInt(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry._ID));
-		String regNo = cursor.getString(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_REG_NO));
-		String brand = cursor.getString(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_BRAND));
-		String model = cursor.getString(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_MODEL));
-		String variant = cursor.getString(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_VARIANT));
-		final int currentUsage = cursor.getInt(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
+		final UserVehicle userVehicle = new UserVehicle(cursor);
+//		final int vehicleId = cursor.getInt(cursor
+//				.getColumnIndexOrThrow(UserVehicleEntry._ID));
+//		String regNo = cursor.getString(cursor
+//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_REG_NO));
+//		String brand = cursor.getString(cursor
+//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_BRAND));
+//		String model = cursor.getString(cursor
+//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_MODEL));
+//		String variant = cursor.getString(cursor
+//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_VARIANT));
+//		final int currentUsage = cursor.getInt(cursor
+//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
 
 		view.findViewById(R.id.txt_replace).setVisibility(View.GONE);
 		view.findViewById(R.id.txt_inspect).setVisibility(View.GONE);
 
 		TextView txtRegNo = view.findViewById(R.id.txt_reg_no);
 		TextView txtBrandModel = view.findViewById(R.id.txt_brand_model);
-		String brandModel = brand + " " + model + " " + variant;
 
 		final String firebaseVehicleId = VehicleTemplate
 				.getVehicleIdFromList(FirebaseObj._vehicleTemplates,
-						brand,
-						model,
-						variant);
+						userVehicle.get_brand(),
+						userVehicle.get_model(),
+						userVehicle.get_variant());
 
-		txtRegNo.setText(regNo);
-		txtBrandModel.setText(brandModel);
+		txtRegNo.setText(userVehicle.get_regNo());
+		txtBrandModel.setText(userVehicle.get_brandModelVariant());
 
 		FirebaseObj.runCallbackMaintenanceDetails(firebaseVehicleId, new FirebaseObj() {
 			@Override
 			public void callback() {
 				displayUpcomingMaintenance(context, view,
-						firebaseVehicleId, vehicleId, currentUsage);
+						firebaseVehicleId, userVehicle);
 			}
 		});
 	}
 
 	private void displayUpcomingMaintenance(
 			Context context, View view, String firebaseVehicleId,
-			int vehicleId, int usage) {
+			UserVehicle userVehicle) {
 
 		LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
 		LinearLayout llReplace = view.findViewById(R.id.ll_replace_items);
@@ -97,11 +97,17 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		if (maintenanceItems != null) {
 			for (MaintenanceItem maintenanceItem : maintenanceItems) {
 				upcomingMaintenanceItems.add(new UpcomingMaintenanceItem(
-						context, maintenanceItem, vehicleId));
+						context, maintenanceItem, userVehicle));
 			}
 			Collections.sort(upcomingMaintenanceItems);
 
 			for (UpcomingMaintenanceItem maintenanceItem : upcomingMaintenanceItems) {
+				// if maintenance item usage is not for this vehicle
+				// and not for all usage, ignore item
+				if (maintenanceItem.getUsage() != userVehicle.get_usage()
+						&& maintenanceItem.getUsage() != UserVehicleEntry.USAGE_ALL) {
+					continue;
+				}
 				if (maintenanceItem.getInspect_replace()
 						== FirebaseMaintenanceDetailsEntry.INSPECT) {
 

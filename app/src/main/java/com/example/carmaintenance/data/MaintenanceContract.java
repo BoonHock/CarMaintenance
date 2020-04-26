@@ -33,8 +33,6 @@ public class MaintenanceContract {
 				+ UserVehicleEntry.TABLE_NAME + "(" + UserVehicleEntry._ID
 				+ ") ON DELETE CASCADE);";
 
-		public static final String SELECT_JOIN_VEHICLE = "SELECT ";
-
 		public static final String[] FULL_PROJECTION = {
 				_ID,
 				COLUMN_VEHICLE,

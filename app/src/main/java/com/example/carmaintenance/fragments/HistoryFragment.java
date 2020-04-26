@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.example.carmaintenance.MaintenanceEditorActivity;
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.cursoradapter.HistoryCursorAdapter;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
+import com.example.carmaintenance.data.MaintenanceDetailsContract;
 import com.example.carmaintenance.utilities.UserDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -41,7 +43,8 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 	}
 
 	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+							 @Nullable Bundle savedInstanceState) {
 		_historyCursorAdapter = new HistoryCursorAdapter(getContext(), null);
 
 		View rootView = inflater.inflate(R.layout.listview_with_empty_view, container, false);
@@ -122,6 +125,19 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 
 		_progressBar.setVisibility(View.GONE);
 		_content.setVisibility(View.VISIBLE);
+
+		Cursor tmpcursor = getContext().getContentResolver().query(
+				MaintenanceDetailsContract.MaintenanceDetailsEntry.CONTENT_URI,
+				MaintenanceDetailsContract.MaintenanceDetailsEntry.FULL_PROJECTION,
+				null,
+				null,
+				null);
+
+		if (tmpcursor != null) {
+			Log.v("VEHICLE_ID_CHECK", "CHECK COUNT ITEM: " + tmpcursor.getCount());
+			tmpcursor.close();
+		}
+
 		return rootView;
 	}
 
