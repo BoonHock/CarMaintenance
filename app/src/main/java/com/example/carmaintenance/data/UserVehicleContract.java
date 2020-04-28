@@ -49,7 +49,7 @@ public class UserVehicleContract {
 				+ COLUMN_MODEL + " TEXT NOT NULL, "
 				+ COLUMN_VARIANT + " TEXT NOT NULL, "
 				+ COLUMN_USAGE + " INTEGER NOT NULL, "
-//				+ COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL, " // TODO: uncomment when publishing app for live
+				+ COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL, "
 				+ COLUMN_CREATED_ON + " INTEGER NOT NULL)";
 
 		static final String ALTER_TABLE_V4 = "ALTER TABLE " + TABLE_NAME

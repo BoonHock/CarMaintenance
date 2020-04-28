@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/ll_maintenance_item"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
@@ -8,7 +9,7 @@
 	<TextView
 		android:id="@+id/txt_item"
 		style="@style/maintenanceEditorTxtItem"
-		android:text="air conditioner performance conditioner performance" />
+		tools:text="air conditioner performance conditioner performance" />
 
 	<TextView style="@style/maintenanceEditorTxtCurrency" />
 

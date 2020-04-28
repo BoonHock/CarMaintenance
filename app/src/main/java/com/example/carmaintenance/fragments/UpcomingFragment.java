@@ -3,7 +3,6 @@ package com.example.carmaintenance.fragments;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import androidx.loader.content.Loader;
 import com.example.carmaintenance.MaintenanceEditorActivity;
 import com.example.carmaintenance.R;
 import com.example.carmaintenance.cursoradapter.UpcomingMaintenanceCursorAdapter;
-import com.example.carmaintenance.data.MaintenanceItemContract;
 import com.example.carmaintenance.data.UserVehicleContract;
 
 /**
@@ -101,7 +99,7 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 		// This loader will execute the ContentProvider's query method on a background thread
-		return new CursorLoader(getContext(),   // Parent activity context
+		return new CursorLoader(requireContext(),   // Parent activity context
 				UserVehicleContract.UserVehicleEntry.CONTENT_URI,   // Provider content URI to query
 				UserVehicleContract.UserVehicleEntry.FULL_PROJECTION,    // Columns to include in the resulting Cursor
 				null,                   // No selection clause

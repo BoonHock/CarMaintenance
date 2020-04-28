@@ -26,7 +26,13 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAllCaps="true"
-		tools:text="perodua axia" />
+		tools:text="Toyota Camry" />
+
+	<TextView
+		android:id="@+id/txt_odometer"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		tools:text="100,000" />
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -36,13 +42,15 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:paddingRight="8dp"
+			android:paddingStart="0dp"
+			android:paddingEnd="8dp"
 			android:text="@string/total2" />
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:paddingRight="8dp"
+			android:paddingStart="0dp"
+			android:paddingEnd="8dp"
 			android:text="@string/myr" />
 
 		<TextView
@@ -65,27 +73,7 @@
 		style="@style/level1_details"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical">
-
-		<!--		<LinearLayout-->
-		<!--			android:layout_width="match_parent"-->
-		<!--			android:layout_height="wrap_content"-->
-		<!--			android:orientation="horizontal">-->
-
-		<!--			<TextView-->
-		<!--				android:layout_width="wrap_content"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:paddingRight="16dp"-->
-		<!--				android:text="-" />-->
-
-		<!--			<TextView-->
-		<!--				android:id="@+id/txt_item"-->
-		<!--				android:layout_width="0dp"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:layout_weight="1"-->
-		<!--				android:text="oil change" />-->
-		<!--		</LinearLayout>-->
-	</LinearLayout>
+		android:orientation="vertical"></LinearLayout>
 
 	<TextView
 		android:id="@+id/txt_replace"
@@ -99,25 +87,5 @@
 		style="@style/level1_details"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical">
-
-		<!--		<LinearLayout-->
-		<!--			android:layout_width="match_parent"-->
-		<!--			android:layout_height="wrap_content"-->
-		<!--			android:orientation="horizontal">-->
-
-		<!--			<TextView-->
-		<!--				android:layout_width="wrap_content"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:paddingRight="16dp"-->
-		<!--				android:text="-" />-->
-
-		<!--			<TextView-->
-		<!--				android:id="@+id/txt_item"-->
-		<!--				android:layout_width="0dp"-->
-		<!--				android:layout_height="wrap_content"-->
-		<!--				android:layout_weight="1"-->
-		<!--				android:text="oil change" />-->
-		<!--		</LinearLayout>-->
-	</LinearLayout>
+		android:orientation="vertical"></LinearLayout>
 </LinearLayout>

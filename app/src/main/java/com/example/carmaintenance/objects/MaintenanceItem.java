@@ -4,9 +4,16 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
+import androidx.annotation.NonNull;
 
-public class MaintenanceItem {
+import com.example.carmaintenance.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
+import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
+import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MaintenanceItem implements Comparable<MaintenanceItem> {
 	private String firebase_item_id;
 	private String item;
 	private int inspect_replace;
@@ -33,7 +40,7 @@ public class MaintenanceItem {
 		duration_interval = cDurationInterval;
 	}
 
-	public String getFirebase_item_id() {
+	String getFirebase_item_id() {
 		return firebase_item_id;
 	}
 
@@ -122,5 +129,76 @@ public class MaintenanceItem {
 			cursor.close();
 		}
 		return null;
+	}
+
+	@Override
+	public int compareTo(@NonNull MaintenanceItem compareItem) {
+		int compareResults = 0;
+
+		// if both have distance interval, sort ascending
+		// else, the one without distance interval is below the one with
+		if (this.distance_interval != 0 && compareItem.getDistance_interval() != 0) {
+			compareResults = this.distance_interval - compareItem.getDistance_interval();
+		} else if (this.distance_interval == 0) {
+			compareResults = 1;
+		} else if (compareItem.getDistance_interval() == 0) {
+			compareResults = -1;
+		}
+
+		if (compareResults == 0) {
+			String compareName = compareItem.getItem().toUpperCase();
+			String thisName = this.getItem().toUpperCase();
+
+			compareResults = thisName.compareTo(compareName);
+		}
+		return compareResults;
+	}
+
+	public static List<MaintenanceItem> getCustomMaintenanceItemNotInFirebase(
+			Context context, List<MaintenanceItem> firebaseItems,
+			UserVehicle userVehicle, int inspectReplace) {
+		List<MaintenanceItem> maintenanceItems = new ArrayList<>();
+
+		Cursor cursor = context.getContentResolver().query(
+				CustomMaintenanceItemEntry.CONTENT_URI,
+				CustomMaintenanceItemEntry.FULL_PROJECTION,
+				CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=?",
+				new String[]{String.valueOf(inspectReplace)},
+				null);
+
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				String itemName = cursor.getString(cursor.getColumnIndexOrThrow(
+						CustomMaintenanceItemEntry.COLUMN_ITEM));
+				boolean add = true;
+
+				for (MaintenanceItem firebaseItem : firebaseItems) {
+					if (firebaseItem.getItem().toUpperCase().trim()
+							.equals(itemName.toUpperCase().trim())
+							&& firebaseItem.getInspect_replace() == inspectReplace) {
+						add = false;
+						break;
+					}
+				}
+				if (add) {
+					MaintenanceItem item = new MaintenanceItem("", itemName,
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE)),
+							UserVehicleEntry.USAGE_ALL,
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)));
+					maintenanceItems.add(item);
+				}
+			}
+			cursor.close();
+		}
+
+		return maintenanceItems;
 	}
 }

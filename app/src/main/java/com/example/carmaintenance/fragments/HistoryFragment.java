@@ -60,8 +60,8 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 		listView.setEmptyView(emptyView);
 		listView.setAdapter(_historyCursorAdapter);
 
-		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
-		final View sheetView = getActivity().getLayoutInflater()
+		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+		final View sheetView = requireActivity().getLayoutInflater()
 				.inflate(R.layout.bottom_sheet_edit_delete, container, false);
 		bottomSheetDialog.setContentView(sheetView);
 
@@ -112,7 +112,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										getContext().getContentResolver().delete(
+										requireContext().getContentResolver().delete(
 												ContentUris.withAppendedId(
 														MaintenanceEntry.CONTENT_URI, _longClickId),
 												null,
@@ -126,16 +126,16 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 		_progressBar.setVisibility(View.GONE);
 		_content.setVisibility(View.VISIBLE);
 
-		Cursor tmpcursor = getContext().getContentResolver().query(
+		Cursor tmpCursor = requireContext().getContentResolver().query(
 				MaintenanceDetailsContract.MaintenanceDetailsEntry.CONTENT_URI,
 				MaintenanceDetailsContract.MaintenanceDetailsEntry.FULL_PROJECTION,
 				null,
 				null,
 				null);
 
-		if (tmpcursor != null) {
-			Log.v("VEHICLE_ID_CHECK", "CHECK COUNT ITEM: " + tmpcursor.getCount());
-			tmpcursor.close();
+		if (tmpCursor != null) {
+			Log.v("VEHICLE_ID_CHECK", "CHECK COUNT ITEM: " + tmpCursor.getCount());
+			tmpCursor.close();
 		}
 
 		return rootView;
@@ -144,7 +144,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 	@NonNull
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-		return new CursorLoader(getContext(),
+		return new CursorLoader(requireContext(),
 				MaintenanceEntry.CONTENT_URI,
 				MaintenanceEntry.FULL_PROJECTION,
 				null,

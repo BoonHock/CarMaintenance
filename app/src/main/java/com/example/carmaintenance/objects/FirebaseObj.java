@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEntry;
+import com.example.carmaintenance.data.UserVehicleContract;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,5 +63,28 @@ public abstract class FirebaseObj {
 				}
 			});
 		}
+	}
+
+	public static List<List<MaintenanceItem>> getItemsByInspectReplace(String firebaseVehicleId, int usage) {
+		List<List<MaintenanceItem>> items = new ArrayList<>();
+		items.add(new ArrayList<MaintenanceItem>()); // inspect
+		items.add(new ArrayList<MaintenanceItem>()); // replace
+
+		List<MaintenanceItem> firebaseItems = _maintenanceItems.get(firebaseVehicleId);
+
+		if (firebaseItems != null) {
+			for (MaintenanceItem item : firebaseItems) {
+				if (item.getUsage() == UserVehicleContract.UserVehicleEntry.USAGE_ALL
+						|| item.getUsage() == usage) {
+					if (item.getInspect_replace() == MaintenanceItemEntry.INSPECT_VALUE) {
+						items.get(0).add(item);
+					} else if (item.getInspect_replace() == MaintenanceItemEntry.REPLACE_VALUE) {
+						items.get(1).add(item);
+					}
+				}
+			}
+		}
+
+		return items;
 	}
 }

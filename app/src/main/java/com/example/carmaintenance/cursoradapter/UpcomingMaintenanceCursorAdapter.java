@@ -13,7 +13,8 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.example.carmaintenance.R;
-import com.example.carmaintenance.data.FirebaseContract.FirebaseMaintenanceDetailsEntry;
+import com.example.carmaintenance.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
+import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 import com.example.carmaintenance.objects.FirebaseObj;
 import com.example.carmaintenance.objects.MaintenanceItem;
@@ -40,18 +41,6 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 	@Override
 	public void bindView(final View view, final Context context, Cursor cursor) {
 		final UserVehicle userVehicle = new UserVehicle(cursor);
-//		final int vehicleId = cursor.getInt(cursor
-//				.getColumnIndexOrThrow(UserVehicleEntry._ID));
-//		String regNo = cursor.getString(cursor
-//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_REG_NO));
-//		String brand = cursor.getString(cursor
-//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_BRAND));
-//		String model = cursor.getString(cursor
-//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_MODEL));
-//		String variant = cursor.getString(cursor
-//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_VARIANT));
-//		final int currentUsage = cursor.getInt(cursor
-//				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
 
 		view.findViewById(R.id.txt_replace).setVisibility(View.GONE);
 		view.findViewById(R.id.txt_inspect).setVisibility(View.GONE);
@@ -87,38 +76,43 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		TextView txtInspect = view.findViewById(R.id.txt_inspect);
 		TextView txtReplace = view.findViewById(R.id.txt_replace);
 
-		List<MaintenanceItem> maintenanceItems = FirebaseObj._maintenanceItems.get(firebaseVehicleId);
+		List<List<MaintenanceItem>> firebaseItems = FirebaseObj
+				.getItemsByInspectReplace(firebaseVehicleId, userVehicle.get_usage());
+
+		List<MaintenanceItem> maintenanceItemsInspect = firebaseItems.get(0);
+		List<MaintenanceItem> maintenanceItemsReplace = firebaseItems.get(1);
+
+		maintenanceItemsInspect.addAll(MaintenanceItem.getCustomMaintenanceItemNotInFirebase(
+				context,
+				maintenanceItemsInspect,
+				userVehicle,
+				MaintenanceItemEntry.INSPECT_VALUE));
+		maintenanceItemsReplace.addAll(MaintenanceItem.getCustomMaintenanceItemNotInFirebase(
+				context,
+				maintenanceItemsReplace,
+				userVehicle,
+				MaintenanceItemEntry.REPLACE_VALUE));
+
+		List<UpcomingMaintenanceItem> upcomingMaintenanceItemsInspect = new ArrayList<>();
+		List<UpcomingMaintenanceItem> upcomingMaintenanceItemsReplace = new ArrayList<>();
+
+		for (MaintenanceItem item : maintenanceItemsInspect) {
+			upcomingMaintenanceItemsInspect.add(
+					new UpcomingMaintenanceItem(context, item, userVehicle));
+		}
+		for (MaintenanceItem item : maintenanceItemsReplace) {
+			upcomingMaintenanceItemsReplace.add(
+					new UpcomingMaintenanceItem(context, item, userVehicle));
+		}
+
+		Collections.sort(upcomingMaintenanceItemsInspect, new UpcomingMaintenanceItem.CustomComparator());
+		Collections.sort(upcomingMaintenanceItemsReplace, new UpcomingMaintenanceItem.CustomComparator());
 
 		llInspect.removeAllViews();
 		llReplace.removeAllViews();
 
-		List<UpcomingMaintenanceItem> upcomingMaintenanceItems = new ArrayList<>();
-
-		if (maintenanceItems != null) {
-			for (MaintenanceItem maintenanceItem : maintenanceItems) {
-				upcomingMaintenanceItems.add(new UpcomingMaintenanceItem(
-						context, maintenanceItem, userVehicle));
-			}
-			Collections.sort(upcomingMaintenanceItems);
-
-			for (UpcomingMaintenanceItem maintenanceItem : upcomingMaintenanceItems) {
-				// if maintenance item usage is not for this vehicle
-				// and not for all usage, ignore item
-				if (maintenanceItem.getUsage() != userVehicle.get_usage()
-						&& maintenanceItem.getUsage() != UserVehicleEntry.USAGE_ALL) {
-					continue;
-				}
-				if (maintenanceItem.getInspect_replace()
-						== FirebaseMaintenanceDetailsEntry.INSPECT) {
-
-					addMaintenanceItem(context, llInspect, maintenanceItem);
-				} else if (maintenanceItem.getInspect_replace()
-						== FirebaseMaintenanceDetailsEntry.REPLACE) {
-
-					addMaintenanceItem(context, llReplace, maintenanceItem);
-				}
-			}
-		}
+		addMaintenanceItems(context, llInspect, upcomingMaintenanceItemsInspect);
+		addMaintenanceItems(context, llReplace, upcomingMaintenanceItemsReplace);
 
 		if (llInspect.getChildCount() == 0) {
 			txtInspect.setVisibility(View.GONE);
@@ -132,51 +126,103 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		}
 	}
 
-	private void addMaintenanceItem(Context context, LinearLayout llParent,
-									UpcomingMaintenanceItem upcomingMaintenanceItem) {
-		View view = LayoutInflater.from(context).inflate(R.layout.template_upcoming_item, null);
-		LinearLayout llItem = view.findViewById(R.id.ll_item);
-		TextView txtItem = view.findViewById(R.id.txt_item);
-		TextView txtUpcomingDue = view.findViewById(R.id.txt_upcoming_due);
+	private List<UpcomingMaintenanceItem> getCustomMaintenanceItemNotInFirebase(
+			Context context, List<MaintenanceItem> firebaseItems,
+			UserVehicle userVehicle, int inspectReplace) {
+		List<UpcomingMaintenanceItem> upcomingMaintenanceItems = new ArrayList<>();
 
-		boolean hasDistanceInterval = false;
-		boolean hasDurationInterval = false;
+		Cursor cursor = context.getContentResolver().query(
+				CustomMaintenanceItemEntry.CONTENT_URI,
+				CustomMaintenanceItemEntry.FULL_PROJECTION,
+				CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=?",
+				new String[]{String.valueOf(inspectReplace)},
+				null);
 
-		txtItem.setText(upcomingMaintenanceItem.getItem());
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				String itemName = cursor.getString(cursor.getColumnIndexOrThrow(
+						CustomMaintenanceItemEntry.COLUMN_ITEM));
+				boolean add = true;
 
-		String upcomingDue = "";
-
-		if (upcomingMaintenanceItem.getDistance_interval() != 0) {
-			hasDistanceInterval = true;
-			upcomingDue = String.format(Locale.getDefault(), "%,d",
-					upcomingMaintenanceItem.get_distanceLeft())
-					+ " " + context.getString(R.string.kilometer);
-			if (upcomingMaintenanceItem.get_durationDaysLeft() != 0) {
-				hasDurationInterval = true;
-				upcomingDue += " or ";
+				for (MaintenanceItem firebaseItem : firebaseItems) {
+					if (firebaseItem.getItem().toUpperCase().trim()
+							.equals(itemName.toUpperCase().trim())
+							&& firebaseItem.getInspect_replace() == inspectReplace) {
+						add = false;
+						break;
+					}
+				}
+				if (add) {
+					MaintenanceItem item = new MaintenanceItem("", itemName,
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE)),
+							UserVehicleEntry.USAGE_ALL,
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)));
+					upcomingMaintenanceItems.add(new UpcomingMaintenanceItem(
+							context, item, userVehicle));
+				}
 			}
-		}
-		if (upcomingMaintenanceItem.get_durationDaysLeft() != 0) {
-			hasDurationInterval = true;
-			upcomingDue += upcomingMaintenanceItem.get_durationDaysLeft() + " days";
-		}
-		if (hasDistanceInterval || hasDurationInterval) {
-			upcomingDue += " left. ";
-		}
-		if (hasDistanceInterval && hasDurationInterval) {
-			upcomingDue += "Whichever comes first.";
-		}
-		txtUpcomingDue.setText(upcomingDue);
-
-		int urgency = upcomingMaintenanceItem.getUrgency();
-
-		if (urgency != UpcomingMaintenanceItem.URGENCY_NOT_URGENT) {
-			llItem.setBackgroundColor(getUrgencyColour(context, urgency));
-			txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
-			txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+			cursor.close();
 		}
 
-		llParent.addView(view);
+		return upcomingMaintenanceItems;
+	}
+
+	private void addMaintenanceItems(
+			Context context, LinearLayout llParent,
+			List<UpcomingMaintenanceItem> upcomingMaintenanceItems) {
+		for (UpcomingMaintenanceItem item : upcomingMaintenanceItems) {
+			View view = View.inflate(context, R.layout.template_upcoming_item, null);
+			LinearLayout llItem = view.findViewById(R.id.ll_item);
+			TextView txtItem = view.findViewById(R.id.txt_item);
+			TextView txtUpcomingDue = view.findViewById(R.id.txt_upcoming_due);
+
+			boolean hasDistanceInterval = false;
+			boolean hasDurationInterval = false;
+
+			txtItem.setText(item.getItem());
+
+			String upcomingDue = "";
+
+			if (item.getDistance_interval() != 0) {
+				hasDistanceInterval = true;
+				upcomingDue = String.format(Locale.getDefault(), "%,d",
+						item.get_distanceLeft())
+						+ " " + context.getString(R.string.kilometer);
+				if (item.get_durationDaysLeft() != 0) {
+					hasDurationInterval = true;
+					upcomingDue += " or ";
+				}
+			}
+			if (item.get_durationDaysLeft() != 0) {
+				hasDurationInterval = true;
+				upcomingDue += item.get_durationDaysLeft() + " days";
+			}
+			if (hasDistanceInterval || hasDurationInterval) {
+				upcomingDue += " left. ";
+			}
+			if (hasDistanceInterval && hasDurationInterval) {
+				upcomingDue += "Whichever comes first.";
+			}
+			txtUpcomingDue.setText(upcomingDue);
+
+			int urgency = item.getUrgency();
+
+			if (urgency != UpcomingMaintenanceItem.URGENCY_NOT_URGENT) {
+				llItem.setBackgroundColor(getUrgencyColour(context, urgency));
+				txtItem.setTextColor(ContextCompat.getColor(context, R.color.white));
+				txtUpcomingDue.setTextColor(ContextCompat.getColor(context, R.color.white));
+			}
+
+			llParent.addView(view);
+		}
 	}
 
 	private int getUrgencyColour(Context context, double mag) {

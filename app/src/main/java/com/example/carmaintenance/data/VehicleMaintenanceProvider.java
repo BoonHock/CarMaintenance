@@ -14,13 +14,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.carmaintenance.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
 import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEntry;
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
-import com.example.carmaintenance.data.UpcomingMaintenanceContract.UpcomingMaintenanceEntry;
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
-import com.example.carmaintenance.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 
 public class VehicleMaintenanceProvider extends ContentProvider {
 	/**
@@ -29,7 +28,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	public static final String LOG_TAG = VehicleMaintenanceProvider.class.getSimpleName();
 
 	/**
-	 * URI matcher code for the content URI for sqlite table
+	 * URI matcher code for the content URI for sql table
 	 */
 	private static final int USER_VEHICLE = 1;
 	private static final int USER_VEHICLE_ID = 2;
@@ -37,8 +36,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private static final int ODOMETER = 10;
 	private static final int ODOMETER_ID = 11;
 	private static final int ODOMETER_VEHICLE = 12;
-
-	private static final int UPCOMING_MAINTENANCE = 20;
 
 	private static final int MAINTENANCE = 30;
 	private static final int MAINTENANCE_ID = 31;
@@ -52,6 +49,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private static final int MAINTENANCE_ITEM_ID = 51;
 
 	private static final int CUSTOM_MAINTENANCE_ITEM = 60;
+	private static final int CUSTOM_MAINTENANCE_ITEM_ID = 60;
 
 	/**
 	 * UriMatcher object to match a content URI to a corresponding code.
@@ -73,8 +71,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				OdometerContract.PATH_ODOMETER + "/#", ODOMETER_ID);
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				OdometerContract.PATH_ODOMETER_VEHICLE, ODOMETER_VEHICLE);
-		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
-				UpcomingMaintenanceContract.PATH_UPCOMING_MAINTENANCE, UPCOMING_MAINTENANCE);
 
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				MaintenanceContract.PATH_MAINTENANCE, MAINTENANCE);
@@ -105,6 +101,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				CustomMaintenanceItemContract.PATH_CUSTOM_MAINTENANCE_ITEM,
 				CUSTOM_MAINTENANCE_ITEM);
+		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
+				CustomMaintenanceItemContract.PATH_CUSTOM_MAINTENANCE_ITEM + "/#",
+				CUSTOM_MAINTENANCE_ITEM_ID);
 	}
 
 	/**
@@ -175,9 +174,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				break;
 			case ODOMETER_VEHICLE:
 				cursor = selectOdometerWithVehicle(database);
-				break;
-			case UPCOMING_MAINTENANCE:
-				cursor = selectUpcomingMaintenance(database);
 				break;
 			case MAINTENANCE:
 				cursor = database.query(MaintenanceEntry.TABLE_NAME,
@@ -278,6 +274,8 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				return insertMaintenanceDetails(uri, values);
 			case MAINTENANCE_ITEM:
 				return insertMaintenanceItem(uri, values);
+			case CUSTOM_MAINTENANCE_ITEM:
+				return insertCustomMaintenanceItem(uri, values);
 			default:
 				throw new IllegalArgumentException("Insertion is not supported for " + uri);
 		}
@@ -299,6 +297,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				break;
 			case MAINTENANCE_ID:
 				rowsDeleted = deleteMaintenance(uri);
+				break;
+			case CUSTOM_MAINTENANCE_ITEM_ID:
+				rowsDeleted = deleteCustomMaintenanceItem(uri);
 				break;
 			default:
 				throw new IllegalArgumentException("Deletion is not supported for " + uri);
@@ -324,6 +325,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				selection = OdometerEntry._ID + "=?";
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				return updateOdometer(values, selection, selectionArgs);
+			case CUSTOM_MAINTENANCE_ITEM_ID:
+				selection = CustomMaintenanceItemEntry._ID + "=?";
+				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+				return updateCustomMaintenanceItem(values, selection, selectionArgs);
 			default:
 				throw new IllegalArgumentException("Deletion is not supported for " + uri);
 		}
@@ -336,7 +341,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		String variant = values.getAsString(UserVehicleEntry.COLUMN_VARIANT);
 		int usage = values.getAsInteger(UserVehicleEntry.COLUMN_USAGE);
 
-		if (!isUserVehicleDataValid(regNo, brand, model, variant, usage)) {
+		if (userVehicleDataNotValid(regNo, brand, model, variant, usage)) {
 			Log.e(LOG_TAG, "Failed to insert row for " + uri +
 					". One or more columns not provided value.");
 			return null;
@@ -354,7 +359,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		}
 
 		if (getContext() != null) {
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(), UserVehicleEntry.CONTENT_URI);
 		}
 
 		return ContentUris.withAppendedId(uri, id);
@@ -375,7 +380,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		String variant = values.getAsString(UserVehicleEntry.COLUMN_VARIANT);
 		int usage = values.getAsInteger(UserVehicleEntry.COLUMN_USAGE);
 
-		if (!isUserVehicleDataValid(regNo, brand, model, variant, usage)) {
+		if (userVehicleDataNotValid(regNo, brand, model, variant, usage)) {
 			throw new IllegalArgumentException("Failed to update row for "
 					+ uri + ". One or more columns not provided value.");
 		}
@@ -386,8 +391,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				values, selection, selectionArgs);
 
 		if (rowsUpdated != 0 && getContext() != null) {
-//			getContext().getContentResolver().notifyChange(uri, null);
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 		// Return the number of rows updated
 		return rowsUpdated;
@@ -396,20 +403,22 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private int deleteUserVehicle(Uri uri) {
 		int rowsDeleted = deleteById(uri, UserVehicleEntry._ID, UserVehicleEntry.TABLE_NAME);
 		if (rowsDeleted != 0 && getContext() != null) {
-//			getContext().getContentResolver().notifyChange(uri, null);
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 		return rowsDeleted;
 	}
 
-	private boolean isUserVehicleDataValid(String regNo, String brand, String model,
-										   String variant, int usage) {
-		return !TextUtils.isEmpty(regNo)
-				&& !TextUtils.isEmpty(brand)
-				&& !TextUtils.isEmpty(model)
-				&& !TextUtils.isEmpty(variant)
-				&& (usage == UserVehicleEntry.USAGE_NORMAL
-				|| usage == UserVehicleEntry.USAGE_SEVERE);
+	private boolean userVehicleDataNotValid(String regNo, String brand, String model,
+											String variant, int usage) {
+		return TextUtils.isEmpty(regNo)
+				|| TextUtils.isEmpty(brand)
+				|| TextUtils.isEmpty(model)
+				|| TextUtils.isEmpty(variant)
+				|| (usage != UserVehicleEntry.USAGE_NORMAL
+				&& usage != UserVehicleEntry.USAGE_SEVERE);
 	}
 
 	private Uri insertOdometer(Uri uri, ContentValues values) {
@@ -423,7 +432,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		}
 
 		if (getContext() != null) {
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 
 		return ContentUris.withAppendedId(OdometerEntry.CONTENT_URI, id);
@@ -442,8 +454,11 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsUpdated = database.update(OdometerEntry.TABLE_NAME,
 				values, selection, selectionArgs);
 
-		if (rowsUpdated != 0 && getContext() != null) {
-			notifyVehicleChanged(getContext());
+		if (rowsUpdated > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 		// Return the number of rows updated
 		return rowsUpdated;
@@ -453,7 +468,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		int rowsDeleted = deleteById(uri, OdometerEntry._ID, OdometerEntry.TABLE_NAME);
 
 		if (rowsDeleted != 0 && getContext() != null) {
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 
 		return rowsDeleted;
@@ -470,7 +488,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		}
 
 		if (getContext() != null) {
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 
 		return ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, id);
@@ -478,8 +499,11 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	private int deleteMaintenance(Uri uri) {
 		int rowsDeleted = deleteById(uri, MaintenanceEntry._ID, MaintenanceEntry.TABLE_NAME);
-		if (rowsDeleted != 0 && getContext() != null) {
-			notifyVehicleChanged(getContext());
+		if (rowsDeleted > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 		return rowsDeleted;
 	}
@@ -496,7 +520,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			return null;
 		}
 		if (getContext() != null) {
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 
 		return ContentUris.withAppendedId(MaintenanceDetailsEntry.CONTENT_URI, id);
@@ -504,7 +531,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	private Uri insertMaintenanceItem(Uri uri, ContentValues values) {
 		SQLiteDatabase database = _DbHelper.getWritableDatabase();
-
 		String itemName = values.getAsString(MaintenanceItemEntry.COLUMN_ITEM);
 
 		// max length of item name
@@ -524,10 +550,80 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		}
 
 		if (getContext() != null) {
-			notifyVehicleChanged(getContext());
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
 		}
 
 		return ContentUris.withAppendedId(MaintenanceItemEntry.CONTENT_URI, id);
+	}
+
+	private Uri insertCustomMaintenanceItem(Uri uri, ContentValues values) {
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+		String itemName = values.getAsString(CustomMaintenanceItemEntry.COLUMN_ITEM);
+
+		if (itemName.length() > CustomMaintenanceItemEntry.ITEM_NAME_MAX_LENGTH) {
+			values.remove(CustomMaintenanceItemEntry.COLUMN_ITEM);
+			values.put(CustomMaintenanceItemEntry.COLUMN_ITEM,
+					itemName.substring(0,
+							CustomMaintenanceItemEntry.ITEM_NAME_MAX_LENGTH - 1));
+		}
+		long id = database.insert(CustomMaintenanceItemEntry.TABLE_NAME,
+				null, values);
+		if (id == -1) {
+			Log.e(LOG_TAG, "Failed to insert row for " + uri);
+			return null;
+		}
+		if (getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					CustomMaintenanceItemEntry.CONTENT_URI);
+		}
+		return ContentUris.withAppendedId(CustomMaintenanceItemEntry.CONTENT_URI, id);
+	}
+
+	private int updateCustomMaintenanceItem(ContentValues values, String selection,
+											String[] selectionArgs) {
+		if (values.size() == 0
+				|| !values.containsKey(CustomMaintenanceItemEntry.COLUMN_ITEM)
+				|| !values.containsKey(CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE)
+				|| !values.containsKey(CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)
+				|| !values.containsKey(CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)) {
+			return 0;
+		}
+
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+		int rowsUpdated = database.update(CustomMaintenanceItemEntry.TABLE_NAME,
+				values,
+				selection,
+				selectionArgs);
+
+		if (rowsUpdated > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					// will update upcoming page
+					UserVehicleEntry.CONTENT_URI,
+					// if user change item name, will need to update history there also
+					MaintenanceEntry.CONTENT_URI,
+					// duh
+					CustomMaintenanceItemEntry.CONTENT_URI);
+		}
+		return rowsUpdated;
+	}
+
+	private int deleteCustomMaintenanceItem(Uri uri) {
+		int rowsDeleted = deleteById(uri, CustomMaintenanceItemEntry._ID,
+				CustomMaintenanceItemEntry.TABLE_NAME);
+		if (rowsDeleted > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					// will update upcoming page
+					UserVehicleEntry.CONTENT_URI,
+					// if user delete item, will delete in history there too
+					MaintenanceEntry.CONTENT_URI,
+					// duh
+					CustomMaintenanceItemEntry.CONTENT_URI);
+		}
+		return rowsDeleted;
 	}
 
 	private int deleteById(Uri uri, String colId, String tableName) {
@@ -555,18 +651,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				null);
 	}
 
-	private Cursor selectUpcomingMaintenance(SQLiteDatabase database) {
-		return database.rawQuery(UpcomingMaintenanceEntry.SELECT_QUERY, null);
+	public static void notifyUris(Context context, Uri... uris) {
+		for (Uri uri : uris) {
+			context.getContentResolver().notifyChange(uri, null);
+		}
 	}
-
-	public static void notifyVehicleChanged(Context context) {
-		context.getContentResolver().notifyChange(UserVehicleEntry.CONTENT_URI, null);
-		context.getContentResolver().notifyChange(OdometerEntry.CONTENT_URI, null);
-		context.getContentResolver().notifyChange(MaintenanceDetailsEntry.CONTENT_URI, null);
-		context.getContentResolver().notifyChange(UpcomingMaintenanceEntry.CONTENT_URI, null);
-		context.getContentResolver().notifyChange(MaintenanceEntry.CONTENT_URI, null);
-	}
-//	private long utcNow() {
-//		return new Date().getTime();
-//	}
 }

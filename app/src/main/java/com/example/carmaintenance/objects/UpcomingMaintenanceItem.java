@@ -8,16 +8,17 @@ import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDet
 import com.example.carmaintenance.data.OdometerContract.OdometerEntry;
 
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparable<UpcomingMaintenanceItem> {
-	private final String LOG_TAG = this.getClass().getSimpleName();
+public class UpcomingMaintenanceItem extends MaintenanceItem {
+	//	private final String LOG_TAG = this.getClass().getSimpleName();
 	private int _latestServiceDistance = 0;
 	// use int instead of date type for latest service date
 	// so that when value is 0, we know no record of service
 	private long _latestServiceDate = 0;
-	private int _distanceLeft = 0;
+	private int _distanceLeft;
 	private long _durationDaysLeft = 0;
 
 	public static final int URGENCY_NOT_URGENT = 0;
@@ -37,7 +38,7 @@ public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparab
 				maintenanceItem.getFirst_duration(),
 				maintenanceItem.getDuration_interval());
 
-		int nextDistance = 0;
+		int nextDistance;
 		int currentOdometer = getCurrentOdometer(context, userVehicle.get_vehicleId());
 		getLatestServiceData(context, userVehicle.get_vehicleId());
 
@@ -148,24 +149,65 @@ public class UpcomingMaintenanceItem extends MaintenanceItem implements Comparab
 		return URGENCY_NOT_URGENT;
 	}
 
-	@Override
-	public int compareTo(UpcomingMaintenanceItem compareItem) {
-		int compareResults = compareItem.getUrgency() - this.getUrgency(); // descending
+//	public int compareTo(UpcomingMaintenanceItem compareItem) {
+//		// positive value means @compareItem is before @this
+//		int compareResults = compareItem.getUrgency() - this.getUrgency(); // descending
+//
+//		// if both same urgency, and both items have distance intervals,
+//		// then check distance left
+//		// if either one doesn't have distance interval,
+//		// the one without distance interval shall be placed after the ones with
+//		if (compareResults == 0) {
+//			if (this.getDistance_interval() != 0
+//					&& compareItem.getDistance_interval() != 0) {
+//				compareResults = this.get_distanceLeft() - compareItem.get_distanceLeft(); // ascending
+//			} else if (this.getDistance_interval() == 0) {
+//				compareResults = 1;
+//			} else if (compareItem.getDistance_interval() == 0) {
+//				compareResults = -1;
+//			}
+//		}
+//
+//		// if still same, then arrange by name alphabetically
+//		if (compareResults == 0) {
+//			String compareName = compareItem.getItem().toUpperCase();
+//			String thisName = this.getItem().toUpperCase();
+//
+//			compareResults = thisName.compareTo(compareName);
+//		}
+//
+//		return compareResults;
+//	}
 
-		// if both same urgency, then arrange by distance left
-		// make sure both have distance interval first
-		if (compareResults == 0 && this.getDistance_interval() != 0
-				&& compareItem.getDistance_interval() != 0) {
-			compareResults = this.get_distanceLeft() - compareItem.get_distanceLeft(); // ascending
+	public static class CustomComparator implements Comparator<UpcomingMaintenanceItem> {
+		@Override
+		public int compare(UpcomingMaintenanceItem item1, UpcomingMaintenanceItem item2) {
+			// positive value means @compareItem is before @this
+			int compareResults = item2.getUrgency() - item1.getUrgency(); // descending
+			// if both same urgency, and both items have distance intervals,
+			// then check distance left
+			// if either one doesn't have distance interval,
+			// the one without distance interval shall be placed after the ones with
+			if (compareResults == 0) {
+				if (item1.getDistance_interval() != 0
+						&& item2.getDistance_interval() != 0) {
+					compareResults = item1.get_distanceLeft() - item2.get_distanceLeft(); // ascending
+				} else if (item1.getDistance_interval() == 0) {
+					compareResults = 1;
+				} else if (item2.getDistance_interval() == 0) {
+					compareResults = -1;
+				}
+			}
+
+			// if still same, then arrange by name alphabetically
+			if (compareResults == 0) {
+				String compareName = item2.getItem().toUpperCase();
+				String o2Name = item1.getItem().toUpperCase();
+
+				compareResults = o2Name.compareTo(compareName);
+			}
+
+			return compareResults;
 		}
-		// if still same, then arrange by name alphabetically
-		if (compareResults == 0) {
-			String compareName = compareItem.getItem();
-			String thisName = this.getItem();
-
-			compareResults = thisName.compareTo(compareName);
-		}
-
-		return compareResults;
 	}
 }

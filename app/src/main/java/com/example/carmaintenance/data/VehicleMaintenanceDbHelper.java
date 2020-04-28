@@ -1,11 +1,12 @@
 package com.example.carmaintenance.data;
 
 import android.content.Context;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
-	public static final String LOG_TAG = VehicleMaintenanceDbHelper.class.getSimpleName();
+//	public static final String LOG_TAG = VehicleMaintenanceDbHelper.class.getSimpleName();
 
 	/**
 	 * Name of the database file
@@ -28,7 +29,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	 *
 	 * @param context of the app
 	 */
-	public VehicleMaintenanceDbHelper(Context context) {
+	VehicleMaintenanceDbHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
@@ -42,6 +43,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 		db.execSQL(MaintenanceContract.MaintenanceEntry.CREATE_TABLE);
 		db.execSQL(MaintenanceDetailsContract.MaintenanceDetailsEntry.CREATE_TABLE);
 		db.execSQL(MaintenanceItemContract.MaintenanceItemEntry.CREATE_TABLE);
+		db.execSQL(CustomMaintenanceItemContract.CustomMaintenanceItemEntry.CREATE_TABLE);
 	}
 
 	/**
@@ -53,10 +55,20 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS user_maintenance_item");
 		}
 		if (oldVersion < 3) {
-			db.execSQL(CustomMaintenanceItemContract.CustomMaintenanceItemEntry.CREATE_TABLE);
+			runQueryIgnoreException(db,
+					CustomMaintenanceItemContract.CustomMaintenanceItemEntry.CREATE_TABLE);
 		}
 		if (oldVersion < 4) {
-			db.execSQL(UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V4);
+			runQueryIgnoreException(db,
+					UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V4);
+		}
+	}
+
+	private void runQueryIgnoreException(SQLiteDatabase db, String query) {
+		try {
+			db.execSQL(query);
+		} catch (SQLException e) {
+			// ignore
 		}
 	}
 }

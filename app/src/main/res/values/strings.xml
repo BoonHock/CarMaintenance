@@ -137,4 +137,6 @@
 	<string name="distance_interval_km">Distance interval (KM)</string>
 	<string name="months_cap">Months</string>
 	<string name="inspect_or_replace">Inspect / replace</string>
+	<string name="all_inputs_required">All inputs are required.</string>
+	<string name="item_deleted">Item deleted</string>
 </resources>

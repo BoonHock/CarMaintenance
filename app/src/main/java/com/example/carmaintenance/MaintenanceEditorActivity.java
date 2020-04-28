@@ -32,7 +32,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.carmaintenance.data.FirebaseContract;
+import com.example.carmaintenance.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.example.carmaintenance.data.MaintenanceContract.MaintenanceEntry;
 import com.example.carmaintenance.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEntry;
@@ -48,6 +48,7 @@ import com.example.carmaintenance.utilities.SetupViews;
 import com.example.carmaintenance.utilities.UserDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.gson.Gson;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -83,9 +84,6 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 	private Calendar _calendarOdometer;
 	private DecimalFormat _decimalFormat = new DecimalFormat("0.00");
 
-	private List<String> _listInspect;
-	private List<String> _listReplace;
-
 	private List<String> _preCheckInspect = new ArrayList<>();
 	private List<String> _preCheckReplace = new ArrayList<>();
 	private Map<String, Double> _mapInitInspect = new HashMap<>();
@@ -115,7 +113,7 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_maintenance_editor);
 
 		// Load an ad into the AdMob banner view.
-		AdView adView = (AdView) findViewById(R.id.adView);
+		AdView adView = findViewById(R.id.adView);
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 
@@ -159,6 +157,8 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
+					_editVehicleId= cursor.getInt(cursor
+							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_VEHICLE));
 					_editOdometer.setText(String.valueOf(cursor.getInt(cursor
 							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_ODOMETER))));
 					_calendarOdometer.setTime(new Date(cursor.getLong(cursor
@@ -168,10 +168,12 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 			}
 			getDbMaintenanceItems();
 		}
-		if (getIntent().getStringExtra("vehicle_id") != null) {
-			// user setting specific vehicle's maintenance. disable spinner
-			_editVehicleId = Integer.parseInt(getIntent().getStringExtra("vehicle_id"));
-			_spinnerVehicle.setEnabled(false);
+		String extraVehicleId = getIntent().getStringExtra("vehicle_id");
+		if (extraVehicleId != null) {
+			if (getIntent().getStringExtra("vehicle_id") != null) {
+				// user setting specific vehicle's maintenance. disable spinner
+				_editVehicleId = Integer.parseInt(extraVehicleId);
+			}
 		}
 
 		_vehicleIds = SetupViews.setupVehicleRegNoSpinner(this, _spinnerVehicle);
@@ -189,31 +191,49 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 					});
 		}
 
-		if (_editVehicleId != -1) {
-			_spinnerVehicle.setSelection(_vehicleIds.indexOf(_editVehicleId));
-		}
-
+		// show default date
 		_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
 
-		final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-			@Override
-			public void onDateSet(DatePicker view, int year, int monthOfYear,
-								  int dayOfMonth) {
-				_calendarOdometer.set(Calendar.YEAR, year);
-				_calendarOdometer.set(Calendar.MONTH, monthOfYear);
-				_calendarOdometer.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+		_editOdometer.setFilters(new InputFilter[]{
+				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
+		});
+		_editNewItemName.setFilters(new InputFilter[]{
+				new InputFilter.LengthFilter(MaintenanceItemEntry.ITEM_NAME_MAX_LENGTH)
+		});
+		_editRemarks.setFilters(new InputFilter[]{
+				new InputFilter.LengthFilter(MaintenanceEntry.REMARKS_MAX_LENGTH)
+		});
 
-				_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
-			}
-		};
+		setupListeners();
 
+		// if user is editing, then pre select in spinner
+		if (_editVehicleId != -1) {
+			_spinnerVehicle.setSelection(_vehicleIds.indexOf(_editVehicleId));
+			_spinnerVehicle.setEnabled(false);
+		}
+	}
+
+	private void setupListeners(){
 		_editDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialog datePickerDialog =
-						new DatePickerDialog(MaintenanceEditorActivity.this, dateSetListener,
-								_calendarOdometer.get(Calendar.YEAR), _calendarOdometer.get(Calendar.MONTH),
-								_calendarOdometer.get(Calendar.DAY_OF_MONTH));
+				DatePickerDialog datePickerDialog = new DatePickerDialog(
+						MaintenanceEditorActivity.this,
+						new DatePickerDialog.OnDateSetListener() {
+							@Override
+							public void onDateSet(DatePicker view, int year, int monthOfYear,
+												  int dayOfMonth) {
+								_calendarOdometer.set(Calendar.YEAR, year);
+								_calendarOdometer.set(Calendar.MONTH, monthOfYear);
+								_calendarOdometer.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+								_editDate.setText(DateUtilities
+										.dateToStringDate(_calendarOdometer.getTime()));
+							}
+						},
+						_calendarOdometer.get(Calendar.YEAR),
+						_calendarOdometer.get(Calendar.MONTH),
+						_calendarOdometer.get(Calendar.DAY_OF_MONTH));
 				// user cannot fill in future odometer. sounds logical right?
 				datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
 				datePickerDialog.show();
@@ -238,15 +258,6 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 			@Override
 			public void afterTextChanged(Editable s) {
 			}
-		});
-		_editOdometer.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
-		});
-		_editNewItemName.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(MaintenanceItemEntry.ITEM_NAME_MAX_LENGTH)
-		});
-		_editRemarks.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(MaintenanceEntry.REMARKS_MAX_LENGTH)
 		});
 
 		findViewById(R.id.btn_add_inspect).setOnClickListener(new View.OnClickListener() {
@@ -323,8 +334,8 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 					return;
 				}
 
-				View view = LayoutInflater.from(MaintenanceEditorActivity.this)
-						.inflate(R.layout.template_maintenance_editor_item, null);
+				View view = View.inflate(MaintenanceEditorActivity.this,
+						R.layout.template_maintenance_editor_item, null);
 
 				TextView txtItem = view.findViewById(R.id.txt_item);
 				EditText editPrice = view.findViewById(R.id.edit_price);
@@ -368,6 +379,10 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 				// maintenance item. or else, if editing vehicle but spinner not selecting
 				// editing vehicle's ID, then this is only triggered by initialisation
 				// and should be ignored
+				Log.v("CHECK_ME", "" + _vehicleIds.get(_spinnerVehicle
+						.getSelectedItemPosition()) + " " + _editVehicleId);
+				Log.v("CHECK_ME", (new Gson()).toJson(_vehicleIds));
+
 				if (_editVehicleId == -1 || _vehicleIds.get(_spinnerVehicle
 						.getSelectedItemPosition()) == _editVehicleId) {
 					getMaintenanceItems();
@@ -433,59 +448,81 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 				UserVehicleEntry._ID + "=?",
 				new String[]{String.valueOf(vehicleId)}, null);
 
-		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				final UserVehicle userVehicle = new UserVehicle(cursor);
-
-				final String firebaseVehicleId = VehicleTemplate
-						.getVehicleIdFromList(FirebaseObj._vehicleTemplates,
-								userVehicle.get_brand(),
-								userVehicle.get_model(),
-								userVehicle.get_variant());
-
-				FirebaseObj.runCallbackMaintenanceDetails(firebaseVehicleId, new FirebaseObj() {
-					@Override
-					public void callback() {
-						_listInspect = new ArrayList<>();
-						_listReplace = new ArrayList<>();
-
-						for (MaintenanceItem item : _maintenanceItems.get(firebaseVehicleId)) {
-							int itemUsage = item.getUsage();
-							if (itemUsage == UserVehicleEntry.USAGE_ALL || itemUsage == userVehicle.get_usage()) {
-								if (item.getInspect_replace() ==
-										FirebaseContract.FirebaseMaintenanceDetailsEntry.INSPECT) {
-									_listInspect.add(item.getItem());
-								} else if (item.getInspect_replace() ==
-										FirebaseContract.FirebaseMaintenanceDetailsEntry.REPLACE) {
-									_listReplace.add(item.getItem());
-								}
-							}
-						}
-
-						Collections.sort(_listInspect);
-						Collections.sort(_listReplace);
-
-						if (_preCheckInspect != null) {
-							_listInspect.removeAll(_preCheckInspect);
-							Collections.sort(_preCheckInspect);
-							_listInspect.addAll(0, _preCheckInspect);
-						}
-						if (_preCheckReplace != null) {
-							_listReplace.removeAll(_preCheckReplace);
-							Collections.sort(_preCheckReplace);
-							_listReplace.addAll(0, _preCheckReplace);
-						}
-
-						displayMaintenanceItems();
-						_viewContent.setVisibility(View.VISIBLE);
-						_progressBar.setVisibility(View.GONE);
-					}
-				});
-			}
-			cursor.close();
+		if (cursor == null) {
+			return;
 		}
+		if (cursor.getCount() > 0) {
+			final UserVehicle userVehicle = new UserVehicle(cursor);
+
+			final String firebaseVehicleId = VehicleTemplate
+					.getVehicleIdFromList(FirebaseObj._vehicleTemplates,
+							userVehicle.get_brand(),
+							userVehicle.get_model(),
+							userVehicle.get_variant());
+
+			FirebaseObj.runCallbackMaintenanceDetails(firebaseVehicleId, new FirebaseObj() {
+				@Override
+				public void callback() {
+					List<MaintenanceItem> preCheckInspectList = new ArrayList<>();
+					List<MaintenanceItem> preCheckReplaceList = new ArrayList<>();
+
+					List<List<MaintenanceItem>> firebaseItems = FirebaseObj
+							.getItemsByInspectReplace(firebaseVehicleId, userVehicle.get_usage());
+					List<MaintenanceItem> maintenanceItemsInspect = firebaseItems.get(0);
+					List<MaintenanceItem> maintenanceItemsReplace = firebaseItems.get(1);
+
+					maintenanceItemsInspect.addAll(MaintenanceItem
+							.getCustomMaintenanceItemNotInFirebase(
+									MaintenanceEditorActivity.this,
+									maintenanceItemsInspect, userVehicle,
+									CustomMaintenanceItemEntry.INSPECT_VALUE));
+
+					maintenanceItemsReplace.addAll(MaintenanceItem
+							.getCustomMaintenanceItemNotInFirebase(
+									MaintenanceEditorActivity.this,
+									maintenanceItemsReplace, userVehicle,
+									CustomMaintenanceItemEntry.REPLACE_VALUE));
+
+					for (int i = maintenanceItemsInspect.size() - 1; i >= 0; i--) {
+						if (_preCheckInspect.contains(maintenanceItemsInspect.get(i).getItem())) {
+							maintenanceItemsInspect.remove(i);
+						}
+					}
+					for (int i = maintenanceItemsReplace.size() - 1; i >= 0; i--) {
+						if (_preCheckReplace.contains(maintenanceItemsReplace.get(i).getItem())) {
+							maintenanceItemsReplace.remove(i);
+						}
+					}
+
+					for (String item : _preCheckInspect) {
+						preCheckInspectList.add(new MaintenanceItem("",
+								item, CustomMaintenanceItemEntry.INSPECT_VALUE,
+								0, 0, 0, 0, 0));
+					}
+					for (String item : _preCheckReplace) {
+						preCheckReplaceList.add(new MaintenanceItem("",
+								item, CustomMaintenanceItemEntry.REPLACE_VALUE,
+								0, 0, 0, 0, 0));
+					}
+
+					Collections.sort(maintenanceItemsInspect);
+					Collections.sort(maintenanceItemsReplace);
+					Collections.sort(preCheckInspectList);
+					Collections.sort(preCheckReplaceList);
+
+					maintenanceItemsInspect.addAll(0, preCheckInspectList);
+					maintenanceItemsReplace.addAll(0, preCheckReplaceList);
+
+					displayMaintenanceItems(maintenanceItemsInspect, maintenanceItemsReplace);
+					_viewContent.setVisibility(View.VISIBLE);
+					_progressBar.setVisibility(View.GONE);
+				}
+			});
+		}
+		cursor.close();
 	}
 
+	// if editing, get maintenance items already selected previously
 	private void getDbMaintenanceItems() {
 		Uri uri = MaintenanceDetailsEntry.CONTENT_URI_MAINTENANCE;
 		long maintenanceId = ContentUris.parseId(_currentUri);
@@ -518,7 +555,8 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 		}
 	}
 
-	private void displayMaintenanceItems() {
+	private void displayMaintenanceItems(List<MaintenanceItem> maintenanceItemsInspect,
+										 List<MaintenanceItem> maintenanceItemsReplace) {
 		LinearLayout llInspect = findViewById(R.id.ll_inspect);
 		LinearLayout llReplace = findViewById(R.id.ll_replace);
 
@@ -526,40 +564,36 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 		_llInspectItems.removeAllViews();
 		_llReplaceItems.removeAllViews();
 
-		if (_listInspect.isEmpty()) {
+		if (maintenanceItemsInspect.isEmpty()) {
 			llInspect.setVisibility(View.GONE);
 		} else {
 			llInspect.setVisibility(View.VISIBLE);
 		}
-		if (_listReplace.isEmpty()) {
+		if (maintenanceItemsReplace.isEmpty()) {
 			llReplace.setVisibility(View.GONE);
 		} else {
 			llReplace.setVisibility(View.VISIBLE);
 		}
-		addMaintenanceItemLayout(_listInspect, _preCheckInspect,
-				_mapInitInspect, _llInspectItems);
-		addMaintenanceItemLayout(_listReplace, _preCheckReplace,
-				_mapInitReplace, _llReplaceItems);
+		addMaintenanceItemLayouts(_llInspectItems, maintenanceItemsInspect, _mapInitInspect);
+		addMaintenanceItemLayouts(_llReplaceItems, maintenanceItemsReplace, _mapInitReplace);
 	}
 
-	private void addMaintenanceItemLayout(
-			List<String> maintenanceItems, List<String> preCheckItems,
-			Map<String, Double> initPrice, LinearLayout linearLayout) {
-		for (String itemName : maintenanceItems) {
-			View view = LayoutInflater.from(this)
-					.inflate(R.layout.template_maintenance_editor_item, null);
-
+	private void addMaintenanceItemLayouts(
+			LinearLayout linearLayout, List<MaintenanceItem> maintenanceItems,
+			Map<String, Double> initPrice) {
+		for (MaintenanceItem maintenanceItem : maintenanceItems) {
+			View view = LayoutInflater.from(this).inflate(
+					R.layout.template_maintenance_editor_item, linearLayout, false);
 			TextView txtItem = view.findViewById(R.id.txt_item);
-			txtItem.setText(itemName);
+			txtItem.setText(maintenanceItem.getItem());
 
 			final EditText editPrice = view.findViewById(R.id.edit_price);
 			final CheckBox cbItem = view.findViewById(R.id.cb_item);
 
-			if (initPrice.containsKey(itemName)) {
-				editPrice.setText(String.valueOf(initPrice.get(itemName)));
+			if (initPrice.containsKey(maintenanceItem.getItem())) {
+				editPrice.setText(String.valueOf(initPrice.get(maintenanceItem.getItem())));
+				cbItem.setChecked(true);
 			}
-
-			cbItem.setChecked(preCheckItems.contains(itemName));
 			setMaintenanceItemListeners(editPrice, cbItem);
 			linearLayout.addView(view);
 		}
@@ -706,7 +740,7 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 					.findViewById(R.id.edit_price)).getText().toString().trim();
 
 			// price is two decimal places only
-			double doubPrice = TextUtils.isEmpty(itemPrice) ?
+			double doublePrice = TextUtils.isEmpty(itemPrice) ?
 					0 : Math.round(Double.parseDouble(itemPrice) * 100.0) / 100.0;
 
 			Cursor itemCursor = getContentResolver().query(
@@ -750,7 +784,7 @@ public class MaintenanceEditorActivity extends AppCompatActivity {
 			ContentValues values = new ContentValues();
 			values.put(MaintenanceDetailsEntry.COLUMN_MAINTENANCE_ID, maintenanceId);
 			values.put(MaintenanceDetailsEntry.COLUMN_ITEM, itemId);
-			values.put(MaintenanceDetailsEntry.COLUMN_PRICE, doubPrice);
+			values.put(MaintenanceDetailsEntry.COLUMN_PRICE, doublePrice);
 
 			Uri newUri = getContentResolver()
 					.insert(MaintenanceDetailsEntry.CONTENT_URI, values);

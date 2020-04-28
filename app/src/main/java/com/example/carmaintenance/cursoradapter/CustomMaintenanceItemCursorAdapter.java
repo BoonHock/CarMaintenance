@@ -43,14 +43,18 @@ public class CustomMaintenanceItemCursorAdapter extends CursorAdapter {
 				.getColumnIndexOrThrow(CustomMaintenanceItemEntry.COLUMN_ITEM)));
 
 		if (intDistanceInterval != 0) {
-			strDistanceInterval += String.valueOf(intDistanceInterval)
-					+ " " + context.getString(R.string.kilometer);
+			strDistanceInterval += intDistanceInterval + " " + context.getString(R.string.kilometer);
 			txtDistance.setText(strDistanceInterval);
+			txtDistance.setVisibility(View.VISIBLE);
+		} else {
+			txtDistance.setVisibility(View.GONE);
 		}
 		if (intDurationInterval != 0) {
-			strDurationInterval += String.valueOf(intDurationInterval)
-					+ " " + context.getString(R.string.months);
-			txtDistance.setText(strDurationInterval);
+			strDurationInterval += intDurationInterval + " " + context.getString(R.string.months);
+			txtDuration.setText(strDurationInterval);
+			txtDuration.setVisibility(View.VISIBLE);
+		} else {
+			txtDuration.setVisibility(View.GONE);
 		}
 	}
 }

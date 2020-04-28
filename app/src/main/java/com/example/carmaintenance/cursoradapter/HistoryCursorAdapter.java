@@ -3,7 +3,6 @@ package com.example.carmaintenance.cursoradapter;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import com.example.carmaintenance.data.MaintenanceItemContract.MaintenanceItemEn
 import com.example.carmaintenance.data.UserVehicleContract.UserVehicleEntry;
 import com.example.carmaintenance.objects.UserVehicle;
 import com.example.carmaintenance.utilities.DateUtilities;
+import com.example.carmaintenance.utilities.Misc;
 
 import java.util.Date;
 import java.util.Locale;
@@ -39,6 +39,7 @@ public class HistoryCursorAdapter extends CursorAdapter {
 		TextView txtDate = view.findViewById(R.id.txt_date);
 		TextView txtRegNo = view.findViewById(R.id.txt_reg_no);
 		TextView txtBrandModel = view.findViewById(R.id.txt_brand_model_variant);
+		TextView txtOdometer = view.findViewById(R.id.txt_odometer);
 		TextView txtInspect = view.findViewById(R.id.txt_inspect);
 		TextView txtReplace = view.findViewById(R.id.txt_replace);
 		LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
@@ -56,10 +57,11 @@ public class HistoryCursorAdapter extends CursorAdapter {
 				.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_VEHICLE));
 		Date date = new Date(cursor.getLong(cursor
 				.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE)));
-
-		Log.v("VEHICLE_ID_CHECK", "MAINTENANCE VEHICLE: " + vehicleId);
+		int odometer = cursor.getInt(cursor
+				.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_ODOMETER));
 
 		txtDate.setText(DateUtilities.dateToStringDate(date));
+		txtOdometer.setText(Misc.getDistanceWithUnit(odometer, context));
 
 		Cursor userVehicleCursor = context.getContentResolver().query(
 				UserVehicleEntry.CONTENT_URI,

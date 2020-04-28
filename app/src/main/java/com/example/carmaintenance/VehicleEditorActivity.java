@@ -39,7 +39,8 @@ import com.google.android.gms.ads.AdView;
 
 import java.util.Date;
 
-public class VehicleEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class VehicleEditorActivity extends AppCompatActivity
+		implements LoaderManager.LoaderCallbacks<Cursor> {
 	/**
 	 * Identifier for the pet data loader
 	 */
@@ -56,7 +57,7 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 
 	private Uri _currentUri;
 	private boolean _hasChanges = false;
-	private boolean _initSpinners = false;
+	private boolean _isEditing = false;
 	private boolean _initialising = true;
 	private UserVehicle _initUserVehicle = null;
 	private ArrayAdapter<String> _modelAdapter;
@@ -361,10 +362,10 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		_initSpinners = false;
+		_isEditing = false;
 		if (data != null && data.getCount() > 0) {
 			if (data.moveToFirst()) {
-				_initSpinners = true;
+				_isEditing = true;
 				_initUserVehicle = new UserVehicle(data);
 
 				if (_initUserVehicle.get_usage() == UserVehicleEntry.USAGE_SEVERE) {
@@ -390,25 +391,24 @@ public class VehicleEditorActivity extends AppCompatActivity implements LoaderMa
 		_brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_spinnerBrand.setAdapter(_brandAdapter);
 
-		if (_initSpinners) {
+		if (_isEditing) {
 			_spinnerBrand.setSelection(_brandAdapter
 					.getPosition(_initUserVehicle.get_brand()));
 		}
 
 		setupSpinnerModel();
-		if (_initSpinners) {
+		if (_isEditing) {
 			_spinnerModel.setSelection(_modelAdapter
 					.getPosition(_initUserVehicle.get_model()));
 		}
 
 		setupSpinnerVariant();
-		if (_initSpinners) {
+		if (_isEditing) {
 			_spinnerVariant.setSelection(_variantAdapter
 					.getPosition(_initUserVehicle.get_variant()));
+			_editUpcomingStartFrom.setText(String
+					.valueOf(_initUserVehicle.get_upcomingStartFrom()));
 		}
-
-		_editUpcomingStartFrom.setText(String
-				.valueOf(_initUserVehicle.get_upcomingStartFrom()));
 
 		_progressBar.setVisibility(View.GONE);
 		findViewById(R.id.ll_content).setVisibility(View.VISIBLE);

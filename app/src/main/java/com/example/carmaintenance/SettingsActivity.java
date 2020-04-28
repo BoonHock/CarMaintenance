@@ -56,13 +56,6 @@ public class SettingsActivity extends AppCompatActivity {
 						editText.setInputType(InputType.TYPE_CLASS_NUMBER);
 					}
 				});
-				editTextStartUpcoming.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-					@Override
-					public boolean onPreferenceChange(Preference preference, Object newValue) {
-						VehicleMaintenanceProvider.notifyVehicleChanged(getContext());
-						return true;
-					}
-				});
 			}
 		}
 	}
