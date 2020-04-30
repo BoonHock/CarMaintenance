@@ -32,9 +32,12 @@ public class VehicleTemplateAdapter extends ArrayAdapter<VehicleTemplate> {
 		TextView txtVariant = convertView.findViewById(R.id.txt_variant);
 
 		VehicleTemplate currentVehicleTemplate = getItem(position);
-		txtBrand.setText(currentVehicleTemplate.getBrand());
-		txtModel.setText(currentVehicleTemplate.getModel());
-		txtVariant.setText(currentVehicleTemplate.getVariant());
+
+		if (currentVehicleTemplate != null) {
+			txtBrand.setText(currentVehicleTemplate.getBrand());
+			txtModel.setText(currentVehicleTemplate.getModel());
+			txtVariant.setText(currentVehicleTemplate.getVariant());
+		}
 
 		return convertView;
 	}

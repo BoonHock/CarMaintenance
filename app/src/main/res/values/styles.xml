@@ -79,7 +79,6 @@
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_marginRight">8dp</item>
 		<item name="android:layout_weight">1</item>
-		<item name="android:hint">$$</item>
 		<item name="android:importantForAutofill" tools:targetApi="o">no</item>
 		<item name="android:inputType">numberDecimal</item>
 		<item name="android:maxLength">8</item>

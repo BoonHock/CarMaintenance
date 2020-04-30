@@ -126,9 +126,9 @@
 	<string name="custom_maintenance_item">Custom maintenance item</string>
 	<string name="start_maintenance_recommendation_from">Start maintenance recommendation from (KM):</string>
 	<string name="odometer_start_upcoming">Odometer distance to start calculating upcoming
-		maintenance items from. For example, if 95,000 KM is set,
+		maintenance items from. For example, if 98,000 KM is set,
 		item with 5000 KM maintenance distance interval will need
-		to be serviced at 100,000 KM. Default value is 0 KM.</string>
+		to be serviced at 103,000 KM. Default value is 0.</string>
 	<string name="distance_interval_label">Distance interval</string>
 	<string name="duration_interval_label">Duration interval</string>
 	<string name="add_item">Add item</string>
@@ -139,4 +139,10 @@
 	<string name="inspect_or_replace">Inspect / replace</string>
 	<string name="all_inputs_required">All inputs are required.</string>
 	<string name="item_deleted">Item deleted</string>
+	<string name="select_by_template">Select by template</string>
+	<string name="dollar_sign">$$</string>
+	<string name="edit">Edit</string>
+
+	<string name="by_distance_interval">By distance interval</string>
+	<string name="by_duration_interval">By duration interval</string>
 </resources>

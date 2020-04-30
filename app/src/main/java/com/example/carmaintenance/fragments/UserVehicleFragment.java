@@ -55,8 +55,8 @@ public class UserVehicleFragment extends Fragment implements LoaderManager.Loade
 		listView.setEmptyView(emptyView);
 		listView.setAdapter(_userVehicleCursorAdapter);
 
-		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
-		final View sheetView = getActivity().getLayoutInflater()
+		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+		final View sheetView = requireActivity().getLayoutInflater()
 				.inflate(R.layout.bottom_sheet_edit_delete, container, false);
 		bottomSheetDialog.setContentView(sheetView);
 
@@ -84,7 +84,7 @@ public class UserVehicleFragment extends Fragment implements LoaderManager.Loade
 			}
 		});
 
-		sheetView.findViewById(R.id.bottom_sheet_ll_edit)
+		sheetView.findViewById(R.id.bottom_sheet_edit)
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -95,7 +95,7 @@ public class UserVehicleFragment extends Fragment implements LoaderManager.Loade
 						bottomSheetDialog.hide();
 					}
 				});
-		sheetView.findViewById(R.id.bottom_sheet_ll_delete)
+		sheetView.findViewById(R.id.bottom_sheet_delete)
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -104,7 +104,7 @@ public class UserVehicleFragment extends Fragment implements LoaderManager.Loade
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										getContext().getContentResolver().delete(
+										requireContext().getContentResolver().delete(
 												ContentUris.withAppendedId(
 														UserVehicleEntry.CONTENT_URI, _longClickId),
 												null,
@@ -122,7 +122,7 @@ public class UserVehicleFragment extends Fragment implements LoaderManager.Loade
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 		// This loader will execute the ContentProvider's query method on a background thread
-		return new CursorLoader(getContext(),   // Parent activity context
+		return new CursorLoader(requireContext(),   // Parent activity context
 				UserVehicleEntry.CONTENT_URI,   // Provider content URI to query
 				UserVehicleEntry.FULL_PROJECTION,    // Columns to include in the resulting Cursor
 				null,                   // No selection clause

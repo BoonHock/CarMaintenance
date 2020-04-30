@@ -73,22 +73,6 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent intent = new Intent(getContext(), MaintenanceEditorActivity.class);
 				intent.putExtra("vehicle_id", String.valueOf(id));
-//				ArrayList<String> inspectItems = new ArrayList<>();
-//				ArrayList<String> replaceItems = new ArrayList<>();
-//
-//				LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
-//				LinearLayout llReplace = view.findViewById(R.id.ll_replace_items);
-//
-//				for (int i = 0, j = llInspect.getChildCount(); i < j; i++) {
-//					inspectItems.add(((TextView) llInspect.getChildAt(i)
-//							.findViewById(R.id.txt_item)).getText().toString());
-//				}
-//				for (int i = 0, j = llReplace.getChildCount(); i < j; i++) {
-//					replaceItems.add(((TextView) llReplace.getChildAt(i)
-//							.findViewById(R.id.txt_item)).getText().toString());
-//				}
-//				intent.putStringArrayListExtra("inspect_items", inspectItems);
-//				intent.putStringArrayListExtra("replace_items", replaceItems);
 				startActivity(intent);
 			}
 		});

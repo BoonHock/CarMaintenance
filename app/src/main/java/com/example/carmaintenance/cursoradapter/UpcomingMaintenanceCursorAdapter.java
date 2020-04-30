@@ -85,12 +85,10 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		maintenanceItemsInspect.addAll(MaintenanceItem.getCustomMaintenanceItemNotInFirebase(
 				context,
 				maintenanceItemsInspect,
-				userVehicle,
 				MaintenanceItemEntry.INSPECT_VALUE));
 		maintenanceItemsReplace.addAll(MaintenanceItem.getCustomMaintenanceItemNotInFirebase(
 				context,
 				maintenanceItemsReplace,
-				userVehicle,
 				MaintenanceItemEntry.REPLACE_VALUE));
 
 		List<UpcomingMaintenanceItem> upcomingMaintenanceItemsInspect = new ArrayList<>();

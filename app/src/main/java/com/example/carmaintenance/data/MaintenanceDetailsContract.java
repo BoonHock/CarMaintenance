@@ -29,6 +29,9 @@ public class MaintenanceDetailsContract {
 		public static final String COLUMN_ITEM = "item";
 		public static final String COLUMN_PRICE = "price";
 
+		// arbitrary value. if need to set higher in future then set lo
+		public static final int PRICE_MAX_LENGTH = 8;
+
 		public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 				+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ COLUMN_MAINTENANCE_ID + " INTEGER NOT NULL, "

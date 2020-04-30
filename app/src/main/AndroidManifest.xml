@@ -34,7 +34,8 @@
 		</activity>
 		<activity
 			android:name=".MaintenanceEditorActivity"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName=".MainActivity"
+			android:windowSoftInputMode="stateAlwaysHidden">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data

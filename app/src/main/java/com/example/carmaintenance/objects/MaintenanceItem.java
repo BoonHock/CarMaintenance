@@ -155,8 +155,7 @@ public class MaintenanceItem implements Comparable<MaintenanceItem> {
 	}
 
 	public static List<MaintenanceItem> getCustomMaintenanceItemNotInFirebase(
-			Context context, List<MaintenanceItem> firebaseItems,
-			UserVehicle userVehicle, int inspectReplace) {
+			Context context, List<MaintenanceItem> firebaseItems, int inspectReplace) {
 		List<MaintenanceItem> maintenanceItems = new ArrayList<>();
 
 		Cursor cursor = context.getContentResolver().query(

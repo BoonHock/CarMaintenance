@@ -83,7 +83,7 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 			}
 		});
 
-		sheetView.findViewById(R.id.bottom_sheet_ll_edit)
+		sheetView.findViewById(R.id.bottom_sheet_edit)
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -95,7 +95,7 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 					}
 				});
 
-		sheetView.findViewById(R.id.bottom_sheet_ll_delete)
+		sheetView.findViewById(R.id.bottom_sheet_delete)
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {

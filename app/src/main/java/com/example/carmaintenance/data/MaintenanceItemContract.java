@@ -29,6 +29,7 @@ public class MaintenanceItemContract {
 		public static final int REPLACE_VALUE = FirebaseContract
 				.FirebaseMaintenanceDetailsEntry.REPLACE;
 
+		// checked with vendor's items. their maximum are about 40 characters
 		public static final int ITEM_NAME_MAX_LENGTH = 50;
 
 		public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("

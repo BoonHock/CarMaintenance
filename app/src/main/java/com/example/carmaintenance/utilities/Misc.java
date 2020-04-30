@@ -57,11 +57,15 @@ public class Misc {
 		if (view == null) {
 			view = new View(activity);
 		}
-		imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		if (imm != null) {
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
 	}
 
 	public static void showKeyboard(Activity activity, EditText editText) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+		if (imm != null) {
+			imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+		}
 	}
 }
