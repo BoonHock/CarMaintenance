@@ -129,8 +129,6 @@
 		maintenance items from. For example, if 98,000 KM is set,
 		item with 5000 KM maintenance distance interval will need
 		to be serviced at 103,000 KM. Default value is 0.</string>
-	<string name="distance_interval_label">Distance interval</string>
-	<string name="duration_interval_label">Duration interval</string>
 	<string name="add_item">Add item</string>
 	<string name="item_name">Item name</string>
 	<string name="duration_interval_month">Duration interval (month)</string>
@@ -145,4 +143,7 @@
 
 	<string name="by_distance_interval">By distance interval</string>
 	<string name="by_duration_interval">By duration interval</string>
+	<string name="current_odometer">Current odometer:</string>
+	<string name="interval_label">Interval:</string>
+	<string name="vertical_separator">|</string>
 </resources>

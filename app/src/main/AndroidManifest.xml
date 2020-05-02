@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.example.carmaintenance">
+	package="com.incupe.vewec">
 	<!-- Include required permissions for Google Mobile Ads to run. -->
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,65 +13,65 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 		<activity
-			android:name=".CustomMaintenanceItemActivity"
+			android:name="com.incupe.vewec.CustomMaintenanceItemActivity"
 			android:label="@string/custom_maintenance_item"
-			android:parentActivityName=".MainActivity"
+			android:parentActivityName="com.incupe.vewec.MainActivity"
 			android:windowSoftInputMode="adjustResize">
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".MainActivity" />
+				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
 		<activity
-			android:name=".SettingsActivity"
+			android:name="com.incupe.vewec.SettingsActivity"
 			android:label="@string/title_activity_settings"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName="com.incupe.vewec.MainActivity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".MainActivity" />
+				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
 		<activity
-			android:name=".MaintenanceEditorActivity"
-			android:parentActivityName=".MainActivity"
+			android:name="com.incupe.vewec.MaintenanceEditorActivity"
+			android:parentActivityName="com.incupe.vewec.MainActivity"
 			android:windowSoftInputMode="stateAlwaysHidden">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".MainActivity" />
+				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
 		<activity
-			android:name=".OdometerEditorActivity"
+			android:name="com.incupe.vewec.OdometerEditorActivity"
 			android:label="@string/odometer"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName="com.incupe.vewec.MainActivity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".MainActivity" />
+				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
 		<activity
-			android:name=".VehicleTemplateActivity"
+			android:name="com.incupe.vewec.VehicleTemplateActivity"
 			android:label="@string/vehicle_template"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName="com.incupe.vewec.MainActivity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".MainActivity" />
+				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
 		<activity
-			android:name=".VehicleEditorActivity"
-			android:parentActivityName=".MainActivity">
+			android:name="com.incupe.vewec.VehicleEditorActivity"
+			android:parentActivityName="com.incupe.vewec.MainActivity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".MainActivity" />
+				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
-		<activity android:name=".MainActivity">
+		<activity android:name="com.incupe.vewec.MainActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -80,8 +80,8 @@
 		</activity>
 
 		<provider
-			android:name=".data.VehicleMaintenanceProvider"
-			android:authorities="com.example.carmaintenance"
+			android:name="com.incupe.vewec.data.VehicleMaintenanceProvider"
+			android:authorities="com.incupe.vewec"
 			android:exported="false" />
 
 		<activity
