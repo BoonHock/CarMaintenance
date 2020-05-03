@@ -75,6 +75,7 @@
 	<string name="inspect">Inspect</string>
 	<string name="replace">Replace</string>
 	<string name="odometer_input_too_large">Odometer value too large. Please retry.</string>
+	<string name="odometer_input_too_small">Odometer value too small. Please retry.</string>
 	<string name="add_maintenance">Add maintenance</string>
 	<string name="items_only_save_checked">Items (only checked items will be saved)</string>
 	<string name="price">Price</string>
@@ -112,10 +113,6 @@
 	<string name="messages_header">Messages</string>
 	<string name="sync_header">Sync</string>
 
-	<!-- Messages Preferences -->
-	<string name="signature_title">Your signature</string>
-	<string name="reply_title">Default reply action</string>
-
 	<!-- Sync Preferences -->
 	<string name="sync_title">Sync email periodically</string>
 	<string name="attachment_title">Download incoming attachments</string>
@@ -146,4 +143,10 @@
 	<string name="current_odometer">Current odometer:</string>
 	<string name="interval_label">Interval:</string>
 	<string name="vertical_separator">|</string>
+	<string name="notifications">Notifications</string>
+	<string name="default_notification_time">0700</string>
+	<string name="friday">Friday</string>
+	<string name="skip">Skip</string>
+	<string name="which_maintenance_template">Which maintenance are you performing?</string>
+	<string name="_0_00">0.00</string>
 </resources>

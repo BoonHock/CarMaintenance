@@ -2,7 +2,6 @@ package com.incupe.vewec.cursoradapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import com.incupe.vewec.objects.UpcomingMaintenanceItem;
 import com.incupe.vewec.objects.UserVehicle;
 import com.incupe.vewec.objects.VehicleTemplate;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -48,7 +46,7 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		TextView txtOdometer = view.findViewById(R.id.txt_odometer);
 
 		final String firebaseVehicleId = VehicleTemplate
-				.getVehicleIdFromList(FirebaseObj._vehicleTemplates,
+				.getFirebaseVehicleIdFromList(FirebaseObj._vehicleTemplates,
 						userVehicle.get_brand(),
 						userVehicle.get_model(),
 						userVehicle.get_variant());
@@ -77,41 +75,33 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		TextView txtInspect = view.findViewById(R.id.txt_inspect);
 		TextView txtReplace = view.findViewById(R.id.txt_replace);
 
-		List<List<MaintenanceItem>> firebaseItems = FirebaseObj
-				.getItemsByInspectReplace(firebaseVehicleId, userVehicle.get_usage());
+		List<List<UpcomingMaintenanceItem>> firebaseItems = FirebaseObj
+				.getUpcomingItemsByInspectReplace(context,
+						firebaseVehicleId,
+						userVehicle);
 
-		List<MaintenanceItem> maintenanceItemsInspect = firebaseItems.get(0);
-		List<MaintenanceItem> maintenanceItemsReplace = firebaseItems.get(1);
+		List<UpcomingMaintenanceItem> upcomingItemsInspect = firebaseItems.get(0);
+		List<UpcomingMaintenanceItem> upcomingItemsReplace = firebaseItems.get(1);
 
-		maintenanceItemsInspect.addAll(MaintenanceItem.getCustomMaintenanceItemNotInFirebase(
-				context,
-				maintenanceItemsInspect,
-				MaintenanceItemEntry.INSPECT_VALUE));
-		maintenanceItemsReplace.addAll(MaintenanceItem.getCustomMaintenanceItemNotInFirebase(
-				context,
-				maintenanceItemsReplace,
-				MaintenanceItemEntry.REPLACE_VALUE));
+		upcomingItemsInspect.addAll(MaintenanceItem
+				.getUpcomingCustomItemNotInFirebase(context,
+						upcomingItemsInspect,
+						userVehicle,
+						MaintenanceItemEntry.INSPECT_VALUE));
+		upcomingItemsReplace.addAll(MaintenanceItem
+				.getUpcomingCustomItemNotInFirebase(context,
+						upcomingItemsReplace,
+						userVehicle,
+						MaintenanceItemEntry.REPLACE_VALUE));
 
-		List<UpcomingMaintenanceItem> upcomingMaintenanceItemsInspect = new ArrayList<>();
-		List<UpcomingMaintenanceItem> upcomingMaintenanceItemsReplace = new ArrayList<>();
-
-		for (MaintenanceItem item : maintenanceItemsInspect) {
-			upcomingMaintenanceItemsInspect.add(
-					new UpcomingMaintenanceItem(context, item, userVehicle));
-		}
-		for (MaintenanceItem item : maintenanceItemsReplace) {
-			upcomingMaintenanceItemsReplace.add(
-					new UpcomingMaintenanceItem(context, item, userVehicle));
-		}
-
-		Collections.sort(upcomingMaintenanceItemsInspect, new UpcomingMaintenanceItem.CustomComparator());
-		Collections.sort(upcomingMaintenanceItemsReplace, new UpcomingMaintenanceItem.CustomComparator());
+		Collections.sort(upcomingItemsInspect, new UpcomingMaintenanceItem.CustomComparator());
+		Collections.sort(upcomingItemsReplace, new UpcomingMaintenanceItem.CustomComparator());
 
 		llInspect.removeAllViews();
 		llReplace.removeAllViews();
 
-		addMaintenanceItems(context, llInspect, upcomingMaintenanceItemsInspect);
-		addMaintenanceItems(context, llReplace, upcomingMaintenanceItemsReplace);
+		addMaintenanceItems(context, llInspect, upcomingItemsInspect);
+		addMaintenanceItems(context, llReplace, upcomingItemsReplace);
 
 		if (llInspect.getChildCount() == 0) {
 			txtInspect.setVisibility(View.GONE);
@@ -177,28 +167,27 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		}
 	}
 
-	private int getUrgencyColour(Context context, double mag) {
-		int magnitudeColorResourceId;
-		int magFloor = (int) Math.floor(mag);
+	public static int getUrgencyColour(Context context, int urgency) {
+		int colorResourceId;
 
-		switch (magFloor) {
+		switch (urgency) {
 			case UpcomingMaintenanceItem.URGENCY_VERY3_URGENT:
-				magnitudeColorResourceId = R.color.urgency1;
+				colorResourceId = R.color.urgency1;
 				break;
 			case UpcomingMaintenanceItem.URGENCY_VERY2_URGENT:
-				magnitudeColorResourceId = R.color.urgency2;
+				colorResourceId = R.color.urgency2;
 				break;
 			case UpcomingMaintenanceItem.URGENCY_VERY_URGENT:
-				magnitudeColorResourceId = R.color.urgency3;
+				colorResourceId = R.color.urgency3;
 				break;
 			case UpcomingMaintenanceItem.URGENCY_URGENT:
-				magnitudeColorResourceId = R.color.urgency4;
+				colorResourceId = R.color.urgency4;
 				break;
 			default:
-				magnitudeColorResourceId = Color.TRANSPARENT;
+				colorResourceId = R.color.urgency_not_urgent;
 				break;
 		}
-		return ContextCompat.getColor(context, magnitudeColorResourceId);
+		return ContextCompat.getColor(context, colorResourceId);
 	}
 
 }

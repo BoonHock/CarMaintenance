@@ -43,7 +43,7 @@ public class UserDialog {
 		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				// User clicked the "Cancel" button, so dismiss the dialog
-				// and continue editing the pet.
+				// and continue editing.
 				if (dialog != null) {
 					dialog.dismiss();
 				}

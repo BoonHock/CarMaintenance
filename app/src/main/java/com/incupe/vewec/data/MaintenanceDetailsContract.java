@@ -10,7 +10,7 @@ public class MaintenanceDetailsContract {
 	private MaintenanceDetailsContract() {
 	}
 
-	public static final String PATH_MAINTENANCE_DETAILS = "maintenance_details";
+	static final String PATH_MAINTENANCE_DETAILS = "maintenance_details";
 
 	public static final class MaintenanceDetailsEntry implements BaseColumns {
 		public static final Uri CONTENT_URI = Uri
@@ -23,7 +23,7 @@ public class MaintenanceDetailsContract {
 		public static final Uri CONTENT_URI_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
 				Uri.withAppendedPath(CONTENT_URI, "latest_by_item");
 
-		public static final String TABLE_NAME = "maintenance_details";
+		static final String TABLE_NAME = "maintenance_details";
 		public static final String _ID = BaseColumns._ID;
 		public static final String COLUMN_MAINTENANCE_ID = "maintenance";
 		public static final String COLUMN_ITEM = "item";
@@ -32,7 +32,7 @@ public class MaintenanceDetailsContract {
 		// arbitrary value. if need to set higher in future then set lo
 		public static final int PRICE_MAX_LENGTH = 8;
 
-		public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
+		static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 				+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ COLUMN_MAINTENANCE_ID + " INTEGER NOT NULL, "
 				+ COLUMN_ITEM + " INTEGER NOT NULL, "
@@ -46,7 +46,7 @@ public class MaintenanceDetailsContract {
 				+ COLUMN_ITEM + "));";
 
 		// select maintenance details and also its item name
-		public static final String SELECT_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
+		static final String SELECT_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
 				"SELECT " + MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_DATE + ", "
 						+ MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_ODOMETER
 						+ " FROM " + TABLE_NAME
@@ -67,7 +67,7 @@ public class MaintenanceDetailsContract {
 						+ " DESC LIMIT 1;";
 
 		// select maintenance details and also its item name by maintenance id
-		public static final String SELECT_JOIN_MAINTENANCE_ITEM_ID =
+		static final String SELECT_JOIN_MAINTENANCE_ITEM_ID =
 				"SELECT " + TABLE_NAME + "." + _ID + ", "
 						+ TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + ", "
 						+ TABLE_NAME + "." + COLUMN_PRICE + ", "
@@ -77,7 +77,9 @@ public class MaintenanceDetailsContract {
 						+ " JOIN " + MaintenanceItemEntry.TABLE_NAME
 						+ " ON " + MaintenanceItemEntry.TABLE_NAME + "." + _ID
 						+ "=" + TABLE_NAME + "." + COLUMN_ITEM
-						+ " WHERE " + TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + "=? ORDER BY "
+						+ " WHERE " + TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + "=? AND "
+						+ MaintenanceItemEntry.TABLE_NAME + "."
+						+ MaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=? ORDER BY "
 						+ MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_ITEM
 						+ ";";
 

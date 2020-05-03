@@ -105,52 +105,8 @@
 				android:id="@+id/btn_select_by_template"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@string/select_by_template" />
-
-			<LinearLayout
-				android:id="@+id/ll_inspect"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginEnd="16dp"
-					android:text="@string/inspect"
-					android:textStyle="bold" />
-
-				<Button
-					android:id="@+id/btn_add_inspect"
-					android:layout_width="wrap_content"
-					android:layout_height="40dp"
-					android:text="@string/add_with_symbol"
-					android:textAppearance="?android:textAppearanceSmall" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_inspect_items"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
-
-				<!--				<LinearLayout-->
-				<!--					android:layout_width="match_parent"-->
-				<!--					android:layout_height="wrap_content"-->
-				<!--					android:orientation="horizontal">-->
-
-				<!--					<TextView-->
-				<!--						style="@style/maintenanceEditorTableRowItem1"-->
-				<!--						android:text="air conditioner performance conditioner performance" />-->
-
-				<!--					<TextView style="@style/maintenanceEditorTableRowItem2" />-->
-
-				<!--					<EditText style="@style/maintenanceEditorTableRowItem3" />-->
-
-				<!--					<CheckBox style="@style/maintenanceEditorTableRowItem4" />-->
-				<!--				</LinearLayout>-->
-			</LinearLayout>
+				android:text="@string/select_by_template"
+				android:visibility="gone" />
 
 			<LinearLayout
 				android:id="@+id/ll_replace"
@@ -178,24 +134,35 @@
 				android:id="@+id/ll_replace_items"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical">
+				android:orientation="vertical" />
 
-				<!--				<LinearLayout-->
-				<!--					android:layout_width="match_parent"-->
-				<!--					android:layout_height="wrap_content"-->
-				<!--					android:orientation="horizontal">-->
+			<LinearLayout
+				android:id="@+id/ll_inspect"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
 
-				<!--					<TextView-->
-				<!--						style="@style/maintenanceEditorTableRowItem1"-->
-				<!--						android:text="air conditioner performance conditioner performance" />-->
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="16dp"
+					android:text="@string/inspect"
+					android:textStyle="bold" />
 
-				<!--					<TextView style="@style/maintenanceEditorTableRowItem2" />-->
+				<Button
+					android:id="@+id/btn_add_inspect"
+					android:layout_width="wrap_content"
+					android:layout_height="40dp"
+					android:text="@string/add_with_symbol"
+					android:textAppearance="?android:textAppearanceSmall" />
 
-				<!--					<EditText style="@style/maintenanceEditorTableRowItem3" />-->
-
-				<!--					<CheckBox style="@style/maintenanceEditorTableRowItem4" />-->
-				<!--				</LinearLayout>-->
 			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/ll_inspect_items"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical" />
 
 			<View
 				android:layout_width="match_parent"
@@ -221,10 +188,12 @@
 					android:id="@+id/edit_total"
 					style="@style/maintenanceEditorEditPrice"
 					android:enabled="false"
+					android:hint="@string/dollar_sign"
 					android:importantForAutofill="no" />
-
+				<!-- placeholder to align with displayed items only -->
 				<CheckBox
-					style="@style/maintenanceEditorCbItem"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
 					android:visibility="invisible" />
 			</LinearLayout>
 

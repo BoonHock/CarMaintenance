@@ -205,7 +205,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 						sortOrder);
 				break;
 			case MAINTENANCE_DETAILS_MAINTENANCE_ID:
-				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				cursor = database.rawQuery(
 						MaintenanceDetailsEntry.SELECT_JOIN_MAINTENANCE_ITEM_ID,
 						selectionArgs);

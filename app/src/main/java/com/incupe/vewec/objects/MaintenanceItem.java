@@ -145,8 +145,7 @@ public class MaintenanceItem implements Comparable<MaintenanceItem> {
 				boolean add = true;
 
 				for (MaintenanceItem firebaseItem : firebaseItems) {
-					if (firebaseItem.getItem().toUpperCase().trim()
-							.equals(itemName.toUpperCase().trim())
+					if (firebaseItem.getItem().equalsIgnoreCase(itemName)
 							&& firebaseItem.getInspect_replace() == inspectReplace) {
 						add = false;
 						break;
@@ -172,5 +171,52 @@ public class MaintenanceItem implements Comparable<MaintenanceItem> {
 		}
 
 		return maintenanceItems;
+	}
+
+	public static List<UpcomingMaintenanceItem> getUpcomingCustomItemNotInFirebase(
+			Context context, List<UpcomingMaintenanceItem> firebaseItems,
+			UserVehicle userVehicle, int inspectReplace) {
+		List<UpcomingMaintenanceItem> upcomingItems = new ArrayList<>();
+
+		Cursor cursor = context.getContentResolver().query(
+				CustomMaintenanceItemEntry.CONTENT_URI,
+				CustomMaintenanceItemEntry.FULL_PROJECTION,
+				CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=?",
+				new String[]{String.valueOf(inspectReplace)},
+				null);
+
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				String itemName = cursor.getString(cursor.getColumnIndexOrThrow(
+						CustomMaintenanceItemEntry.COLUMN_ITEM));
+				boolean add = true;
+
+				for (UpcomingMaintenanceItem firebaseItem : firebaseItems) {
+					if (firebaseItem.getItem().equalsIgnoreCase(itemName)
+							&& firebaseItem.getInspect_replace() == inspectReplace) {
+						add = false;
+						break;
+					}
+				}
+				if (add) {
+					MaintenanceItem item = new MaintenanceItem("", itemName,
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE)),
+							UserVehicleEntry.USAGE_ALL,
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)));
+					upcomingItems.add(new UpcomingMaintenanceItem(context,item,userVehicle));
+				}
+
+			}
+			cursor.close();
+		}
+		return upcomingItems;
 	}
 }

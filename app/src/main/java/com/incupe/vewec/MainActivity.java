@@ -13,10 +13,9 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.incupe.vewec.objects.FirebaseObj;
-import com.incupe.vewec.objects.VehicleTemplate;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -26,6 +25,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.incupe.vewec.data.UserVehicleContract;
+import com.incupe.vewec.objects.FirebaseObj;
+import com.incupe.vewec.objects.VehicleTemplate;
 
 public class MainActivity extends AppCompatActivity {
 	private boolean _isOpenFab = true;
@@ -41,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+//		setDefaultPreferenceValues();
+
 		// Load an ad into the AdMob banner view.
-		AdView adView = (AdView) findViewById(R.id.adView);
+		AdView adView = findViewById(R.id.adView);
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 
@@ -169,6 +173,10 @@ public class MainActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void setDefaultPreferenceValues() {
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+	}
+
 	private void setupFabMenu() {
 		_llFabVehicle.setY(_fabMenu.getTop());
 		_llFabVehicle.setVisibility(View.INVISIBLE);
@@ -186,7 +194,12 @@ public class MainActivity extends AppCompatActivity {
 		_llMask.setVisibility(View.VISIBLE);
 		_llMask.animate().alpha((float) 0.5);
 
-		showLinearLayoutFab(_llFabVehicle);
+		// TODO: temporary limit only one vehicle allowed
+		if (UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
+			findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
+		} else {
+			showLinearLayoutFab(_llFabVehicle);
+		}
 		showLinearLayoutFab(_llFabOdometer);
 		showLinearLayoutFab(_llFabMaintenance);
 

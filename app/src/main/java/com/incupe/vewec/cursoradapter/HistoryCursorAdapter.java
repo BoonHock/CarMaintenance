@@ -79,57 +79,61 @@ public class HistoryCursorAdapter extends CursorAdapter {
 			userVehicleCursor.close();
 		}
 
-		Cursor maintenanceDetailsCursor = context.getContentResolver().query(
+		totalPrice += setupInspectReplaceItems(context,
+				maintenanceId,
+				MaintenanceItemEntry.REPLACE_VALUE,
+				llReplace,
+				txtReplace);
+		totalPrice += setupInspectReplaceItems(context,
+				maintenanceId,
+				MaintenanceItemEntry.INSPECT_VALUE,
+				llInspect,
+				txtInspect);
+
+		txtTotalPrice.setText(String.format(Locale.getDefault(), "%.2f", totalPrice));
+	}
+
+	private double setupInspectReplaceItems(Context context, int maintenanceId, int inspectReplace,
+											LinearLayout linearLayout, TextView textView) {
+		double totalPrice = 0;
+		Cursor cursor = context.getContentResolver().query(
 				ContentUris.withAppendedId(MaintenanceDetailsEntry
 						.CONTENT_URI_MAINTENANCE, maintenanceId),
 				null,
 				null,
-				new String[]{String.valueOf(maintenanceId)},
+				new String[]{String.valueOf(maintenanceId),
+						String.valueOf(inspectReplace)},
 				null);
 
-		if (maintenanceDetailsCursor != null) {
-			while (maintenanceDetailsCursor.moveToNext()) {
-				View itemView = LayoutInflater.from(context)
-						.inflate(R.layout.template_maintenance_item, null);
-				String itemName = maintenanceDetailsCursor.getString(maintenanceDetailsCursor
-						.getColumnIndexOrThrow(MaintenanceItemEntry.COLUMN_ITEM));
-				double itemPrice = maintenanceDetailsCursor.getDouble(maintenanceDetailsCursor
-						.getColumnIndexOrThrow(MaintenanceDetailsEntry.COLUMN_PRICE));
-				totalPrice += itemPrice;
-
-				TextView txtItem = itemView.findViewById(R.id.txt_item);
-				txtItem.setText(itemName);
-
-				TextView txtPrice = itemView.findViewById(R.id.txt_price);
-				String strPrice = context.getString(R.string.myr) + " "
-						+ String.format(Locale.getDefault(), "%.2f", itemPrice);
-				txtPrice.setText(strPrice);
-
-				switch (maintenanceDetailsCursor.getInt(maintenanceDetailsCursor
-						.getColumnIndexOrThrow(MaintenanceItemEntry.COLUMN_INSPECT_REPLACE))) {
-					case MaintenanceItemEntry.INSPECT_VALUE:
-						llInspect.addView(itemView);
-						break;
-					case MaintenanceItemEntry.REPLACE_VALUE:
-						llReplace.addView(itemView);
-						break;
-				}
-
-			}
-			maintenanceDetailsCursor.close();
+		if (cursor == null) {
+			return totalPrice;
 		}
 
-		txtTotalPrice.setText(String.format(Locale.getDefault(), "%.2f", totalPrice));
-
-		if (llInspect.getChildCount() == 0) {
-			txtInspect.setVisibility(View.GONE);
+		if (cursor.getCount() == 0) {
+			textView.setVisibility(View.GONE);
 		} else {
-			txtInspect.setVisibility(View.VISIBLE);
+			textView.setVisibility(View.VISIBLE);
 		}
-		if (llReplace.getChildCount() == 0) {
-			txtReplace.setVisibility(View.GONE);
-		} else {
-			txtReplace.setVisibility(View.VISIBLE);
+
+		while (cursor.moveToNext()) {
+			View itemView = View.inflate(context, R.layout.template_maintenance_item, null);
+			String itemName = cursor.getString(cursor
+					.getColumnIndexOrThrow(MaintenanceItemEntry.COLUMN_ITEM));
+			double itemPrice = cursor.getDouble(cursor
+					.getColumnIndexOrThrow(MaintenanceDetailsEntry.COLUMN_PRICE));
+			totalPrice += itemPrice;
+
+			TextView txtItem = itemView.findViewById(R.id.txt_item);
+			txtItem.setText(itemName);
+
+			TextView txtPrice = itemView.findViewById(R.id.txt_price);
+			String strPrice = context.getString(R.string.myr) + " "
+					+ String.format(Locale.getDefault(), "%.2f", itemPrice);
+			txtPrice.setText(strPrice);
+
+			linearLayout.addView(itemView);
 		}
+		cursor.close();
+		return totalPrice;
 	}
 }

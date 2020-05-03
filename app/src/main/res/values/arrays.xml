@@ -8,4 +8,8 @@
 		<item>@string/inspect</item>
 		<item>@string/replace</item>
 	</string-array>
+	<string-array name="array_maintenance_template_options">
+		<item>@string/by_distance_interval</item>
+		<item>@string/by_duration_interval</item>
+	</string-array>
 </resources>

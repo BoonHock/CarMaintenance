@@ -1,5 +1,8 @@
 package com.incupe.vewec.data;
 
+import android.content.Context;
+import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -54,5 +57,11 @@ public class UserVehicleContract {
 
 		static final String ALTER_TABLE_V4 = "ALTER TABLE " + TABLE_NAME
 				+ " ADD COLUMN " + COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL DEFAULT 0;";
+
+		public static long getCount(Context context) {
+			VehicleMaintenanceDbHelper helper = new VehicleMaintenanceDbHelper(context);
+			SQLiteDatabase db = helper.getReadableDatabase();
+			return DatabaseUtils.queryNumEntries(db, TABLE_NAME);
+		}
 	}
 }

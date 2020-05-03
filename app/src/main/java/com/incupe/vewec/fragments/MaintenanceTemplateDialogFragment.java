@@ -48,7 +48,7 @@ public class MaintenanceTemplateDialogFragment extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 		View v = View.inflate(requireContext(),
-				R.layout.dialog_maintenance_template, null);
+				R.layout.item_list, null);
 
 		ListView listView = (ListView) v;
 		ArrayList<Integer> list = new ArrayList<>();
@@ -77,7 +77,8 @@ public class MaintenanceTemplateDialogFragment extends DialogFragment {
 
 		final AlertDialog dialog = new AlertDialog.Builder(getActivity())
 				.setView(v)
-				.setNegativeButton(android.R.string.cancel, null)
+				.setTitle(getString(R.string.which_maintenance_template))
+				.setNegativeButton(getString(R.string.skip), null)
 				.create();
 
 		final ArrayList<Integer> finalList = list;

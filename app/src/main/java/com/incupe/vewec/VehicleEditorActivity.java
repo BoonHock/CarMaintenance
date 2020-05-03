@@ -28,22 +28,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
+import com.incupe.vewec.data.UserVehicleContract;
 import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
 import com.incupe.vewec.objects.FirebaseObj;
 import com.incupe.vewec.objects.UserVehicle;
 import com.incupe.vewec.objects.VehicleTemplate;
 import com.incupe.vewec.utilities.UserDialog;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import java.util.Date;
 
 public class VehicleEditorActivity extends AppCompatActivity
 		implements LoaderManager.LoaderCallbacks<Cursor> {
-	/**
-	 * Identifier for the pet data loader
-	 */
 	private static final int EXISTING_RECORD_LOADER = 0;
 
 	private EditText _editRegNo;
@@ -83,6 +81,25 @@ public class VehicleEditorActivity extends AppCompatActivity
 			};
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		// TODO: temporary limit only one vehicle allowed
+		if (_currentUri == null
+				&& UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
+			UserDialog.showDialog(this,
+					"",
+					"Number of vehicle is currently limited to one only. " +
+							"More vehicles can be created in future release.",
+					new DialogInterface.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface dialog) {
+							finish();
+						}
+					});
+		}
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vehicle_editor);
@@ -90,7 +107,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 		_currentUri = intent.getData();
 
 		// Load an ad into the AdMob banner view.
-		AdView adView = (AdView) findViewById(R.id.adView);
+		AdView adView = findViewById(R.id.adView);
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 
@@ -201,7 +218,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		// If this is a new pet, hide the "Delete" menu item.
+		// If this is new, hide the "Delete" menu item.
 		if (_currentUri == null) {
 			MenuItem menuItem = menu.findItem(R.id.action_delete);
 			menuItem.setVisible(false);
@@ -303,14 +320,13 @@ public class VehicleEditorActivity extends AppCompatActivity
 		values.put(UserVehicleEntry.COLUMN_USAGE, usage);
 		values.put(UserVehicleEntry.COLUMN_UPCOMING_START_FROM, upcomingStartFrom);
 
-		boolean saveSuccess = false;
+		boolean saveSuccess;
 
 		if (_currentUri == null) {
 			// insert new record
 			values.put(UserVehicleEntry.COLUMN_CREATED_ON, new Date().getTime());
 			Uri newUri = getContentResolver().insert(UserVehicleEntry.CONTENT_URI, values);
 			saveSuccess = newUri != null;
-			Log.v("VEHICLE_ID_CHECK", "CREATED: " + ContentUris.parseId(newUri));
 		} else {
 			// update existing record
 			int rowsAffected = getContentResolver().update(_currentUri,

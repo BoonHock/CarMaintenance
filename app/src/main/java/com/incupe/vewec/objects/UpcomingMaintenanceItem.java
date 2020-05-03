@@ -5,7 +5,6 @@ import android.database.Cursor;
 
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
-import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 
 import java.util.Calendar;
 import java.util.Comparator;
@@ -27,7 +26,7 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 	public static final int URGENCY_VERY2_URGENT = 3;
 	public static final int URGENCY_VERY3_URGENT = 4;
 
-	public UpcomingMaintenanceItem(
+	UpcomingMaintenanceItem(
 			Context context, MaintenanceItem maintenanceItem, UserVehicle userVehicle) {
 		super(maintenanceItem.getFirebase_item_id(),
 				maintenanceItem.getItem(),
@@ -39,14 +38,21 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 				maintenanceItem.getDuration_interval());
 
 		int nextDistance;
-		int currentOdometer = getCurrentOdometer(context, userVehicle.get_vehicleId());
+		int currentOdometer = userVehicle.getLatestOdometer(context);
+		int odoStartFrom = userVehicle.get_upcomingStartFrom();
+
+		// if latest odometer is zero, that means no odometer record
+		// then current odometer will follow user specified odo start from
+		// which may also be zero
+		if (currentOdometer == 0) {
+			currentOdometer = odoStartFrom;
+		}
+
 		getLatestServiceData(context, userVehicle.get_vehicleId());
 
 		if (currentOdometer < _latestServiceDistance) {
 			currentOdometer = _latestServiceDistance;
 		}
-
-		int odoStartFrom = userVehicle.get_upcomingStartFrom();
 
 		if (_latestServiceDistance == 0) {
 			if (odoStartFrom < this.getFirst_distance()) {
@@ -72,24 +78,6 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 				_durationDaysLeft = -_durationDaysLeft;
 			}
 		}
-	}
-
-	private int getCurrentOdometer(Context context, int vehicleId) {
-		Cursor odometerCursor = context.getContentResolver().query(
-				OdometerEntry.CONTENT_URI,
-				OdometerEntry.FULL_PROJECTION,
-				OdometerEntry.COLUMN_VEHICLE + "=?",
-				new String[]{String.valueOf(vehicleId)},
-				OdometerEntry.COLUMN_DATE + " DESC");
-
-		if (odometerCursor != null) {
-			if (odometerCursor.moveToFirst()) {
-				return odometerCursor.getInt(odometerCursor
-						.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
-			}
-			odometerCursor.close();
-		}
-		return 0;
 	}
 
 	private void getLatestServiceData(Context context, int vehicleId) {
@@ -134,16 +122,16 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 		boolean hasDurationUrgency = hasDurationInterval && hasLastServiceDate;
 
 		if ((hasDistanceInterval && this.get_distanceLeft() < 100)
-				|| (hasDurationUrgency && this.get_durationDaysLeft() < 5)) {
+				|| (hasDurationUrgency && this.get_durationDaysLeft() <= 5)) {
 			return URGENCY_VERY3_URGENT;
-		} else if ((hasDistanceInterval && this.get_distanceLeft() < 500)
-				|| (hasDurationUrgency && this.get_durationDaysLeft() < 10)) {
+		} else if ((hasDistanceInterval && this.get_distanceLeft() <= 500)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() <= 10)) {
 			return URGENCY_VERY2_URGENT;
-		} else if ((hasDistanceInterval && this.get_distanceLeft() < 1000)
-				|| (hasDurationUrgency && this.get_durationDaysLeft() < 14)) {
+		} else if ((hasDistanceInterval && this.get_distanceLeft() <= 1000)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() <= 14)) {
 			return URGENCY_VERY_URGENT;
-		} else if ((hasDistanceInterval && this.get_distanceLeft() < 1500)
-				|| (hasDurationUrgency && this.get_durationDaysLeft() < 21)) {
+		} else if ((hasDistanceInterval && this.get_distanceLeft() <= 1500)
+				|| (hasDurationUrgency && this.get_durationDaysLeft() <= 21)) {
 			return URGENCY_URGENT;
 		}
 		return URGENCY_NOT_URGENT;
@@ -153,7 +141,7 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 		@Override
 		public int compare(UpcomingMaintenanceItem o1, UpcomingMaintenanceItem o2) {
 			// positive value means @compareItem is before @this
-			int compareResults = o2.getUrgency() - o1.getUrgency(); // descending
+			int compareResults = o1.get_distanceLeft() - o2.get_distanceLeft();
 			// if both same urgency, and both items have distance intervals,
 			// then check distance left
 			// if either one doesn't have distance interval,

@@ -1,24 +1,22 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 
-	<!--	<PreferenceCategory app:title="@string/messages_header">-->
-
-	<!--		<EditTextPreference-->
-	<!--			android:inputType="number"-->
-	<!--			app:defaultValue="0"-->
-	<!--			app:key="ignore_odometer_before"-->
-	<!--			app:title="@string/signature_title"-->
-	<!--			app:useSimpleSummaryProvider="true" />-->
-
-	<!--		<ListPreference-->
-	<!--			app:defaultValue="reply"-->
-	<!--			app:entries="@array/reply_entries"-->
-	<!--			app:entryValues="@array/reply_values"-->
-	<!--			app:key="reply"-->
-	<!--			app:title="@string/reply_title"-->
-	<!--			app:useSimpleSummaryProvider="true" />-->
-
-	<!--	</PreferenceCategory>-->
+	<PreferenceCategory app:title="@string/notifications">
+		<!--		<SwitchPreferenceCompat-->
+		<!--			app:key="get_notifications"-->
+		<!--			app:title="Get notifications" />-->
+		<EditTextPreference
+			app:defaultValue="@string/friday"
+			android:textAllCaps="true"
+			app:key="odometer_update_notification_day"
+			app:title="Notify me to update odometer every"
+			app:useSimpleSummaryProvider="true" />
+		<EditTextPreference
+			app:defaultValue="@string/default_notification_time"
+			app:key="odometer_update_notification_time"
+			app:title="Notify me to update odometer at"
+			app:useSimpleSummaryProvider="true" />
+	</PreferenceCategory>
 
 	<!--	<PreferenceCategory app:title="@string/sync_header">-->
 
@@ -34,17 +32,17 @@
 	<!--			app:title="@string/attachment_title" />-->
 
 	<!--	</PreferenceCategory>-->
-<!--	<EditTextPreference-->
-<!--		android:inputType="number"-->
-<!--		app:defaultValue="0"-->
-<!--		app:key="@string/pref_key_start_upcoming_maintenance_from"-->
-<!--		app:title="Start maintenance recommendation from (KM):"-->
-<!--		app:useSimpleSummaryProvider="true" />-->
-<!--	<CheckBoxPreference-->
-<!--		app:isPreferenceVisible="false"-->
-<!--		android:inputType="number"-->
-<!--		app:defaultValue="0"-->
-<!--		app:key="test"-->
-<!--		app:title="Start maintenance recommendation from (KM):"-->
-<!--		app:useSimpleSummaryProvider="true" />-->
+	<!--	<EditTextPreference-->
+	<!--		android:inputType="number"-->
+	<!--		app:defaultValue="0"-->
+	<!--		app:key="@string/pref_key_start_upcoming_maintenance_from"-->
+	<!--		app:title="Start maintenance recommendation from (KM):"-->
+	<!--		app:useSimpleSummaryProvider="true" />-->
+	<!--	<CheckBoxPreference-->
+	<!--		app:isPreferenceVisible="false"-->
+	<!--		android:inputType="number"-->
+	<!--		app:defaultValue="0"-->
+	<!--		app:key="test"-->
+	<!--		app:title="Start maintenance recommendation from (KM):"-->
+	<!--		app:useSimpleSummaryProvider="true" />-->
 </PreferenceScreen>

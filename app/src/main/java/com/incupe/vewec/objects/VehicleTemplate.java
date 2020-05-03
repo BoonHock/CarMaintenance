@@ -101,7 +101,7 @@ public class VehicleTemplate {
 		return list;
 	}
 
-	public static String getVehicleIdFromList(
+	public static String getFirebaseVehicleIdFromList(
 			List<VehicleTemplate> vehicleTemplates, String findBrand,
 			String findModel, String findVariant) {
 		for (int i = 0, j = vehicleTemplates.size(); i < j; i++) {

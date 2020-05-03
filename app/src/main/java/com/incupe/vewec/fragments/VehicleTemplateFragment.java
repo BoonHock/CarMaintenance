@@ -11,14 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.incupe.vewec.R;
-import com.incupe.vewec.arrayadapter.VehicleTemplateAdapter;
-import com.incupe.vewec.objects.VehicleTemplate;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.incupe.vewec.R;
+import com.incupe.vewec.arrayadapter.VehicleTemplateAdapter;
+import com.incupe.vewec.objects.VehicleTemplate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,8 +31,8 @@ public class VehicleTemplateFragment extends Fragment {
 							 @Nullable Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 
-		View rootView = inflater.inflate(R.layout.fragment_vehicle_template, container, false);
-		final ListView listView = rootView.findViewById(R.id.ll_vehicle_template);
+		View rootView = inflater.inflate(R.layout.item_list, container, false);
+		final ListView listView = (ListView) rootView;
 
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 		DatabaseReference databaseReference = firebaseDatabase.getReference().child("vehicle_template");

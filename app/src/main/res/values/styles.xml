@@ -85,11 +85,6 @@
 		<item name="android:textAlignment">viewEnd</item>
 	</style>
 
-	<style name="maintenanceEditorCbItem">
-		<item name="android:layout_width">wrap_content</item>
-		<item name="android:layout_height">wrap_content</item>
-	</style>
-
 	<style name="editTextPrice">
 		<item name="android:hint">@string/price</item>
 		<item name="android:importantForAutofill" tools:targetApi="o">no</item>

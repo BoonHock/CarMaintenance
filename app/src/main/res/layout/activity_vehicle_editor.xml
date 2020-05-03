@@ -134,6 +134,7 @@
 					<TextView
 						android:id="@+id/txt_ignore"
 						style="@style/CategoryStyle"
+						android:layout_weight="2"
 						android:text="@string/start_maintenance_recommendation_from" />
 					<!-- Name field -->
 					<EditText

@@ -24,14 +24,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.incupe.vewec.data.APP_MASTER_CONTRACT;
 import com.incupe.vewec.data.OdometerContract;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 import com.incupe.vewec.utilities.DateUtilities;
 import com.incupe.vewec.utilities.SetupViews;
 import com.incupe.vewec.utilities.UserDialog;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -72,7 +72,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_odometer_editor);
 
 		// Load an ad into the AdMob banner view.
-		AdView adView = (AdView) findViewById(R.id.adView);
+		AdView adView = findViewById(R.id.adView);
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 
@@ -185,7 +185,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		// If this is a new pet, hide the "Delete" menu item.
+		// If this is new, hide the "Delete" menu item.
 		if (_currentUri == null) {
 			MenuItem menuItem = menu.findItem(R.id.action_delete);
 			menuItem.setVisible(false);
@@ -241,21 +241,22 @@ public class OdometerEditorActivity extends AppCompatActivity {
 
 		if (_currentUri != null) {
 			isUpdate = true;
-		} else if (cursor.getCount() > 0 && cursor.moveToFirst()) {
-			_currentUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
-					OdometerContract.PATH_ODOMETER + "/"
-							+ cursor.getLong(cursor.getColumnIndexOrThrow(OdometerEntry._ID)));
-			isUpdate = true;
+		} else if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				_currentUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
+						OdometerContract.PATH_ODOMETER + "/"
+								+ cursor.getLong(cursor.getColumnIndexOrThrow(OdometerEntry._ID)));
+				isUpdate = true;
+			}
+			cursor.close();
 		}
-
-		cursor.close();
 
 		ContentValues values = new ContentValues();
 		values.put(OdometerEntry.COLUMN_VEHICLE, vehicle);
 		values.put(OdometerEntry.COLUMN_DATE, date);
 		values.put(OdometerEntry.COLUMN_DISTANCE, distance);
 
-		boolean saveSuccess = false;
+		boolean saveSuccess;
 
 		if (isUpdate) {
 			int rowsAffected = getContentResolver().update(_currentUri,

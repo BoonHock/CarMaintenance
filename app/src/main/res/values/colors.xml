@@ -6,12 +6,10 @@
 
 	<color name="white">#FFFFFF</color>
 
+	<color name="urgency_not_urgent">#F5A623</color>
 	<color name="urgency4">#F5A623</color>
-
 	<color name="urgency3">#FC6644</color>
-
 	<color name="urgency2">#E75F40</color>
-
 	<color name="urgency1">#C03823</color>
 
 </resources>
