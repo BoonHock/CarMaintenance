@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.incupe.vewec.data.UserVehicleContract;
 import com.incupe.vewec.objects.FirebaseObj;
 import com.incupe.vewec.objects.VehicleTemplate;
+import com.incupe.vewec.utilities.Misc;
 
 public class MainActivity extends AppCompatActivity {
 	private boolean _isOpenFab = true;
@@ -70,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
 		rlContent.setVisibility(View.GONE);
 
 		FirebaseDatabase _firebaseDatabase = FirebaseDatabase.getInstance();
-		DatabaseReference _databaseReference = _firebaseDatabase.getReference().child("vehicle_template");
+		DatabaseReference _databaseReference =
+				_firebaseDatabase.getReference().child("vehicle_template");
 		_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
 				hideFabMenu();
 			}
 		});
+		Misc.startNoInternetActivityIfNoNetwork(this);
 	}
 
 	@Override

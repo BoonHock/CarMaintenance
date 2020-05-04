@@ -7,35 +7,17 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends SingleFragmentActivity {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_fragment);
-
-		// Load an ad into the AdMob banner view.
-		AdView adView = (AdView) findViewById(R.id.adView);
-		AdRequest adRequest = new AdRequest.Builder().build();
-		adView.loadAd(adRequest);
-
-		getSupportFragmentManager()
-				.beginTransaction()
-				.replace(R.id.fragment_container, new SettingsFragment())
-				.commit();
-		ActionBar actionBar = getSupportActionBar();
-		if (actionBar != null) {
-			actionBar.setDisplayHomeAsUpEnabled(true);
-		}
+	protected Fragment createFragment() {
+		return new SettingsFragment();
 	}
 
 	public static class SettingsFragment extends PreferenceFragmentCompat {

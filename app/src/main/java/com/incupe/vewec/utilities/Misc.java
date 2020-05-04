@@ -2,6 +2,9 @@ package com.incupe.vewec.utilities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -9,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.incupe.vewec.NoInternetActivity;
 import com.incupe.vewec.R;
 
 import java.text.NumberFormat;
@@ -67,5 +71,19 @@ public class Misc {
 		if (imm != null) {
 			imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
 		}
+	}
+
+	public static void startNoInternetActivityIfNoNetwork(Context context) {
+		if (!Misc.isNetworkAvailable(context)) {
+			Intent intent = new Intent(context, NoInternetActivity.class);
+			context.startActivity(intent);
+		}
+	}
+
+	public static boolean isNetworkAvailable(Context context) {
+		ConnectivityManager connectivityManager
+				= (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 }
