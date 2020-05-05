@@ -5,15 +5,25 @@
 		<!--		<SwitchPreferenceCompat-->
 		<!--			app:key="get_notifications"-->
 		<!--			app:title="Get notifications" />-->
-		<EditTextPreference
+		<!--		<EditTextPreference-->
+		<!--			android:dialogLayout="@layout/dialog_pref_update_odo_day"-->
+		<!--			android:textAllCaps="true"-->
+		<!--			app:defaultValue="@string/friday"-->
+		<!--			app:key="@string/pref_odo_update_notification_day"-->
+		<!--			app:title="Notify me to update odometer every"-->
+		<!--			app:useSimpleSummaryProvider="true" />-->
+		<com.incupe.vewec.fragments.PrefUpdateOdoDayFragment
+			android:dialogLayout="@layout/dialog_pref_update_odo_day"
+			android:negativeButtonText="@android:string/cancel"
+			android:positiveButtonText="@android:string/ok"
 			android:textAllCaps="true"
 			app:defaultValue="@string/friday"
-			app:key="odometer_update_notification_day"
+			app:key="@string/pref_odo_update_notification_day"
 			app:title="Notify me to update odometer every"
 			app:useSimpleSummaryProvider="true" />
 		<EditTextPreference
 			app:defaultValue="@string/default_notification_time"
-			app:key="odometer_update_notification_time"
+			app:key="@string/pref_odo_update_notification_time"
 			app:title="Notify me to update odometer at"
 			app:useSimpleSummaryProvider="true" />
 	</PreferenceCategory>

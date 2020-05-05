@@ -49,7 +49,7 @@ public class DatePickerFragment extends DialogFragment {
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-		View v = View.inflate(requireContext(), R.layout.dialog_date, null);
+		View v = View.inflate(requireContext(), R.layout.dialog_datepicker, null);
 		_datePicker = v.findViewById(R.id.dialog_date_picker);
 
 		final Calendar calendar = Calendar.getInstance();

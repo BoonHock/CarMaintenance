@@ -205,8 +205,9 @@ public class VehicleEditorActivity extends AppCompatActivity
 		txtIntro.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				// open google forms to submit brand-model-variant
 				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setData(Uri.parse("https://forms.gle/uwYG5YMgKhj2vmSd8"));
+				intent.setData(Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLScbmnApgQj5wDmW2pMZHJwFlkfwNm_xpGFLtv1WamSEf1j41A/viewform?usp=sf_link"));
 				startActivity(intent);
 			}
 		});

@@ -146,7 +146,6 @@
 	<string name="vertical_separator">|</string>
 	<string name="notifications">Notifications</string>
 	<string name="default_notification_time">07:00</string>
-	<string name="friday">Friday</string>
 	<string name="skip">Skip</string>
 	<string name="which_maintenance_template">Which maintenance are you performing?</string>
 	<string name="_0_00">0.00</string>
@@ -173,11 +172,24 @@
 	<!--    preference keys	-->
 	<string name="pref_get_started">get_started</string>
 	<string name="pref_upcoming_intro">upcoming_intro</string>
+	<string name="pref_odo_update_notification_day">pref_odo_update_notification_day</string>
+	<string name="pref_odo_update_notification_time">pref_odo_update_notification_time</string>
 
 	<string name="quit">Quit</string>
 	<string name="previous">Previous</string>
 	<string name="clear_preferences">Clear preferences</string>
 	<string name="no_brand_model_variant_contact_us">Do not find your vehicle\'s
 		brand-model-variant? <u>Contact us</u> and let us know.</string>
+
+	<string name="sunday">Sunday</string>
+	<string name="monday">Monday</string>
+	<string name="tuesday">Tuesday</string>
+	<string name="wednesday">Wednesday</string>
+	<string name="thursday">Thursday</string>
+	<string name="friday">Friday</string>
+	<string name="saturday">Saturday</string>
+	<string name="select_days_to_get_notification">Select days to get notification</string>
+	<string name="update_odo_day_label">Notification to update odometer every</string>
+	<string name="update_odo_time_label">Notification to update odometer at</string>
 
 </resources>
