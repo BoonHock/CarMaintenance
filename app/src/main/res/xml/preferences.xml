@@ -6,8 +6,8 @@
 		<!--			app:key="get_notifications"-->
 		<!--			app:title="Get notifications" />-->
 		<EditTextPreference
-			app:defaultValue="@string/friday"
 			android:textAllCaps="true"
+			app:defaultValue="@string/friday"
 			app:key="odometer_update_notification_day"
 			app:title="Notify me to update odometer every"
 			app:useSimpleSummaryProvider="true" />
@@ -17,6 +17,16 @@
 			app:title="Notify me to update odometer at"
 			app:useSimpleSummaryProvider="true" />
 	</PreferenceCategory>
+	<CheckBoxPreference
+		app:defaultValue="true"
+		app:isPreferenceVisible="false"
+		app:key="@string/pref_get_started"
+		app:title="@string/pref_get_started"
+		app:useSimpleSummaryProvider="true" />
+	<CheckBoxPreference
+		app:defaultValue="true"
+		app:isPreferenceVisible="false"
+		app:key="@string/pref_upcoming_intro" />
 
 	<!--	<PreferenceCategory app:title="@string/sync_header">-->
 

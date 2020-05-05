@@ -14,7 +14,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +22,12 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -61,22 +62,13 @@ public class VehicleEditorActivity extends AppCompatActivity
 	private ArrayAdapter<String> _modelAdapter;
 	private ArrayAdapter<String> _variantAdapter;
 
-	private DialogInterface.OnClickListener _discardButtonClickListener =
+	final private DialogInterface.OnClickListener _discardButtonClickListener =
 			new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
 					// User clicked "Discard" button, navigate to parent activity.
 //								NavUtils.navigateUpFromSameTask(VehicleEditorActivity.this);
 					finish();
-				}
-			};
-
-	private DialogInterface.OnClickListener _deleteButtonClickListener =
-			new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int id) {
-					// User clicked the "Delete" button
-					deleteVehicle();
 				}
 			};
 
@@ -103,13 +95,19 @@ public class VehicleEditorActivity extends AppCompatActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vehicle_editor);
-		Intent intent = getIntent();
-		_currentUri = intent.getData();
+		_currentUri = getIntent().getData();
 
 		// Load an ad into the AdMob banner view.
 		AdView adView = findViewById(R.id.adView);
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
+
+		TextView txtIntro = findViewById(R.id.intro_msg);
+
+		if (PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.pref_get_started), true)) {
+			txtIntro.setVisibility(View.VISIBLE);
+		}
 
 		_spinnerBrand = findViewById(R.id.spinner_brand);
 		_spinnerModel = findViewById(R.id.spinner_model);
@@ -203,6 +201,15 @@ public class VehicleEditorActivity extends AppCompatActivity
 			public void onNothingSelected(AdapterView<?> parent) {
 			}
 		});
+
+		txtIntro.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse("https://forms.gle/uwYG5YMgKhj2vmSd8"));
+				startActivity(intent);
+			}
+		});
 	}
 
 	@Override
@@ -228,12 +235,37 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 	@Override
 	public void onBackPressed() {
-		if (!_hasChanges) {
+		if (PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.pref_get_started), true)) {
+			UserDialog.showDialog(this,
+					"",
+					"Quit tutorial?",
+					getString(R.string.quit),
+					getString(R.string.cancel),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							PreferenceManager
+									.getDefaultSharedPreferences(VehicleEditorActivity.this)
+									.edit()
+									.putBoolean(getString(R.string.pref_get_started), false)
+									.apply();
+							VehicleEditorActivity.super.onBackPressed();
+						}
+					},
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (dialog != null) dialog.dismiss();
+						}
+					},
+					null);
+		} else if (_hasChanges) {
+			// Show dialog that there are unsaved changes
+			UserDialog.showUnsavedChangesDialog(this, _discardButtonClickListener);
+		} else {
 			super.onBackPressed();
-			return;
 		}
-		// Show dialog that there are unsaved changes
-		UserDialog.showUnsavedChangesDialog(this, _discardButtonClickListener);
 	}
 
 	@Override
@@ -245,20 +277,50 @@ public class VehicleEditorActivity extends AppCompatActivity
 			case R.id.action_delete:
 				UserDialog.showDeleteConfirmationDialog(this,
 						"Delete " + _initUserVehicle.get_regNo() + "?",
-						_deleteButtonClickListener);
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								// User clicked the "Delete" button
+								deleteVehicle();
+							}
+						});
 				return true;
 			case android.R.id.home:
-				if (!_hasChanges) {
-					finish();
-//					NavUtils.navigateUpFromSameTask(VehicleEditorActivity.this);
-					return true;
-				}
-				// Otherwise if there are unsaved changes, setup a dialog to warn the user.
-				// Create a click listener to handle the user confirming that
-				// changes should be discarded.
+				if (PreferenceManager.getDefaultSharedPreferences(this)
+						.getBoolean(getString(R.string.pref_get_started), true)) {
+					UserDialog.showDialog(this,
+							"",
+							"Quit tutorial?",
+							getString(R.string.quit),
+							getString(R.string.cancel),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									PreferenceManager
+											.getDefaultSharedPreferences(VehicleEditorActivity.this)
+											.edit()
+											.putBoolean(getString(R.string.pref_get_started), false)
+											.apply();
+									finish();
+								}
+							},
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									if (dialog != null) dialog.dismiss();
+								}
+							},
+							null);
+				} else if (_hasChanges) {
+					// Otherwise if there are unsaved changes, setup a dialog to warn the user.
+					// Create a click listener to handle the user confirming that
+					// changes should be discarded.
 
-				// Show a dialog that notifies the user they have unsaved changes
-				UserDialog.showUnsavedChangesDialog(this, _discardButtonClickListener);
+					// Show a dialog that notifies the user they have unsaved changes
+					UserDialog.showUnsavedChangesDialog(this, _discardButtonClickListener);
+				} else {
+					finish();
+				}
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -334,6 +396,11 @@ public class VehicleEditorActivity extends AppCompatActivity
 			saveSuccess = rowsAffected != 0;
 		}
 		if (saveSuccess) {
+			// this is for if user is being guided by tutorial.
+			// used by main activity
+			// return save ok results.
+			setResult(RESULT_OK);
+
 			Toast.makeText(this, getString(R.string.saved_successfully),
 					Toast.LENGTH_SHORT).show();
 			finish();
@@ -360,7 +427,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 	private void showDuplicateRegNoDialog() {
 		// Create an AlertDialog.Builder and set the message, and click listeners
-		// for the postivie and negative buttons on the dialog.
+		// for the positive and negative buttons on the dialog.
 		UserDialog.showDialog(this, getString(R.string.duplicate_record),
 				getString(R.string.duplicate_reg_no_message),
 				null);
@@ -430,7 +497,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 		findViewById(R.id.ll_content).setVisibility(View.VISIBLE);
 	}
 
-	public void setupSpinnerModel() {
+	private void setupSpinnerModel() {
 		String selectedBrand = (String) _spinnerBrand.getSelectedItem();
 		_modelAdapter = new ArrayAdapter<>(VehicleEditorActivity.this,
 				android.R.layout.simple_spinner_item,
@@ -440,7 +507,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 		_spinnerModel.setAdapter(_modelAdapter);
 	}
 
-	public void setupSpinnerVariant() {
+	private void setupSpinnerVariant() {
 		String selectedBrand = (String) _spinnerBrand.getSelectedItem();
 		String selectedModel = (String) _spinnerModel.getSelectedItem();
 		_variantAdapter = new ArrayAdapter<>(VehicleEditorActivity.this,

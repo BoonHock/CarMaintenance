@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">Car Maintenance</string>
 	<string name="tab_upcoming">Upcoming</string>
@@ -42,7 +43,8 @@
 	<string name="variant">Variant</string>
 	<!--	<string name="delete_vehicle_dialog_msg">Delete vehicle?</string>-->
 	<string name="no_user_vehicle">You have not added any vehicle</string>
-	<string name="duplicate_reg_no_message">Vehicle registration number already exists. Try again with new registration number.</string>
+	<string name="duplicate_reg_no_message">Vehicle registration number already exists.
+		Try again with new registration number.</string>
 	<string name="duplicate_record">Duplicate Record</string>
 	<string name="close">Close</string>
 	<string name="add_odometer">Add odometer</string>
@@ -101,7 +103,6 @@
 	<string name="action_settings">Settings</string>
 
 	<string name="hello_world">Hello world!</string>
-	<string name="title_activity_main2">Main2Activity</string>
 	<!-- -
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
@@ -150,4 +151,33 @@
 	<string name="which_maintenance_template">Which maintenance are you performing?</string>
 	<string name="_0_00">0.00</string>
 	<string name="no_internet_connection">No internet connection</string>
+	<string name="icon">icon</string>
+	<string name="next">Next</string>
+	<string name="get_started_string2">Let\'s get started by adding a vehicle</string>
+	<string name="get_started_string1">Hi! Thanks for using Vewec to
+		manage your car maintenance.</string>
+	<string name="skip_tutorial_question">Skip tutorial?</string>
+	<string name="continue_r">continue</string>
+	<string name="get_started_upcoming_msg0">All your vehicle\'s maintenance items defined by
+		your car\'s manufacturer are shown here with their respective distance and duration
+		left until next maintenance.</string>
+	<string name="get_started_upcoming_msg1">You can add custom items under
+		\"Custom Maintenance Item\" menu.</string>
+	<string name="get_started_upcoming_msg2">Distance left calculations for each item start
+		from odometer of 0 KM. You can change calculation start odometer by editing your
+		vehicle\'s \"Start maintenance recommendation from\" option.</string>
+	<string name="get_started_upcoming_msg3">Duration left calculations start from
+		item\'s latest service record.</string>
+	<string name="got_it">Got it</string>
+
+	<!--    preference keys	-->
+	<string name="pref_get_started">get_started</string>
+	<string name="pref_upcoming_intro">upcoming_intro</string>
+
+	<string name="quit">Quit</string>
+	<string name="previous">Previous</string>
+	<string name="clear_preferences">Clear preferences</string>
+	<string name="no_brand_model_variant_contact_us">Do not find your vehicle\'s
+		brand-model-variant? <u>Contact us</u> and let us know.</string>
+
 </resources>

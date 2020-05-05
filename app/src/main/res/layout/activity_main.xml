@@ -62,7 +62,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center"
-					android:layout_marginRight="@dimen/fab_margin"
+					android:layout_marginEnd="@dimen/fab_margin"
 					android:text="@string/add_odometer"
 					android:textAppearance="?android:textAppearanceMedium"
 					android:textColor="@android:color/white" />
@@ -86,7 +86,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center"
-					android:layout_marginRight="@dimen/fab_margin"
+					android:layout_marginEnd="@dimen/fab_margin"
 					android:text="@string/add_maintenance"
 					android:textAppearance="?android:textAppearanceMedium"
 					android:textColor="@android:color/white" />
@@ -110,7 +110,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center"
-					android:layout_marginRight="@dimen/fab_margin"
+					android:layout_marginEnd="@dimen/fab_margin"
 					android:text="@string/add_vehicle"
 					android:textAppearance="?android:textAppearanceMedium"
 					android:textColor="@android:color/white" />

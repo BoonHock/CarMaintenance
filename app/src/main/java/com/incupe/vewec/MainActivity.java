@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
@@ -39,11 +40,18 @@ public class MainActivity extends AppCompatActivity {
 	private FloatingActionButton _fabMenu;
 	private LinearLayout _llMask;
 
+	private final int REQUEST_GET_STARTED_MESSAGE = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		if (PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.pref_get_started), true)) {
+			Intent intent = new Intent(this, GetStartedActivity.class);
+			startActivityForResult(intent, REQUEST_GET_STARTED_MESSAGE);
+		}
 //		setDefaultPreferenceValues();
 
 		// Load an ad into the AdMob banner view.
@@ -172,8 +180,41 @@ public class MainActivity extends AppCompatActivity {
 				intent = new Intent(this, CustomMaintenanceItemActivity.class);
 				startActivity(intent);
 				return true;
+			case R.id.action_clear_preferences:
+				PreferenceManager.getDefaultSharedPreferences(this).edit().clear().apply();
+//				getPreferences(MODE_PRIVATE).edit().clear().apply();
+				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		final int REQUEST_GET_STARTED_VEHICLE_EDITOR = 1;
+		final int REQUEST_GET_STARTED_ODOMETER_EDITOR = 2;
+		Intent intent;
+
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
+				case REQUEST_GET_STARTED_MESSAGE:
+					intent = new Intent(this, VehicleEditorActivity.class);
+					startActivityForResult(intent, REQUEST_GET_STARTED_VEHICLE_EDITOR);
+					break;
+				case REQUEST_GET_STARTED_VEHICLE_EDITOR:
+					intent = new Intent(this, OdometerEditorActivity.class);
+					startActivityForResult(intent, REQUEST_GET_STARTED_ODOMETER_EDITOR);
+					break;
+				case REQUEST_GET_STARTED_ODOMETER_EDITOR:
+					// END OF TUTORIAL
+					PreferenceManager.getDefaultSharedPreferences(this)
+							.edit()
+							.putBoolean(getString(R.string.pref_get_started), false)
+							.apply();
+					break;
+			}
+		}
 	}
 
 	private void setDefaultPreferenceValues() {

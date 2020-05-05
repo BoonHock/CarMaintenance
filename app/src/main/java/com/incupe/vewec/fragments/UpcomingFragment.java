@@ -3,11 +3,14 @@ package com.incupe.vewec.fragments;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -19,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+import androidx.preference.PreferenceManager;
 
 import com.incupe.vewec.MaintenanceEditorActivity;
 import com.incupe.vewec.R;
@@ -38,6 +42,13 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 	private ProgressBar _progressBar;
 	private RelativeLayout _rlContent;
 
+	private LinearLayout _llIntro;
+	private TextView _txtIntro;
+	private Button _btnPrev;
+	private Button _btnNext;
+
+	private int introPageCounter = 0;
+
 	public UpcomingFragment() {
 		// Required empty public constructor
 	}
@@ -47,6 +58,17 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 							 @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.listview_with_empty_view,
 				container, false);
+
+		_llIntro = rootView.findViewById(R.id.intro_msg);
+		_btnNext = rootView.findViewById(R.id.btn_next);
+		_btnPrev = rootView.findViewById(R.id.btn_previous);
+		_txtIntro = rootView.findViewById(R.id.txt_intro);
+
+		if (PreferenceManager.getDefaultSharedPreferences(requireContext())
+				.getBoolean(getString(R.string.pref_upcoming_intro), true)) {
+			_llIntro.setVisibility(View.VISIBLE);
+			setupIntro();
+		}
 
 		_progressBar = rootView.findViewById(R.id.progress_bar);
 		_rlContent = rootView.findViewById(R.id.rl_content);
@@ -76,6 +98,21 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 				startActivity(intent);
 			}
 		});
+		_btnNext.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				introPageCounter += 1; // next page
+				setupIntro();
+			}
+		});
+		_btnPrev.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				introPageCounter -= 1; // prev page
+				setupIntro();
+			}
+		});
+
 		return rootView;
 	}
 
@@ -101,5 +138,32 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 	@Override
 	public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 		_upcomingMaintenanceCursorAdapter.swapCursor(null);
+	}
+
+	private void setupIntro() {
+		_btnPrev.setEnabled(true);
+		_btnNext.setText(getString(R.string.next));
+
+		switch (introPageCounter) {
+			case 0:
+				_txtIntro.setText(Html.fromHtml(getString(R.string.get_started_upcoming_msg0)));
+				_btnPrev.setEnabled(false);
+				break;
+			case 1:
+				_txtIntro.setText(Html.fromHtml(getString(R.string.get_started_upcoming_msg1)));
+				break;
+			case 2:
+				_txtIntro.setText(Html.fromHtml(getString(R.string.get_started_upcoming_msg2)));
+				_btnNext.setText(getString(R.string.got_it));
+				break;
+			default:
+				PreferenceManager
+						.getDefaultSharedPreferences(requireContext())
+						.edit()
+						.putBoolean(getString(R.string.pref_upcoming_intro), false)
+						.apply();
+				_llIntro.setVisibility(View.GONE);
+				break;
+		}
 	}
 }

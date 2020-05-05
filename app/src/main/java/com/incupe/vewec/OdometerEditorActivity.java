@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -46,25 +47,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 	private EditText _editOdometer;
 
 	private Calendar _calendarOdometer;
-	List<Integer> _vehicleIds = new ArrayList<>();
-
-	private DialogInterface.OnClickListener _discardButtonClickListener =
-			new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialogInterface, int i) {
-					// User clicked "Discard" button, navigate to parent activity.
-//								NavUtils.navigateUpFromSameTask(VehicleEditorActivity.this);
-					finish();
-				}
-			};
-
-	private DialogInterface.OnClickListener _closeDialog = new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int id) {
-			if (dialog != null) {
-				dialog.dismiss();
-			}
-		}
-	};
+	private List<Integer> _vehicleIds = new ArrayList<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +161,38 @@ public class OdometerEditorActivity extends AppCompatActivity {
 		return true;
 	}
 
+	@Override
+	public void onBackPressed() {
+		if (PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.pref_get_started), true)) {
+			UserDialog.showDialog(this,
+					"",
+					"Quit tutorial?",
+					getString(R.string.quit),
+					getString(R.string.cancel),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							PreferenceManager
+									.getDefaultSharedPreferences(OdometerEditorActivity.this)
+									.edit()
+									.putBoolean(getString(R.string.pref_get_started), false)
+									.apply();
+							OdometerEditorActivity.super.onBackPressed();
+						}
+					},
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (dialog != null) dialog.dismiss();
+						}
+					},
+					null);
+		} else {
+			super.onBackPressed();
+		}
+	}
+
 	/**
 	 * This method is called after invalidateOptionsMenu(), so that the
 	 * menu can be updated (some menu items can be hidden or made visible).
@@ -211,7 +226,34 @@ public class OdometerEditorActivity extends AppCompatActivity {
 						});
 				return true;
 			case android.R.id.home:
-				finish();
+				if (PreferenceManager.getDefaultSharedPreferences(this)
+						.getBoolean(getString(R.string.pref_get_started), true)) {
+					UserDialog.showDialog(this,
+							"",
+							"Quit tutorial?",
+							getString(R.string.quit),
+							getString(R.string.cancel),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									PreferenceManager
+											.getDefaultSharedPreferences(OdometerEditorActivity.this)
+											.edit()
+											.putBoolean(getString(R.string.pref_get_started), false)
+											.apply();
+									finish();
+								}
+							},
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									if (dialog != null) dialog.dismiss();
+								}
+							},
+							null);
+				} else {
+					finish();
+				}
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
