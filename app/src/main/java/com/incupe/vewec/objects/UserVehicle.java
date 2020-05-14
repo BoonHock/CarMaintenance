@@ -15,7 +15,7 @@ public class UserVehicle {
 	private String _model;
 	private String _variant;
 	private int _usage;
-	private int _upcomingStartFrom;
+	private boolean _isNew;
 	private Date _addedOn = null;
 
 	// cursor is select data from user_vehicle table
@@ -35,8 +35,8 @@ public class UserVehicle {
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_VARIANT));
 		_usage = cursor.getInt(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
-		_upcomingStartFrom = cursor.getInt(cursor
-				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_UPCOMING_START_FROM));
+		_isNew = cursor.getInt(cursor
+				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_IS_NEW)) == 1;
 		_addedOn = new Date(cursor.getLong(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_CREATED_ON)));
 	}
@@ -73,10 +73,6 @@ public class UserVehicle {
 		return _vehicleId;
 	}
 
-	public int get_upcomingStartFrom() {
-		return _upcomingStartFrom;
-	}
-
 	public int getLatestOdometer(Context context) {
 		int latestOdo = 0;
 
@@ -94,5 +90,29 @@ public class UserVehicle {
 			cursor.close();
 		}
 		return latestOdo;
+	}
+
+	public int getFirstOdometer(Context context) {
+		int firstOdo = 0;
+
+		Cursor cursor = context.getContentResolver().query(
+				OdometerEntry.CONTENT_URI,
+				OdometerEntry.FULL_PROJECTION,
+				OdometerEntry.COLUMN_VEHICLE + "=?",
+				new String[]{String.valueOf(this._vehicleId)},
+				OdometerEntry.COLUMN_DATE + " ASC LIMIT 1");
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				firstOdo = cursor.getInt(cursor
+						.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
+			}
+			cursor.close();
+		}
+
+		return firstOdo;
+	}
+
+	public boolean is_isNew() {
+		return _isNew;
 	}
 }

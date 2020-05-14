@@ -151,9 +151,6 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 				break;
 			case 1:
 				_txtIntro.setText(Html.fromHtml(getString(R.string.get_started_upcoming_msg1)));
-				break;
-			case 2:
-				_txtIntro.setText(Html.fromHtml(getString(R.string.get_started_upcoming_msg2)));
 				_btnNext.setText(getString(R.string.got_it));
 				break;
 			default:

@@ -61,7 +61,7 @@
 	<string name="usage">Usage</string>
 	<string name="usage_severe">Severe</string>
 	<string name="usage_normal">Normal</string>
-	<string name="maintenance_may_vary">Maintenance recommendations may vary across different usage type.</string>
+	<string name="maintenance_may_vary">Maintenance recommendations by manufacturer may vary across different usage type.</string>
 	<string name="severe_usage_conditions">
 		Severe conditions include but are not limited to the following:\n
 		1. Driving on dusty roads or in an area which the vehicle is likely to be exposed to salty air\n
@@ -162,9 +162,6 @@
 		left until next maintenance.</string>
 	<string name="get_started_upcoming_msg1">You can add custom items under
 		\"Custom Maintenance Item\" menu.</string>
-	<string name="get_started_upcoming_msg2">Distance left calculations for each item start
-		from odometer of 0 KM. You can change calculation start odometer by editing your
-		vehicle\'s \"Start maintenance recommendation from\" option.</string>
 	<string name="get_started_upcoming_msg3">Duration left calculations start from
 		item\'s latest service record.</string>
 	<string name="got_it">Got it</string>
@@ -191,5 +188,8 @@
 	<string name="select_days_to_get_notification">Select days to get notification</string>
 	<string name="update_odo_day_label">Notification to update odometer every</string>
 	<string name="update_odo_time_label">Notification to update odometer at</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="brand_new_vehicle_label">Brand new vehicle (no service or maintenance performed before)</string>
 
 </resources>

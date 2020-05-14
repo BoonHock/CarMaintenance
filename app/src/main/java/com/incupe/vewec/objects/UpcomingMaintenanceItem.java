@@ -12,6 +12,15 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class UpcomingMaintenanceItem extends MaintenanceItem {
+	// arbitrary value decided during 20200512 meeting
+	private static final int MAJOR_SERVICE_DISTANCE_INTERVAL = 40000;
+
+	public static final int URGENCY_NOT_URGENT = 0;
+	public static final int URGENCY_URGENT = 1;
+	public static final int URGENCY_VERY_URGENT = 2;
+	public static final int URGENCY_VERY2_URGENT = 3;
+	public static final int URGENCY_VERY3_URGENT = 4;
+
 	//	private final String LOG_TAG = this.getClass().getSimpleName();
 	private int _latestServiceDistance = 0;
 	// use int instead of date type for latest service date
@@ -19,12 +28,6 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 	private long _latestServiceDate = 0;
 	private int _distanceLeft;
 	private long _durationDaysLeft = 0;
-
-	public static final int URGENCY_NOT_URGENT = 0;
-	public static final int URGENCY_URGENT = 1;
-	public static final int URGENCY_VERY_URGENT = 2;
-	public static final int URGENCY_VERY2_URGENT = 3;
-	public static final int URGENCY_VERY3_URGENT = 4;
 
 	UpcomingMaintenanceItem(
 			Context context, MaintenanceItem maintenanceItem, UserVehicle userVehicle) {
@@ -37,33 +40,41 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 				maintenanceItem.getFirst_duration(),
 				maintenanceItem.getDuration_interval());
 
-		int nextDistance;
-		int currentOdometer = userVehicle.getLatestOdometer(context);
-		int odoStartFrom = userVehicle.get_upcomingStartFrom();
-
-		// if latest odometer is zero, that means no odometer record
-		// then current odometer will follow user specified odo start from
-		// which may also be zero
-		if (currentOdometer == 0) {
-			currentOdometer = odoStartFrom;
-		}
+		int nextDistance = 0;
+		int latestOdometer = userVehicle.getLatestOdometer(context);
+		int firstOdometer = userVehicle.getFirstOdometer(context);
 
 		getLatestServiceData(context, userVehicle.get_vehicleId());
 
-		if (currentOdometer < _latestServiceDistance) {
-			currentOdometer = _latestServiceDistance;
+		if (latestOdometer < _latestServiceDistance) {
+			latestOdometer = _latestServiceDistance;
 		}
 
 		if (_latestServiceDistance == 0) {
-			if (odoStartFrom < this.getFirst_distance()) {
+			// if no service performed record
+			if (userVehicle.is_isNew() || latestOdometer < this.getFirst_distance()) {
+				// if vehicle is brand new (no maintenance performed before
+				// or latest odometer less than first distance
+				// then set next distance as first service distance
 				nextDistance = this.getFirst_distance();
+			} else if (this.getDistance_interval() < MAJOR_SERVICE_DISTANCE_INTERVAL) {
+				// if item is not major service item
+				// next service is first odometer plus distance interval
+				nextDistance = firstOdometer + this.getDistance_interval();
 			} else {
-				nextDistance = odoStartFrom + this.getDistance_interval();
+				// else, meaning if item is not new and is major service
+				// next service should be calculated starting from 0
+				// then add until next service more than first odometer
+				nextDistance = this.getFirst_distance();
+				while (nextDistance < firstOdometer) {
+					nextDistance += this.getDistance_interval();
+				}
 			}
 		} else {
 			nextDistance = _latestServiceDistance + this.getDistance_interval();
 		}
-		_distanceLeft = nextDistance - currentOdometer;
+
+		_distanceLeft = nextDistance - latestOdometer;
 
 		if (_latestServiceDate != 0) {
 			Calendar calToday = Calendar.getInstance();

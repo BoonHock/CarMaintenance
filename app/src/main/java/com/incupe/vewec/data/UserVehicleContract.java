@@ -24,7 +24,7 @@ public class UserVehicleContract {
 		public static final String COLUMN_MODEL = "model";
 		public static final String COLUMN_VARIANT = "variant";
 		public static final String COLUMN_USAGE = "usage";
-		public static final String COLUMN_UPCOMING_START_FROM = "upcoming_start_from";
+		public static final String COLUMN_IS_NEW = "is_new";
 		public static final String COLUMN_CREATED_ON = "created_on";
 
 		public static final int USAGE_ALL = -1;
@@ -41,7 +41,7 @@ public class UserVehicleContract {
 				COLUMN_MODEL,
 				COLUMN_VARIANT,
 				COLUMN_USAGE,
-				COLUMN_UPCOMING_START_FROM,
+				COLUMN_IS_NEW,
 				COLUMN_CREATED_ON
 		};
 
@@ -52,11 +52,12 @@ public class UserVehicleContract {
 				+ COLUMN_MODEL + " TEXT NOT NULL, "
 				+ COLUMN_VARIANT + " TEXT NOT NULL, "
 				+ COLUMN_USAGE + " INTEGER NOT NULL, "
-				+ COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL, "
+				+ COLUMN_IS_NEW + " INTEGER NOT NULL,"
 				+ COLUMN_CREATED_ON + " INTEGER NOT NULL)";
 
-		static final String ALTER_TABLE_V4 = "ALTER TABLE " + TABLE_NAME
-				+ " ADD COLUMN " + COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL DEFAULT 0;";
+		// no longer using this column
+//		static final String ALTER_TABLE_V4 = "ALTER TABLE " + TABLE_NAME
+//				+ " ADD COLUMN " + COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL DEFAULT 0;";
 
 		public static long getCount(Context context) {
 			VehicleMaintenanceDbHelper helper = new VehicleMaintenanceDbHelper(context);

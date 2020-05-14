@@ -20,7 +20,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +33,6 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 import com.incupe.vewec.data.UserVehicleContract;
 import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
 import com.incupe.vewec.objects.FirebaseObj;
@@ -50,7 +51,9 @@ public class VehicleEditorActivity extends AppCompatActivity
 	private Spinner _spinnerModel;
 	private Spinner _spinnerVariant;
 	private Spinner _spinnerUsage;
-	private EditText _editUpcomingStartFrom;
+	private LinearLayout _llNewVehicle;
+	private RadioButton _radIsNew;
+	private RadioButton _radIsNotNew;
 
 	private ProgressBar _progressBar;
 
@@ -116,7 +119,9 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 		_editRegNo = findViewById(R.id.edit_reg_no);
 		_progressBar = findViewById(R.id.indeterminateBar);
-		_editUpcomingStartFrom = findViewById(R.id.edit_upcoming_start_from);
+		_llNewVehicle = findViewById(R.id.ll_is_new_vehicle);
+		_radIsNew = findViewById(R.id.rad_new);
+		_radIsNotNew = findViewById(R.id.rad_not_new);
 
 		_progressBar.setVisibility(View.VISIBLE);
 		findViewById(R.id.ll_content).setVisibility(View.INVISIBLE);
@@ -124,9 +129,6 @@ public class VehicleEditorActivity extends AppCompatActivity
 		_editRegNo.setFilters(new InputFilter[]{
 				new InputFilter.LengthFilter(UserVehicleEntry.REG_NO_MAX_LENGTH),
 				new InputFilter.AllCaps()
-		});
-		_editUpcomingStartFrom.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
 		});
 
 		ArrayAdapter usageSpinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -333,17 +335,13 @@ public class VehicleEditorActivity extends AppCompatActivity
 		String model = _spinnerModel.getSelectedItem().toString();
 		String variant = _spinnerVariant.getSelectedItem().toString();
 		int usage = _spinnerUsage.getSelectedItemPosition();
-		int upcomingStartFrom = 0;
-		String strUpcomingStartFrom = _editUpcomingStartFrom.getText().toString().trim();
-
-		if (!TextUtils.isEmpty(strUpcomingStartFrom)) {
-			upcomingStartFrom = Integer.parseInt(strUpcomingStartFrom);
-		}
+		boolean isNew = _radIsNew.isChecked();
 
 		if (TextUtils.isEmpty(regNo) || TextUtils.isEmpty(brand)
-				|| TextUtils.isEmpty(model) || TextUtils.isEmpty(variant)) {
-			Toast.makeText(this, "All information is required.",
-					Toast.LENGTH_SHORT).show();
+				|| TextUtils.isEmpty(model) || TextUtils.isEmpty(variant) ||
+				(!_radIsNew.isChecked() && !_radIsNotNew.isChecked())) {
+			UserDialog.showDialog(this, "",
+					"All information is required.", null);
 			return;
 		}
 
@@ -381,7 +379,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 		values.put(UserVehicleEntry.COLUMN_MODEL, model);
 		values.put(UserVehicleEntry.COLUMN_VARIANT, variant);
 		values.put(UserVehicleEntry.COLUMN_USAGE, usage);
-		values.put(UserVehicleEntry.COLUMN_UPCOMING_START_FROM, upcomingStartFrom);
+		values.put(UserVehicleEntry.COLUMN_IS_NEW, isNew);
 
 		boolean saveSuccess;
 
@@ -490,8 +488,12 @@ public class VehicleEditorActivity extends AppCompatActivity
 		if (_isEditing) {
 			_spinnerVariant.setSelection(_variantAdapter
 					.getPosition(_initUserVehicle.get_variant()));
-			_editUpcomingStartFrom.setText(String
-					.valueOf(_initUserVehicle.get_upcomingStartFrom()));
+			_llNewVehicle.setVisibility(View.GONE); // not editable
+			if (_initUserVehicle.is_isNew()) {
+				_radIsNew.setChecked(true);
+			} else {
+				_radIsNotNew.setChecked(true);
+			}
 		}
 
 		_progressBar.setVisibility(View.GONE);

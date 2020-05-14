@@ -52,15 +52,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		if (oldVersion < 2) {
-			db.execSQL("DROP TABLE IF EXISTS user_maintenance_item");
-		}
-		if (oldVersion < 3) {
-			runQueryIgnoreException(db,
-					CustomMaintenanceItemContract.CustomMaintenanceItemEntry.CREATE_TABLE);
-		}
-		if (oldVersion < 4) {
-			runQueryIgnoreException(db,
-					UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V4);
+			// do something
 		}
 	}
 
