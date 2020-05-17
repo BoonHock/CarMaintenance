@@ -13,7 +13,7 @@
 		android:padding="16dp"
 		android:text="@string/no_brand_model_variant_contact_us"
 		android:textColor="@color/white"
-		android:visibility="gone" />
+		android:visibility="visible" />
 
 	<RelativeLayout
 		android:layout_width="match_parent"

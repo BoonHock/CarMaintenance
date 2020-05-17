@@ -24,6 +24,8 @@ public class PrefUpdateOdoDayFragment extends DialogFragment {
 	private static final String ARG_DAYS = "day";
 	public static final String EXTRA_DAYS = ARG_DAYS;
 
+	public static final String DAY_SEPARATOR = ", ";
+
 	private List<CheckBox> _cbs;
 
 	public static PrefUpdateOdoDayFragment newInstance(String days) {
@@ -52,7 +54,7 @@ public class PrefUpdateOdoDayFragment extends DialogFragment {
 		if (getArguments() != null) {
 			String days = getArguments().getString(ARG_DAYS);
 			if (days != null) {
-				List<String> preSelectDays = Arrays.asList(days.split(", ", 0));
+				List<String> preSelectDays = Arrays.asList(days.split(DAY_SEPARATOR, 0));
 				for (CheckBox cb : _cbs) {
 					cb.setChecked(preSelectDays.contains(cb.getText().toString()));
 				}
@@ -71,11 +73,13 @@ public class PrefUpdateOdoDayFragment extends DialogFragment {
 								String result = "";
 								for (CheckBox cb : _cbs) {
 									if (cb.isChecked()) {
-										selectedDays.append(cb.getText().toString().trim()).append(", ");
+										selectedDays.append(cb.getText().toString()
+												.trim()).append(DAY_SEPARATOR);
 									}
 								}
 								if (selectedDays.length() > 0) {
-									selectedDays = new StringBuilder(selectedDays.substring(0, selectedDays.length() - 2));
+									selectedDays = new StringBuilder(selectedDays
+											.substring(0, selectedDays.length() - 2));
 									result = selectedDays.toString();
 								}
 								sendResults(result);

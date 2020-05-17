@@ -107,11 +107,6 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 		TextView txtIntro = findViewById(R.id.intro_msg);
 
-		if (PreferenceManager.getDefaultSharedPreferences(this)
-				.getBoolean(getString(R.string.pref_get_started), true)) {
-			txtIntro.setVisibility(View.VISIBLE);
-		}
-
 		_spinnerBrand = findViewById(R.id.spinner_brand);
 		_spinnerModel = findViewById(R.id.spinner_model);
 		_spinnerVariant = findViewById(R.id.spinner_variant);

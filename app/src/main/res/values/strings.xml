@@ -107,7 +107,9 @@
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
-	<string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+	<!-- for testing -->
+		<string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+<!--	<string name="banner_ad_unit_id">ca-app-pub-5570583030825452/1907637256</string>-->
 	<string name="title_activity_settings">Settings</string>
 
 	<!-- Preference Titles -->
@@ -176,7 +178,7 @@
 	<string name="previous">Previous</string>
 	<string name="clear_preferences">Clear preferences</string>
 	<string name="no_brand_model_variant_contact_us">Do not find your vehicle\'s
-		brand-model-variant? <u>Contact us</u> and let us know.</string>
+		brand-model-variant? <u>Let us know</u>.</string>
 
 	<string name="sunday">Sunday</string>
 	<string name="monday">Monday</string>
@@ -191,5 +193,7 @@
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="brand_new_vehicle_label">Brand new vehicle (no service or maintenance performed before)</string>
+	<string name="update_odometer_reminder_notification">update_odometer_reminder_notification</string>
+	<string name="update_odometer_reminder">Update odometer reminder</string>
 
 </resources>

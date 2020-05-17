@@ -56,8 +56,8 @@ public class UserVehicleContract {
 				+ COLUMN_CREATED_ON + " INTEGER NOT NULL)";
 
 		// no longer using this column
-//		static final String ALTER_TABLE_V4 = "ALTER TABLE " + TABLE_NAME
-//				+ " ADD COLUMN " + COLUMN_UPCOMING_START_FROM + " INTEGER NOT NULL DEFAULT 0;";
+		static final String ALTER_TABLE_V5 = "ALTER TABLE " + TABLE_NAME
+				+ " ADD COLUMN " + COLUMN_IS_NEW + " INTEGER NOT NULL DEFAULT 0;";
 
 		public static long getCount(Context context) {
 			VehicleMaintenanceDbHelper helper = new VehicleMaintenanceDbHelper(context);

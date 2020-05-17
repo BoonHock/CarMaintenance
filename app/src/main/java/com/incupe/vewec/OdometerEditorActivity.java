@@ -139,7 +139,13 @@ public class OdometerEditorActivity extends AppCompatActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (!TextUtils.isEmpty(_editOdometer.getText().toString().trim())) {
 					int distance = Integer.parseInt(_editOdometer.getText().toString().trim());
-					if (distance > OdometerEntry.DISTANCE_MAX || distance < OdometerEntry.DISTANCE_MIN) {
+					if (distance < OdometerEntry.DISTANCE_MIN) {
+						_editOdometer.setText("");
+						UserDialog.showDialog(OdometerEditorActivity.this, "",
+								getString(R.string.odometer_input_too_small), null);
+					}
+					if (distance > OdometerEntry.DISTANCE_MAX) {
+						_editOdometer.setText("");
 						UserDialog.showDialog(OdometerEditorActivity.this, "",
 								getString(R.string.odometer_input_too_large), null);
 					}

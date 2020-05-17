@@ -1,11 +1,8 @@
 package com.incupe.vewec;
 
 import android.animation.Animator;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,7 +15,6 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
@@ -51,6 +47,16 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		// run code for only first time app opened
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (!prefs.getBoolean("firstTime", false)) {
+			runFirstTime();
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putBoolean("firstTime", true);
+			editor.apply();
+		}
+
 
 		if (PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.pref_get_started), true)) {
@@ -124,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
 				if (_isOpenFab) {
 					showFabMenu();
 				} else {
-					Log.v("HIDEMENU", "CALLED");
 					hideFabMenu();
 				}
 			}
@@ -186,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 				return true;
 			case R.id.action_clear_preferences:
+
 				PreferenceManager.getDefaultSharedPreferences(this).edit().clear().apply();
 //				getPreferences(MODE_PRIVATE).edit().clear().apply();
 				return true;
@@ -299,5 +305,10 @@ public class MainActivity extends AppCompatActivity {
 
 	private void hideLinearLayoutFab(LinearLayout llFab) {
 		llFab.animate().alpha(0).y(_fabMenu.getTop());
+	}
+
+	private void runFirstTime() {
+		Log.v("CHECK_ME", "FIRST_TIME");
+		SettingsActivity.SettingsFragment.setOdoReminderAlarm(this);
 	}
 }
