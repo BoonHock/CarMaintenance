@@ -177,7 +177,7 @@ public class MaintenanceEditorFragment extends Fragment {
 		}
 		_vehicleIds = SetupViews.setupVehicleRegNoSpinner(requireContext(), _spinnerVehicle);
 		if (_vehicleIds.isEmpty()) {
-			UserDialog.showDialog(requireContext(), "",
+			UserDialog.showDialog(getActivity(), "",
 					getString(R.string.no_vehicle_found),
 					new DialogInterface.OnDismissListener() {
 						@Override
@@ -187,30 +187,30 @@ public class MaintenanceEditorFragment extends Fragment {
 							}
 						}
 					});
-		}
+		} else {
+			// show default date
+			_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
 
-		// show default date
-		_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
-
-		_editOdometer.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
-		});
+			_editOdometer.setFilters(new InputFilter[]{
+					new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
+			});
 //		_editNewItemName.setFilters(new InputFilter[]{
 //				new InputFilter.LengthFilter(MaintenanceItemEntry.ITEM_NAME_MAX_LENGTH)
 //		});
-		_editRemarks.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(MaintenanceEntry.REMARKS_MAX_LENGTH)
-		});
+			_editRemarks.setFilters(new InputFilter[]{
+					new InputFilter.LengthFilter(MaintenanceEntry.REMARKS_MAX_LENGTH)
+			});
 
-		setupListeners(view);
+			setupListeners(view);
 
-		// if user is editing, then pre select in spinner
-		if (_editVehicleId != -1) {
-			_spinnerVehicle.setSelection(_vehicleIds.indexOf(_editVehicleId));
-			_spinnerVehicle.setEnabled(false);
+			// if user is editing, then pre select in spinner
+			if (_editVehicleId != -1) {
+				_spinnerVehicle.setSelection(_vehicleIds.indexOf(_editVehicleId));
+				_spinnerVehicle.setEnabled(false);
+			}
+
+			getMaintenanceItems();
 		}
-
-		getMaintenanceItems();
 
 		return view;
 	}

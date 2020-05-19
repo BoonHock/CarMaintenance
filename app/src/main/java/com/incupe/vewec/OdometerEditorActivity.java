@@ -82,83 +82,83 @@ public class OdometerEditorActivity extends AppCompatActivity {
 							}
 						}
 					});
-		}
-
-		_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
-
-		if (_currentUri == null) {
-			invalidateOptionsMenu();
 		} else {
-			_spinnerVehicle.setEnabled(false);
-			initVehicle();
-		}
+			_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
 
-		final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-			@Override
-			public void onDateSet(DatePicker view, int year, int monthOfYear,
-								  int dayOfMonth) {
-				_calendarOdometer.set(Calendar.YEAR, year);
-				_calendarOdometer.set(Calendar.MONTH, monthOfYear);
-				_calendarOdometer.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-				_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
-				getDistance();
-			}
-		};
-
-		_editDate.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				DatePickerDialog datePickerDialog =
-						new DatePickerDialog(OdometerEditorActivity.this, dateSetListener,
-								_calendarOdometer.get(Calendar.YEAR), _calendarOdometer.get(Calendar.MONTH),
-								_calendarOdometer.get(Calendar.DAY_OF_MONTH));
-				// user cannot fill in future odometer. sounds logical right?
-				datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
-				datePickerDialog.show();
-			}
-		});
-
-		_spinnerVehicle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				getDistance();
+			if (_currentUri == null) {
+				invalidateOptionsMenu();
+			} else {
+				_spinnerVehicle.setEnabled(false);
+				initVehicle();
 			}
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-			}
-		});
+			final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+				@Override
+				public void onDateSet(DatePicker view, int year, int monthOfYear,
+									  int dayOfMonth) {
+					_calendarOdometer.set(Calendar.YEAR, year);
+					_calendarOdometer.set(Calendar.MONTH, monthOfYear);
+					_calendarOdometer.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-		_editOdometer.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
+					_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
+					getDistance();
+				}
+			};
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (!TextUtils.isEmpty(_editOdometer.getText().toString().trim())) {
-					int distance = Integer.parseInt(_editOdometer.getText().toString().trim());
-					if (distance < OdometerEntry.DISTANCE_MIN) {
-						_editOdometer.setText("");
-						UserDialog.showDialog(OdometerEditorActivity.this, "",
-								getString(R.string.odometer_input_too_small), null);
-					}
-					if (distance > OdometerEntry.DISTANCE_MAX) {
-						_editOdometer.setText("");
-						UserDialog.showDialog(OdometerEditorActivity.this, "",
-								getString(R.string.odometer_input_too_large), null);
+			_editDate.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					DatePickerDialog datePickerDialog =
+							new DatePickerDialog(OdometerEditorActivity.this, dateSetListener,
+									_calendarOdometer.get(Calendar.YEAR), _calendarOdometer.get(Calendar.MONTH),
+									_calendarOdometer.get(Calendar.DAY_OF_MONTH));
+					// user cannot fill in future odometer. sounds logical right?
+					datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
+					datePickerDialog.show();
+				}
+			});
+
+			_spinnerVehicle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+					getDistance();
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parent) {
+				}
+			});
+
+			_editOdometer.addTextChangedListener(new TextWatcher() {
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				}
+
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					if (!TextUtils.isEmpty(_editOdometer.getText().toString().trim())) {
+						int distance = Integer.parseInt(_editOdometer.getText().toString().trim());
+						if (distance < OdometerEntry.DISTANCE_MIN) {
+							_editOdometer.setText("");
+							UserDialog.showDialog(OdometerEditorActivity.this, "",
+									getString(R.string.odometer_input_too_small), null);
+						}
+						if (distance > OdometerEntry.DISTANCE_MAX) {
+							_editOdometer.setText("");
+							UserDialog.showDialog(OdometerEditorActivity.this, "",
+									getString(R.string.odometer_input_too_large), null);
+						}
 					}
 				}
-			}
 
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-		});
-		_editOdometer.setFilters(new InputFilter[]{
-				new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
-		});
+				@Override
+				public void afterTextChanged(Editable s) {
+				}
+			});
+			_editOdometer.setFilters(new InputFilter[]{
+					new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
+			});
+		}
 	}
 
 	@Override

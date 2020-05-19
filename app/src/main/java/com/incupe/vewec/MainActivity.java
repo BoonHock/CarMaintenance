@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +30,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.incupe.vewec.data.UserVehicleContract;
 import com.incupe.vewec.objects.FirebaseObj;
 import com.incupe.vewec.objects.VehicleTemplate;
@@ -166,6 +171,24 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 		Misc.startNoInternetActivityIfNoNetwork(this);
+
+		FirebaseInstanceId.getInstance().getInstanceId()
+				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+					@Override
+					public void onComplete(@NonNull Task<InstanceIdResult> task) {
+						if (!task.isSuccessful()) {
+							Log.w("CHECK_ME", "getInstanceId failed", task.getException());
+							return;
+						}
+
+						// Get new Instance ID token
+						String token = task.getResult().getToken();
+
+						// Log and toast
+						Log.v("CHECK_ME", token);
+					}
+				});
+
 	}
 
 	@Override
@@ -308,7 +331,6 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void runFirstTime() {
-		Log.v("CHECK_ME", "FIRST_TIME");
 		SettingsActivity.SettingsFragment.setOdoReminderAlarm(this);
 	}
 }
