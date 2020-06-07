@@ -3,6 +3,7 @@ package com.incupe.vewec.fragments;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,14 +38,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.incupe.vewec.OdometerEditorActivity;
 import com.incupe.vewec.R;
 import com.incupe.vewec.cursoradapter.UpcomingMaintenanceCursorAdapter;
-import com.incupe.vewec.data.APP_MASTER_CONTRACT;
 import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
-import com.incupe.vewec.data.OdometerContract;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
 import com.incupe.vewec.objects.FirebaseObj;
@@ -99,6 +100,7 @@ public class MaintenanceEditorFragment extends Fragment {
 	private int _editVehicleId = -1;
 	private boolean _isInit = true;
 	private boolean _isAddingReplaceItem = true;
+	private long _maintenanceOriDate = 0;
 
 	private View.OnFocusChangeListener _focusChangeFormatMoney =
 			new View.OnFocusChangeListener() {
@@ -163,8 +165,9 @@ public class MaintenanceEditorFragment extends Fragment {
 							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_VEHICLE));
 					_editOdometer.setText(String.valueOf(cursor.getInt(cursor
 							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_ODOMETER))));
-					_calendarOdometer.setTime(new Date(cursor.getLong(cursor
-							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE))));
+					_maintenanceOriDate = cursor.getLong(cursor
+							.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE));
+					_calendarOdometer.setTime(new Date(_maintenanceOriDate));
 				}
 				cursor.close();
 			}
@@ -527,9 +530,6 @@ public class MaintenanceEditorFragment extends Fragment {
 					List<UpcomingMaintenanceItem> itemsInspect = firebaseItems.get(0);
 					List<UpcomingMaintenanceItem> itemsReplace = firebaseItems.get(1);
 
-					List<List<MaintenanceItem>> test = FirebaseObj
-							.getItemsByInspectReplace(firebaseVehicleId, userVehicle.get_usage());
-
 					itemsInspect.addAll(MaintenanceItem
 							.getUpcomingCustomItemNotInFirebase(
 									requireActivity(), itemsInspect, userVehicle,
@@ -609,19 +609,21 @@ public class MaintenanceEditorFragment extends Fragment {
 					_viewContent.setVisibility(View.VISIBLE);
 					_progressBar.setVisibility(View.GONE);
 
-					if (_isInit) {
-						_isInit = false;
-						// display template dialog only if adding new record
-						if (_currentUri == null) {
-							FragmentManager manager = requireActivity().getSupportFragmentManager();
-							MaintenanceTemplateDialogFragment dialog =
-									MaintenanceTemplateDialogFragment.newInstance(_distanceIntervals,
-											MaintenanceTemplateDialogFragment.BY_DISTANCE);
-							dialog.setTargetFragment(MaintenanceEditorFragment.this,
-									DIALOG_TEMPLATE_RESULT);
-							dialog.show(manager, DIALOG_TEMPLATE);
-						}
-					}
+					// as discussed, in 20200521, temporarily disable this first.
+					// Too confusing for users
+//					if (_isInit) {
+//						_isInit = false;
+//						// display template dialog only if adding new record
+//						if (_currentUri == null) {
+//							FragmentManager manager = requireActivity().getSupportFragmentManager();
+//							MaintenanceTemplateDialogFragment dialog =
+//									MaintenanceTemplateDialogFragment.newInstance(_distanceIntervals,
+//											MaintenanceTemplateDialogFragment.BY_DISTANCE);
+//							dialog.setTargetFragment(MaintenanceEditorFragment.this,
+//									DIALOG_TEMPLATE_RESULT);
+//							dialog.show(manager, DIALOG_TEMPLATE);
+//						}
+//					}
 				}
 			});
 		}
@@ -766,10 +768,10 @@ public class MaintenanceEditorFragment extends Fragment {
 	}
 
 	private void saveMaintenance() {
-		long maintenanceDate = DateUtilities
+		final long maintenanceDate = DateUtilities
 				.getCalendarAtMidnight(_calendarOdometer).getTime().getTime();
-		String strOdometerDistance = _editOdometer.getText().toString();
-		int vehicleId = getVehicleId();
+		final String strOdometerDistance = _editOdometer.getText().toString();
+		final int vehicleId = getVehicleId();
 		String remarks = _editRemarks.getText().toString().trim();
 
 		if (TextUtils.isEmpty(strOdometerDistance)) {
@@ -785,12 +787,15 @@ public class MaintenanceEditorFragment extends Fragment {
 			return;
 		}
 
-		saveOdometer(vehicleId, maintenanceDate, Integer.parseInt(strOdometerDistance));
+		// temporarily disable save odometer first.
+		// need to discuss with others
+
+		//		saveOdometer(vehicleId, maintenanceDate, Integer.parseInt(strOdometerDistance));
 
 		ContentValues values = new ContentValues();
 		values.put(MaintenanceEntry.COLUMN_VEHICLE, vehicleId);
 		values.put(MaintenanceEntry.COLUMN_DATE, maintenanceDate);
-		values.put(MaintenanceEntry.COLUMN_ODOMETER, Integer.valueOf(strOdometerDistance));
+		values.put(MaintenanceEntry.COLUMN_ODOMETER, Integer.parseInt(strOdometerDistance));
 		values.put(MaintenanceEntry.COLUMN_REMARKS, remarks);
 		values.put(MaintenanceEntry.COLUMN_CREATED_ON, Calendar.getInstance().getTimeInMillis());
 
@@ -838,9 +843,58 @@ public class MaintenanceEditorFragment extends Fragment {
 				MaintenanceItemEntry.REPLACE_VALUE, _llReplaceItems) &&
 				saveMaintenanceDetails(maintenanceId,
 						MaintenanceItemEntry.INSPECT_VALUE, _llInspectItems)) {
-			Toast.makeText(requireContext(), getString(R.string.saved_successfully),
-					Toast.LENGTH_SHORT).show();
-			requireActivity().finish();
+
+			final Uri editOdoUri = _currentUri == null ?
+					getOdometerUri(requireContext(), vehicleId, maintenanceDate) :
+					getOdometerUri(requireContext(), vehicleId, _maintenanceOriDate);
+
+			String updateOdoMessage = editOdoUri == null ?
+					"Do you want to create an odometer record too?" :
+					"Do you want to update odometer record too?";
+
+			UserDialog.showDialog(requireActivity(),
+					"",
+					updateOdoMessage,
+					getString(R.string.yes),
+					getString(R.string.no),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// update odometer
+							// if original date is 0 means user not editing existing
+							if (editOdoUri != null) {
+								Log.v("CHECK_ME", editOdoUri.toString());
+							}
+							OdometerEditorActivity.saveOdometer(requireContext(),
+									editOdoUri,
+									vehicleId,
+									maintenanceDate,
+									Integer.parseInt(strOdometerDistance));
+
+							Toast.makeText(requireContext(),
+									getString(R.string.saved_successfully),
+									Toast.LENGTH_SHORT).show();
+							requireActivity().finish();
+						}
+					},
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Toast.makeText(requireContext(),
+									getString(R.string.saved_successfully),
+									Toast.LENGTH_SHORT).show();
+							requireActivity().finish();
+						}
+					},
+					new DialogInterface.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface dialog) {
+							Toast.makeText(requireContext(),
+									getString(R.string.saved_successfully),
+									Toast.LENGTH_SHORT).show();
+							requireActivity().finish();
+						}
+					});
 		}
 	}
 
@@ -919,42 +973,49 @@ public class MaintenanceEditorFragment extends Fragment {
 		return true;
 	}
 
-	private void saveOdometer(int vehicleId, long odometerDate, int odometerDistance) {
-		Cursor cursor = requireContext().getContentResolver().query(OdometerEntry.CONTENT_URI,
+	private static Uri getOdometerUri(Context context, long vehicleId, long date) {
+		Cursor cursor = context.getContentResolver().query(
+				OdometerEntry.CONTENT_URI,
 				OdometerEntry.FULL_PROJECTION,
 				OdometerEntry.COLUMN_VEHICLE + "=? AND "
 						+ OdometerEntry.COLUMN_DATE + "=?",
 				new String[]{String.valueOf(vehicleId),
-						String.valueOf(odometerDate)},
+						String.valueOf(date)},
 				null);
 
-		ContentValues values = new ContentValues();
-		values.put(OdometerEntry.COLUMN_VEHICLE, vehicleId);
-		values.put(OdometerEntry.COLUMN_DATE, odometerDate);
-		values.put(OdometerEntry.COLUMN_DISTANCE, odometerDistance);
+		Uri odoUri = null;
 
 		if (cursor != null) {
-			if (cursor.getCount() > 0 && cursor.moveToFirst()) {
-				// update odometer
-				// update 20200424: if maintenance odometer entry more than
-				// today's odometer entry, update
-				int dbOdometer = cursor.getInt(cursor
-						.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
-
-				if (odometerDistance > dbOdometer) {
-					Uri odometerUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
-							OdometerContract.PATH_ODOMETER + "/"
-									+ cursor.getLong(cursor
-									.getColumnIndexOrThrow(OdometerEntry._ID)));
-					requireContext().getContentResolver()
-							.update(odometerUri, values, null, null);
-				}
-			} else {
-				// insert odometer
-				requireContext().getContentResolver().insert(OdometerEntry.CONTENT_URI, values);
+			if (cursor.moveToFirst()) {
+				odoUri = ContentUris.withAppendedId(OdometerEntry.CONTENT_URI,
+						cursor.getInt(cursor.getColumnIndexOrThrow(OdometerEntry._ID)));
 			}
 			cursor.close();
 		}
+		return odoUri;
+	}
+
+	public static Uri getOdometerUri(Context context, Uri maintenanceUri) {
+		Uri odoUri = null;
+		Cursor cursor = context.getContentResolver().query(
+				maintenanceUri,
+				MaintenanceEntry.FULL_PROJECTION,
+				null,
+				null,
+				null);
+
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int vehicleId = cursor.getInt(cursor
+						.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_VEHICLE));
+				long date = cursor.getLong(cursor
+						.getColumnIndexOrThrow(MaintenanceEntry.COLUMN_DATE));
+
+				odoUri = getOdometerUri(context, vehicleId, date);
+			}
+			cursor.close();
+		}
+		return odoUri;
 	}
 
 	private int getVehicleId() {
@@ -981,15 +1042,56 @@ public class MaintenanceEditorFragment extends Fragment {
 		if (_currentUri == null) {
 			return;
 		}
+		final Uri odoUri = getOdometerUri(requireContext(), _currentUri);
 		int rowsDeleted = requireContext().getContentResolver().delete(_currentUri, null, null);
 
 		if (rowsDeleted == 0) {
 			Toast.makeText(requireContext(), getString(R.string.error_has_occurred),
 					Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(requireContext(), getString(R.string.maintenance_deleted),
-					Toast.LENGTH_SHORT).show();
-			requireActivity().finish();
+			if (odoUri == null) {
+				Toast.makeText(requireContext(), getString(R.string.maintenance_deleted),
+						Toast.LENGTH_SHORT).show();
+				requireActivity().finish();
+			} else {
+				UserDialog.showDialog(
+						requireContext(),
+						"",
+						getString(R.string.maintenance_deleted_confirm_delete_odo_too),
+						getString(R.string.yes),
+						getString(R.string.no),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								requireContext().getContentResolver().delete(
+										odoUri,
+										null,
+										null);
+								Toast.makeText(requireContext(),
+										getString(R.string.maintenance_deleted),
+										Toast.LENGTH_SHORT).show();
+								requireActivity().finish();
+							}
+						},
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Toast.makeText(requireContext(),
+										getString(R.string.maintenance_deleted),
+										Toast.LENGTH_SHORT).show();
+								requireActivity().finish();
+							}
+						},
+						new DialogInterface.OnDismissListener() {
+							@Override
+							public void onDismiss(DialogInterface dialog) {
+								Toast.makeText(requireContext(),
+										getString(R.string.maintenance_deleted),
+										Toast.LENGTH_SHORT).show();
+								requireActivity().finish();
+							}
+						});
+			}
 		}
 	}
 }

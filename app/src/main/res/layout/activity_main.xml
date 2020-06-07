@@ -52,83 +52,110 @@
 				android:visibility="visible" />
 
 			<LinearLayout
-				android:id="@+id/ll_fab_odometer"
-				style="@style/main_activity_fab"
-				android:layout_above="@id/ll_fab_maintenance"
-				android:orientation="horizontal"
-				android:visibility="visible">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center"
-					android:layout_marginEnd="@dimen/fab_margin"
-					android:text="@string/add_odometer"
-					android:textAppearance="?android:textAppearanceMedium"
-					android:textColor="@android:color/white" />
-
-				<com.google.android.material.floatingactionbutton.FloatingActionButton
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:src="@drawable/ic_near_me_24dp"
-					app:borderWidth="0dp" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_fab_maintenance"
-				style="@style/main_activity_fab"
-				android:layout_above="@id/ll_fab_vehicle"
-				android:orientation="horizontal"
-				android:visibility="visible">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center"
-					android:layout_marginEnd="@dimen/fab_margin"
-					android:text="@string/add_maintenance"
-					android:textAppearance="?android:textAppearanceMedium"
-					android:textColor="@android:color/white" />
-
-				<com.google.android.material.floatingactionbutton.FloatingActionButton
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:src="@drawable/ic_build_24dp"
-					app:borderWidth="0dp" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_fab_vehicle"
-				style="@style/main_activity_fab"
-				android:layout_above="@id/fab"
-				android:orientation="horizontal"
-				android:visibility="visible">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center"
-					android:layout_marginEnd="@dimen/fab_margin"
-					android:text="@string/add_vehicle"
-					android:textAppearance="?android:textAppearanceMedium"
-					android:textColor="@android:color/white" />
-
-				<com.google.android.material.floatingactionbutton.FloatingActionButton
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:src="@drawable/ic_directions_car_24dp"
-					app:borderWidth="0dp" />
-
-			</LinearLayout>
-
-			<com.google.android.material.floatingactionbutton.FloatingActionButton
-				android:id="@+id/fab"
-				style="@style/main_activity_fab"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentEnd="true"
 				android:layout_alignParentBottom="true"
-				android:src="@drawable/ic_add"
-				app:borderWidth="0dp" />
+				android:orientation="vertical">
+
+				<LinearLayout
+					android:id="@+id/ll_fab_vehicle"
+					style="@style/main_activity_fab"
+					android:orientation="horizontal"
+					android:visibility="visible">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_marginEnd="@dimen/fab_margin"
+						android:text="@string/add_vehicle"
+						android:textAppearance="?android:textAppearanceMedium"
+						android:textColor="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:src="@drawable/ic_directions_car_24dp"
+						app:borderWidth="0dp" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ll_fab_maintenance"
+					style="@style/main_activity_fab"
+					android:orientation="horizontal"
+					android:visibility="visible">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_marginEnd="@dimen/fab_margin"
+						android:text="@string/add_maintenance"
+						android:textAppearance="?android:textAppearanceMedium"
+						android:textColor="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:src="@drawable/ic_build_24dp"
+						app:borderWidth="0dp" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ll_fab_odometer"
+					style="@style/main_activity_fab"
+					android:orientation="horizontal"
+					android:visibility="visible">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_marginEnd="@dimen/fab_margin"
+						android:text="@string/add_odometer"
+						android:textAppearance="?android:textAppearanceMedium"
+						android:textColor="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:src="@drawable/ic_near_me_24dp"
+						app:borderWidth="0dp" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ll_fab_custom_item"
+					style="@style/main_activity_fab"
+					android:orientation="horizontal"
+					android:visibility="visible">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_marginEnd="@dimen/fab_margin"
+						android:text="@string/add_maintenance_item"
+						android:textAppearance="?android:textAppearanceMedium"
+						android:textColor="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:src="@drawable/ic_library_add_white_24dp"
+						app:borderWidth="0dp" />
+
+				</LinearLayout>
+
+				<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:id="@+id/fab"
+					style="@style/main_activity_fab"
+					android:src="@drawable/ic_add"
+					app:borderWidth="0dp" />
+			</LinearLayout>
 		</RelativeLayout>
 	</RelativeLayout>
 

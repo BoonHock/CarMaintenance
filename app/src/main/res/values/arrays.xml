@@ -5,8 +5,8 @@
 		<item>@string/usage_severe</item>
 	</string-array>
 	<string-array name="array_inspect_replace_options">
-		<item>@string/inspect</item>
 		<item>@string/replace</item>
+		<item>@string/inspect</item>
 	</string-array>
 	<string-array name="array_maintenance_template_options">
 		<item>@string/by_distance_interval</item>

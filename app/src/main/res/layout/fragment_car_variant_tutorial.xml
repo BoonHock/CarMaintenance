@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	tools:layout_marginTop="-0dp">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/find_out_model_variant_title"
+			android:textAppearance="?android:textAppearanceLarge"
+			android:textStyle="bold" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/find_out_model_variant_method1"
+				android:textAppearance="?android:textAppearanceMedium" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/find_out_model_variant_method1_desc" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:drawableTop="@drawable/cert_registration_card"
+				android:text="@string/vehicle_registration_card"
+				android:textAlignment="center" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:drawableTop="@drawable/cert_vehicle_ownership_cert"
+				android:text="@string/vehicle_ownership_certificate"
+				android:textAlignment="center" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/find_out_model_variant_method2"
+				android:textAppearance="?android:textAppearanceMedium" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/find_out_model_variant_method2_desc" />
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:orientation="vertical">
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="8dp"
+					android:layout_weight="1"
+					android:adjustViewBounds="true"
+					android:contentDescription="@string/back_of_vehicle"
+					android:maxWidth="300dp"
+					android:src="@drawable/vehicle_back_iriz_manual" />
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="8dp"
+					android:layout_weight="1"
+					android:adjustViewBounds="true"
+					android:contentDescription="@string/back_of_vehicle"
+					android:maxWidth="300dp"
+					android:src="@drawable/vehicle_back_nissan_sentra" />
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:adjustViewBounds="true"
+					android:contentDescription="@string/back_of_vehicle"
+					android:maxWidth="300dp"
+					android:src="@drawable/vehicle_back_saga_2019_manual" />
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>

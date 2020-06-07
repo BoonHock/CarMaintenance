@@ -329,7 +329,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				return updateCustomMaintenanceItem(values, selection, selectionArgs);
 			default:
-				throw new IllegalArgumentException("Deletion is not supported for " + uri);
+				throw new IllegalArgumentException("Update not supported for " + uri);
 		}
 	}
 

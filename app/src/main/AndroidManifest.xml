@@ -47,6 +47,16 @@
 				android:value="com.incupe.vewec.MainActivity" />
 		</activity>
 		<activity
+			android:name=".CarVariantTutorialActivity"
+			android:label="@string/title_activity_settings"
+			android:parentActivityName=".VehicleEditorActivity">
+
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.VehicleEditorActivity" />
+		</activity>
+		<activity
 			android:name=".MaintenanceEditorActivity"
 			android:parentActivityName=".MainActivity"
 			android:windowSoftInputMode="stateAlwaysHidden">
@@ -107,10 +117,9 @@
 		<meta-data
 			android:name="com.google.android.gms.ads.AD_MANAGER_APP"
 			android:value="true" />
-		<service
-			android:name="com.google.firebase.messaging.FirebaseMessagingService">
+		<service android:name="com.google.firebase.messaging.FirebaseMessagingService">
 			<intent-filter>
-				<action android:name="com.google.firebase.MESSAGING_EVENT"/>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
 			</intent-filter>
 		</service>
 	</application>

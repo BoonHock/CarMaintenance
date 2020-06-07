@@ -1,16 +1,16 @@
 package com.incupe.vewec;
 
 import android.app.DatePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,8 +27,6 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.incupe.vewec.data.APP_MASTER_CONTRACT;
-import com.incupe.vewec.data.OdometerContract;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 import com.incupe.vewec.utilities.DateUtilities;
 import com.incupe.vewec.utilities.SetupViews;
@@ -40,6 +38,9 @@ import java.util.Date;
 import java.util.List;
 
 public class OdometerEditorActivity extends AppCompatActivity {
+	// arbitrary value
+	private static final int DISTANCE_DIFFERENCE_FOR_WARNING = 20000;
+
 	private Uri _currentUri;
 
 	private Spinner _spinnerVehicle;
@@ -129,32 +130,6 @@ public class OdometerEditorActivity extends AppCompatActivity {
 				}
 			});
 
-			_editOdometer.addTextChangedListener(new TextWatcher() {
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				}
-
-				@Override
-				public void onTextChanged(CharSequence s, int start, int before, int count) {
-					if (!TextUtils.isEmpty(_editOdometer.getText().toString().trim())) {
-						int distance = Integer.parseInt(_editOdometer.getText().toString().trim());
-						if (distance < OdometerEntry.DISTANCE_MIN) {
-							_editOdometer.setText("");
-							UserDialog.showDialog(OdometerEditorActivity.this, "",
-									getString(R.string.odometer_input_too_small), null);
-						}
-						if (distance > OdometerEntry.DISTANCE_MAX) {
-							_editOdometer.setText("");
-							UserDialog.showDialog(OdometerEditorActivity.this, "",
-									getString(R.string.odometer_input_too_large), null);
-						}
-					}
-				}
-
-				@Override
-				public void afterTextChanged(Editable s) {
-				}
-			});
 			_editOdometer.setFilters(new InputFilter[]{
 					new InputFilter.LengthFilter(String.valueOf(OdometerEntry.DISTANCE_MAX).length())
 			});
@@ -218,7 +193,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_save:
-				saveOdometer();
+				processSaveOdometer();
 				return true;
 			case R.id.action_delete:
 				UserDialog.showDeleteConfirmationDialog(
@@ -227,7 +202,9 @@ public class OdometerEditorActivity extends AppCompatActivity {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
 								// User clicked the "Delete" button
-								deleteOdometer();
+								if (_currentUri != null) {
+									deleteOdometer(_currentUri);
+								}
 							}
 						});
 				return true;
@@ -265,36 +242,100 @@ public class OdometerEditorActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void saveOdometer() {
+	private void processSaveOdometer() {
 		if (TextUtils.isEmpty(_editOdometer.getText().toString())) {
 			UserDialog.showDialog(this, "",
 					getString(R.string.odometer_not_provided),
 					null);
 			return;
 		}
+		final int vehicle = getSelectedVehicleId();
+		final long date = getCalendarAtMidnight();
+		final int distance = Integer.parseInt(_editOdometer.getText().toString());
 
-		int vehicle = getSelectedVehicleId();
-		long date = getCalendarAtMidnight();
+		if (distance < OdometerEntry.DISTANCE_MIN) {
+			UserDialog.showDialog(this, "",
+					getString(R.string.odometer_input_too_small), null);
+			return;
+		}
+		if (distance > OdometerEntry.DISTANCE_MAX) {
+			UserDialog.showDialog(this, "",
+					getString(R.string.odometer_input_too_large), null);
+			return;
+		}
 
-		int distance = Integer.parseInt(_editOdometer.getText().toString());
+		int diff = bigDiff(this, vehicle, date, distance);
 
-		Cursor cursor = getContentResolver().query(OdometerEntry.CONTENT_URI,
+		if (diff > DISTANCE_DIFFERENCE_FOR_WARNING) {
+			UserDialog.showDialog(this,
+					"",
+					"Entered odometer has huge difference of " + diff
+							+ " " + getString(R.string.kilometer)
+							+ " with previous record. Continue?",
+					getString(android.R.string.ok),
+					getString(android.R.string.cancel),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (dialog != null) {
+								dialog.dismiss();
+								if (saveOdometer(OdometerEditorActivity.this,
+										_currentUri, vehicle, date, distance)) {
+									Toast.makeText(OdometerEditorActivity.this,
+											getString(R.string.saved_successfully),
+											Toast.LENGTH_SHORT).show();
+									finish();
+								} else {
+									Toast.makeText(OdometerEditorActivity.this,
+											getString(R.string.error_has_occurred),
+											Toast.LENGTH_SHORT).show();
+								}
+							}
+						}
+					},
+					null,
+					null);
+		} else {
+			if (saveOdometer(OdometerEditorActivity.this,
+					_currentUri, vehicle, date, distance)) {
+				Toast.makeText(OdometerEditorActivity.this,
+						getString(R.string.saved_successfully),
+						Toast.LENGTH_SHORT).show();
+				finish();
+			} else {
+				Toast.makeText(OdometerEditorActivity.this,
+						getString(R.string.error_has_occurred),
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	public static boolean saveOdometer(Context context, Uri updateUri,
+									   int vehicle, long date, int distance) {
+		Uri existingRecordUri = null;
+
+		Cursor cursor = context.getContentResolver().query(
+				OdometerEntry.CONTENT_URI,
 				OdometerEntry.FULL_PROJECTION,
 				OdometerEntry.COLUMN_VEHICLE + "=? AND "
 						+ OdometerEntry.COLUMN_DATE + "=?",
-				new String[]{String.valueOf(vehicle), String.valueOf(date)},
+				new String[]{String.valueOf(vehicle),
+						String.valueOf(date)},
 				null);
 
-		boolean isUpdate = false;
-
-		if (_currentUri != null) {
-			isUpdate = true;
-		} else if (cursor != null) {
+		if (cursor != null) {
 			if (cursor.moveToFirst()) {
-				_currentUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
-						OdometerContract.PATH_ODOMETER + "/"
-								+ cursor.getLong(cursor.getColumnIndexOrThrow(OdometerEntry._ID)));
-				isUpdate = true;
+				long existingRecordId = cursor.getLong(cursor
+						.getColumnIndexOrThrow(OdometerEntry._ID));
+				existingRecordUri = ContentUris.withAppendedId(
+						OdometerEntry.CONTENT_URI, existingRecordId);
+				// if user updating and existing record on this date is this record itself,
+				// then set existingRecordUri to null
+				// existingRecordUri if not null, will be deleted because clash with current
+				// editing record's date
+				if (updateUri != null && ContentUris.parseId(updateUri) == existingRecordId) {
+					existingRecordUri = null;
+				}
 			}
 			cursor.close();
 		}
@@ -304,37 +345,98 @@ public class OdometerEditorActivity extends AppCompatActivity {
 		values.put(OdometerEntry.COLUMN_DATE, date);
 		values.put(OdometerEntry.COLUMN_DISTANCE, distance);
 
-		boolean saveSuccess;
+		boolean saveSuccess = true;
 
-		if (isUpdate) {
-			int rowsAffected = getContentResolver().update(_currentUri,
-					values, null, null);
-			saveSuccess = rowsAffected != 0;
+		if (updateUri == null) {
+			// user selected add maintenance
+			if (existingRecordUri == null) {
+				// no previous existing record. Insert new record
+				Uri newUri = context.getContentResolver().insert(OdometerEntry.CONTENT_URI, values);
+				saveSuccess = newUri != null;
+			} else {
+				// previous existing record found. Update record
+				saveSuccess = updateOdometer(context, existingRecordUri, values);
+			}
 		} else {
-			Uri newUri = getContentResolver().insert(OdometerEntry.CONTENT_URI, values);
-			saveSuccess = newUri != null;
+			// user selected edit maintenance
+			if (existingRecordUri == null) {
+				// if no previous record, update current record right away
+				saveSuccess = updateOdometer(context, updateUri, values);
+			} else {
+				// existing record found. delete the record first then update
+				// or else will violate UNIQUE constraint
+				int rowsDeleted = context.getContentResolver().delete(
+						existingRecordUri,
+						null,
+						null);
+				if (rowsDeleted > 0) {
+					saveSuccess = updateOdometer(context, updateUri, values);
+				}
+			}
 		}
-		if (saveSuccess) {
-			Toast.makeText(this, getString(R.string.saved_successfully),
-					Toast.LENGTH_SHORT).show();
-			finish();
-		} else {
-			Toast.makeText(this, getString(R.string.error_has_occurred),
-					Toast.LENGTH_SHORT).show();
-		}
+		return saveSuccess;
 	}
 
-	private void deleteOdometer() {
-		if (_currentUri != null) {
-			int rowsDeleted = getContentResolver()
-					.delete(_currentUri, null, null);
-			if (rowsDeleted == 0) {
-				Toast.makeText(this, getString(R.string.error_has_occurred),
-						Toast.LENGTH_SHORT).show();
+	private static boolean updateOdometer(Context context, Uri updateUri, ContentValues values) {
+		int rowsAffected = context.getContentResolver().update(
+				updateUri,
+				values,
+				null,
+				null);
+
+		return rowsAffected != 0;
+	}
+
+/*
+	public static boolean saveOdometer(Context context, int vehicleId, long odometerDate,
+									   int odometerDistance, Uri updateUri) {
+		Cursor cursor = context.getContentResolver().query(OdometerEntry.CONTENT_URI,
+				OdometerEntry.FULL_PROJECTION,
+				OdometerEntry.COLUMN_VEHICLE + "=? AND "
+						+ OdometerEntry.COLUMN_DATE + "=?",
+				new String[]{String.valueOf(vehicleId),
+						String.valueOf(odometerDate)},
+				null);
+
+		ContentValues values = new ContentValues();
+		values.put(OdometerEntry.COLUMN_VEHICLE, vehicleId);
+		values.put(OdometerEntry.COLUMN_DATE, odometerDate);
+		values.put(OdometerEntry.COLUMN_DISTANCE, odometerDistance);
+
+		if (cursor != null) {
+			if (cursor.getCount() > 0 && cursor.moveToFirst()) {
+				// update odometer
+				// update 20200424: if maintenance odometer entry more than
+				// today's odometer entry, update
+				int dbOdometer = cursor.getInt(cursor
+						.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
+
+				if (odometerDistance > dbOdometer) {
+					Uri odometerUri = Uri.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI,
+							OdometerContract.PATH_ODOMETER + "/"
+									+ cursor.getLong(cursor
+									.getColumnIndexOrThrow(OdometerEntry._ID)));
+					context.getContentResolver()
+							.update(odometerUri, values, null, null);
+				}
 			} else {
-				Toast.makeText(this, getString(R.string.odometer_deleted),
-						Toast.LENGTH_SHORT).show();
+				// insert odometer
+				context.getContentResolver().insert(OdometerEntry.CONTENT_URI, values);
 			}
+			cursor.close();
+		}
+	}
+*/
+
+	private void deleteOdometer(Uri deleteUri) {
+		int rowsDeleted = getContentResolver()
+				.delete(deleteUri, null, null);
+		if (rowsDeleted == 0) {
+			Toast.makeText(this, getString(R.string.error_has_occurred),
+					Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(this, getString(R.string.odometer_deleted),
+					Toast.LENGTH_SHORT).show();
 		}
 		finish();
 	}
@@ -393,5 +495,32 @@ public class OdometerEditorActivity extends AppCompatActivity {
 		_calendarOdometer.set(Calendar.SECOND, 0);
 		_calendarOdometer.set(Calendar.MILLISECOND, 0);
 		return _calendarOdometer.getTime().getTime();
+	}
+
+	public static int bigDiff(
+			Context context, int vehicleId, long currentDate, int compareDistance) {
+		Cursor cursor = context.getContentResolver().query(
+				OdometerEntry.CONTENT_URI,
+				OdometerEntry.FULL_PROJECTION,
+				OdometerEntry.COLUMN_VEHICLE + "=? AND "
+						+ OdometerEntry.COLUMN_DATE + "<?",
+				new String[]{String.valueOf(vehicleId),
+						String.valueOf(currentDate)},
+				OdometerEntry.COLUMN_DATE + " DESC LIMIT 1");
+
+		int latestOdometer = 0;
+
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				latestOdometer = cursor.getInt(cursor
+						.getColumnIndexOrThrow(OdometerEntry.COLUMN_DISTANCE));
+			}
+			cursor.close();
+		}
+		if (latestOdometer == 0) {
+			// no previous record found. then it's ok. return as no big diff
+			return 0;
+		}
+		return compareDistance - latestOdometer;
 	}
 }

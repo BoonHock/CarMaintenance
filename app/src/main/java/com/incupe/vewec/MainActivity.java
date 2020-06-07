@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,15 +32,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.incupe.vewec.data.UserVehicleContract;
+import com.incupe.vewec.fragments.CustomMaintenanceItemFragment;
 import com.incupe.vewec.objects.FirebaseObj;
 import com.incupe.vewec.objects.VehicleTemplate;
 import com.incupe.vewec.utilities.Misc;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 	private boolean _isOpenFab = true;
-	private LinearLayout _llFabVehicle;
-	private LinearLayout _llFabMaintenance;
-	private LinearLayout _llFabOdometer;
+	private ArrayList<View> _fabButtons;
 
 	private FloatingActionButton _fabMenu;
 	private LinearLayout _llMask;
@@ -79,16 +79,21 @@ public class MainActivity extends AppCompatActivity {
 		final RelativeLayout rlContent = findViewById(R.id.rl_content);
 
 		_fabMenu = findViewById(R.id.fab);
-		_llFabVehicle = findViewById(R.id.ll_fab_vehicle);
-		_llFabOdometer = findViewById(R.id.ll_fab_odometer);
-		_llFabMaintenance = findViewById(R.id.ll_fab_maintenance);
-
+		LinearLayout _llFabVehicle = findViewById(R.id.ll_fab_vehicle);
+		LinearLayout _llFabOdometer = findViewById(R.id.ll_fab_odometer);
+		LinearLayout _llFabMaintenance = findViewById(R.id.ll_fab_maintenance);
+		LinearLayout _llFabCustomItem = findViewById(R.id.ll_fab_custom_item);
 		_llMask = findViewById(R.id.ll_mask);
 
-		_llFabVehicle.setVisibility(View.INVISIBLE);
-		_llFabOdometer.setVisibility(View.INVISIBLE);
-		_llFabMaintenance.setVisibility(View.INVISIBLE);
+		_fabButtons = new ArrayList<>();
+		_fabButtons.add(_llFabVehicle);
+		_fabButtons.add(_llFabOdometer);
+		_fabButtons.add(_llFabMaintenance);
+		_fabButtons.add(_llFabCustomItem);
 
+		for (View v : _fabButtons) {
+			v.setVisibility(View.INVISIBLE);
+		}
 		_llMask.setVisibility(View.GONE);
 
 		progressBar.setVisibility(View.VISIBLE);
@@ -139,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
+
 		_llFabVehicle.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -160,6 +166,15 @@ public class MainActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				hideFabMenu();
 				Intent intent = new Intent(MainActivity.this, MaintenanceEditorActivity.class);
+				startActivity(intent);
+			}
+		});
+		_llFabCustomItem.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				hideFabMenu();
+				Intent intent = new Intent(MainActivity.this, CustomMaintenanceItemActivity.class);
+				intent.putExtra(CustomMaintenanceItemFragment.EXTRA_ADD_ITEM, true);
 				startActivity(intent);
 			}
 		});
@@ -188,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
 						Log.v("CHECK_ME", token);
 					}
 				});
-
 	}
 
 	@Override
@@ -251,19 +265,11 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	private void setDefaultPreferenceValues() {
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-	}
-
 	private void setupFabMenu() {
-		_llFabVehicle.setY(_fabMenu.getTop());
-		_llFabVehicle.setVisibility(View.INVISIBLE);
-
-		_llFabOdometer.setY(_fabMenu.getTop());
-		_llFabOdometer.setVisibility(View.INVISIBLE);
-
-		_llFabMaintenance.setY(_fabMenu.getTop());
-		_llFabMaintenance.setVisibility(View.INVISIBLE);
+		for (View v : _fabButtons) {
+			v.setY(_fabMenu.getTop());
+			v.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	private void showFabMenu() {
@@ -272,14 +278,26 @@ public class MainActivity extends AppCompatActivity {
 		_llMask.setVisibility(View.VISIBLE);
 		_llMask.animate().alpha((float) 0.5);
 
-		// TODO: temporary limit only one vehicle allowed
-		if (UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
-			findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
-		} else {
-			showLinearLayoutFab(_llFabVehicle);
+		for (View v : _fabButtons) {
+			if (v.getId() == R.id.ll_fab_vehicle) {
+				// TODO: temporary limit only one vehicle allowed
+				if (UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
+					findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
+				} else {
+					showLinearLayoutFab(v);
+				}
+			} else {
+				showLinearLayoutFab(v);
+			}
 		}
-		showLinearLayoutFab(_llFabOdometer);
-		showLinearLayoutFab(_llFabMaintenance);
+//		// TODO: temporary limit only one vehicle allowed
+//		if (UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
+//			findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
+//		} else {
+//			showLinearLayoutFab(_llFabVehicle);
+//		}
+//		showLinearLayoutFab(_llFabOdometer);
+//		showLinearLayoutFab(_llFabMaintenance);
 
 		_fabMenu.animate().rotation(45);
 		_isOpenFab = false;
@@ -287,6 +305,8 @@ public class MainActivity extends AppCompatActivity {
 
 	private void hideFabMenu() {
 		_llMask.setAlpha((float) 0.5);
+
+		// fade out and make gone
 		_llMask.animate().alpha(0).setListener(new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
@@ -309,25 +329,21 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		hideLinearLayoutFab(_llFabVehicle);
-		hideLinearLayoutFab(_llFabOdometer);
-		hideLinearLayoutFab(_llFabMaintenance);
+		for (View v : _fabButtons) {
+			v.animate().alpha(0).y(_fabMenu.getTop());
+		}
 
 		_fabMenu.animate().rotation(0);
 		_isOpenFab = true;
 	}
 
-	private void showLinearLayoutFab(LinearLayout llFab) {
+	private void showLinearLayoutFab(View llFab) {
 		// set initial position before animation
 		llFab.setY(_fabMenu.getTop());
 		llFab.setAlpha(0);
 
 		llFab.setVisibility(View.VISIBLE);
 		llFab.animate().translationY(0).alpha(1);
-	}
-
-	private void hideLinearLayoutFab(LinearLayout llFab) {
-		llFab.animate().alpha(0).y(_fabMenu.getTop());
 	}
 
 	private void runFirstTime() {

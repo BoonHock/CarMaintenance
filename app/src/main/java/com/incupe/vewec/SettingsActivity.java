@@ -170,16 +170,15 @@ public class SettingsActivity extends SingleFragmentActivity {
 				pendingIntent = PendingIntent.getBroadcast(context,
 						i,
 						intent, 0);
-				alarmManager.cancel(pendingIntent);
+				if (alarmManager != null) {
+					alarmManager.cancel(pendingIntent);
+				}
 			}
 
-			int hour = 0, minute = 0;
-			if (time != null) {
-				hour = Integer.parseInt(time.substring(0, 2));
-				minute = Integer.parseInt(time.substring(3, 5));
-			}
+			int hour = Integer.parseInt(time.substring(0, 2));
+			int minute = Integer.parseInt(time.substring(3, 5));
 
-			if (days != null && !days.trim().equals("")) {
+			if (!days.trim().equals("")) {
 				String[] listDays = days.split(
 						PrefUpdateOdoDayFragment.DAY_SEPARATOR, 0);
 				for (String day : listDays) {
@@ -197,10 +196,12 @@ public class SettingsActivity extends SingleFragmentActivity {
 						pendingIntent = PendingIntent.getBroadcast(context,
 								calendar.get(Calendar.DAY_OF_WEEK), // id to differentiate with other days
 								intent, 0);
-						alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-								calendar.getTimeInMillis(),
-								AlarmManager.INTERVAL_DAY * 7,
-								pendingIntent);
+						if (alarmManager != null) {
+							alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+									calendar.getTimeInMillis(),
+									AlarmManager.INTERVAL_DAY * 7,
+									pendingIntent);
+						}
 					}
 					// TODO: if calendar null means got error!!!
 				}

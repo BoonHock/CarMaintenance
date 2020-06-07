@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.incupe.vewec.data.FirebaseContract;
 import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
 import com.incupe.vewec.data.UserVehicleContract;
 
@@ -53,7 +54,12 @@ public abstract class FirebaseObj {
 				public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 					List<MaintenanceItem> maintenanceItems = new ArrayList<>();
 					for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-						maintenanceItems.add(snapshot.getValue(MaintenanceItem.class));
+						MaintenanceItem item = snapshot.getValue(MaintenanceItem.class);
+						if (item != null && item.getInspect_replace() ==
+								FirebaseContract.FirebaseMaintenanceDetailsEntry.REPLACE) {
+							// as discussed on 20200521, show replace items only for now
+							maintenanceItems.add(snapshot.getValue(MaintenanceItem.class));
+						}
 					}
 					_maintenanceItems.put(firebaseVehicleId, maintenanceItems);
 					fbo.callback();

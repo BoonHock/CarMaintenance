@@ -61,7 +61,9 @@
 	<string name="usage">Usage</string>
 	<string name="usage_severe">Severe</string>
 	<string name="usage_normal">Normal</string>
-	<string name="maintenance_may_vary">Maintenance recommendations by manufacturer may vary across different usage type.</string>
+	<string name="maintenance_may_vary">Maintenance recommendations by manufacturer may
+		vary across different usage type.\nSome examples of severe usage: car sharing
+		vehicles, e-hailing vehicles, taxis and delivery vehicles.</string>
 	<string name="severe_usage_conditions">
 		Severe conditions include but are not limited to the following:\n
 		1. Driving on dusty roads or in an area which the vehicle is likely to be exposed to salty air\n
@@ -108,8 +110,9 @@
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
 	<!-- for testing -->
-		<string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-<!--	<string name="banner_ad_unit_id">ca-app-pub-5570583030825452/1907637256</string>-->
+<!--	<string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>-->
+	<string name="banner_ad_unit_id">ca-app-pub-5570583030825452~8041800760</string>
+	<!--	<string name="banner_ad_unit_id">ca-app-pub-5570583030825452/1907637256</string>-->
 	<string name="title_activity_settings">Settings</string>
 
 	<!-- Preference Titles -->
@@ -121,14 +124,13 @@
 	<string name="attachment_title">Download incoming attachments</string>
 	<string name="attachment_summary_on">Automatically download attachments for incoming emails
 	</string>
-	<string name="attachment_summary_off">Only download attachments when manually requested</string>
-	<string name="pref_key_start_upcoming_maintenance_from">start_upcoming_maintenance_from</string>
+	<string name="attachment_summary_off">
+		Only download attachments when manually requested</string>
+	<string name="pref_key_start_upcoming_maintenance_from">
+		start_upcoming_maintenance_from</string>
 	<string name="custom_maintenance_item">Custom maintenance item</string>
-	<string name="start_maintenance_recommendation_from">Start maintenance recommendation from (KM):</string>
-	<string name="odometer_start_upcoming">Odometer distance to start calculating upcoming
-		maintenance items from. For example, if 98,000 KM is set,
-		item with 5000 KM maintenance distance interval will need
-		to be serviced at 103,000 KM. Default value is 0.</string>
+	<string name="start_maintenance_recommendation_from">
+		Start maintenance recommendation from (KM):</string>
 	<string name="add_item">Add item</string>
 	<string name="item_name">Item name</string>
 	<string name="duration_interval_month">Duration interval (month)</string>
@@ -187,13 +189,41 @@
 	<string name="thursday">Thursday</string>
 	<string name="friday">Friday</string>
 	<string name="saturday">Saturday</string>
-	<string name="select_days_to_get_notification">Select days to get notification</string>
 	<string name="update_odo_day_label">Notification to update odometer every</string>
 	<string name="update_odo_time_label">Notification to update odometer at</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
-	<string name="brand_new_vehicle_label">Brand new vehicle (no service or maintenance performed before)</string>
-	<string name="update_odometer_reminder_notification">update_odometer_reminder_notification</string>
+	<string name="brand_new_vehicle_label">Brand new vehicle (no service or maintenance
+		performed before)</string>
+	<string name="update_odometer_reminder_notification">
+		update_odometer_reminder_notification</string>
 	<string name="update_odometer_reminder">Update odometer reminder</string>
-
+	<string name="unable_to_open_link">Unable to open link.</string>
+	<string name="add_maintenance_item">Add maintenance item</string>
+	<string name="tips">Tips</string>
+	<string name="odometer_editor_tips">Make sure your odometer is displaying total
+		distance travelled by ensuring your odometer displays \"ODO\" near the
+		distance travelled.</string>
+	<string name="car_variant_help"><u>Not sure what is your car\'s variant?</u></string>
+	<string name="find_out_model_variant_title">
+		Finding out your vehicle\'s model and variant</string>
+	<string name="vehicle_registration_card">Vehicle Registration Card</string>
+	<string name="find_out_model_variant_method1">
+		<u>Method 1: Vehicle Registration Card (RC) or Vehicle Ownership Certificate (VOC)</u>
+	</string>
+	<string name="find_out_model_variant_method2"><u>Method 2: Back of your vehicle</u>
+	</string>
+	<string name="find_out_model_variant_method1_desc">Depending on when you register your
+		vehicle, you will either have RC or VOC issued by Road Transport Department (JPJ).
+		These documents contain information of your vehicle\'s model and variant.</string>
+	<string name="find_out_model_variant_method2_desc">For some vehicles, information
+		of variant may be obtained by looking at the back of the vehicle.</string>
+	<string name="variant_tip">
+		Tip: Some manufacturers abbreviate \"Manual\" transmission as \"MT\"
+		and \"Auto\" transmission as \"AT\"
+	</string>
+	<string name="vehicle_ownership_certificate">Vehicle Ownership Certificate</string>
+	<string name="back_of_vehicle">Back of vehicle</string>
+	<string name="maintenance_deleted_confirm_delete_odo_too">
+		Maintenance deleted. Do you want to delete odometer record too?</string>
 </resources>

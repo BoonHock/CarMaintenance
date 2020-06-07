@@ -24,7 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -105,8 +104,6 @@ public class VehicleEditorActivity extends AppCompatActivity
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 
-		TextView txtIntro = findViewById(R.id.intro_msg);
-
 		_spinnerBrand = findViewById(R.id.spinner_brand);
 		_spinnerModel = findViewById(R.id.spinner_model);
 		_spinnerVariant = findViewById(R.id.spinner_variant);
@@ -126,7 +123,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 				new InputFilter.AllCaps()
 		});
 
-		ArrayAdapter usageSpinnerAdapter = ArrayAdapter.createFromResource(this,
+		ArrayAdapter<CharSequence> usageSpinnerAdapter = ArrayAdapter.createFromResource(this,
 				R.array.array_usage_options, android.R.layout.simple_spinner_item);
 		// Specify dropdown layout style - simple list view with 1 item per line
 		usageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -199,15 +196,31 @@ public class VehicleEditorActivity extends AppCompatActivity
 			}
 		});
 
-		txtIntro.setOnClickListener(new View.OnClickListener() {
+		findViewById(R.id.intro_msg).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// open google forms to submit brand-model-variant
 				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setData(Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLScbmnApgQj5wDmW2pMZHJwFlkfwNm_xpGFLtv1WamSEf1j41A/viewform?usp=sf_link"));
-				startActivity(intent);
+
+				if (intent.resolveActivity(getPackageManager()) != null) {
+					intent.setData(Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLScbmnApgQj5wDmW2pMZHJwFlkfwNm_xpGFLtv1WamSEf1j41A/viewform?usp=sf_link"));
+					startActivity(intent);
+				} else {
+					Toast.makeText(VehicleEditorActivity.this,
+							getString(R.string.unable_to_open_link),
+							Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
+		findViewById(R.id.txt_car_variant_help).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(VehicleEditorActivity.this,
+								CarVariantTutorialActivity.class);
+						startActivity(intent);
+					}
+				});
 	}
 
 	@Override

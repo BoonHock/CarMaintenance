@@ -28,14 +28,16 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.incupe.vewec.R;
 import com.incupe.vewec.cursoradapter.CustomMaintenanceItemCursorAdapter;
 import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.utilities.UserDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class CustomMaintenanceItemFragment extends Fragment
 		implements LoaderManager.LoaderCallbacks<Cursor> {
+	public static final String EXTRA_ADD_ITEM = "EXTRA_ADD_ITEM";
+
 	private static final String DIALOG_CUSTOM_ITEM = "DIALOG_CUSTOM_ITEM";
 	private static final int DIALOG_RESULT = 0;
 	private static final int LOADER_ID = 0;
@@ -60,12 +62,11 @@ public class CustomMaintenanceItemFragment extends Fragment
 		ListView listView = rootView.findViewById(R.id.item_list);
 
 		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-		final View sheetView = requireActivity().getLayoutInflater()
+		final View bottomSheetView = requireActivity().getLayoutInflater()
 				.inflate(R.layout.bottom_sheet_edit_delete, container, false);
-		bottomSheetDialog.setContentView(sheetView);
+		bottomSheetDialog.setContentView(bottomSheetView);
 
 		setupEmptyView(rootView, listView);
-		setupBottomSheetDialog(listView);
 
 		_customMaintenanceItemCursorAdapter =
 				new CustomMaintenanceItemCursorAdapter(getContext(), null);
@@ -114,8 +115,8 @@ public class CustomMaintenanceItemFragment extends Fragment
 			}
 		});
 		// no need edit la. already can edit when click directly
-		sheetView.findViewById(R.id.bottom_sheet_edit).setVisibility(View.GONE);
-		sheetView.findViewById(R.id.bottom_sheet_delete).setOnClickListener(
+		bottomSheetView.findViewById(R.id.bottom_sheet_edit).setVisibility(View.GONE);
+		bottomSheetView.findViewById(R.id.bottom_sheet_delete).setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -151,6 +152,10 @@ public class CustomMaintenanceItemFragment extends Fragment
 		// TODO: fix deprecated call
 		// Kick off the loader
 		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		if (requireActivity().getIntent().getSerializableExtra(EXTRA_ADD_ITEM) != null) {
+			showAddItemDialog();
+		}
 
 		return rootView;
 	}
@@ -225,13 +230,6 @@ public class CustomMaintenanceItemFragment extends Fragment
 		listView.setEmptyView(emptyView);
 	}
 
-	private void setupBottomSheetDialog(ListView listView) {
-		final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-		final View sheetView = getLayoutInflater()
-				.inflate(R.layout.bottom_sheet_edit_delete, listView, false);
-		bottomSheetDialog.setContentView(sheetView);
-	}
-
 	private boolean checkItemExists(String itemName, int inspectReplace, long excludeId) {
 		boolean returnValue = false;
 		Cursor cursor = requireContext().getContentResolver().query(
@@ -256,15 +254,7 @@ public class CustomMaintenanceItemFragment extends Fragment
 	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_add:
-				// set edit item id to 0 to indicate adding record
-				_editItemId = 0;
-				// show dialog to add
-				FragmentManager manager = requireActivity().getSupportFragmentManager();
-				CustomMaintenanceItemEditorFragment dialog =
-						CustomMaintenanceItemEditorFragment.newInstance();
-				dialog.setTargetFragment(CustomMaintenanceItemFragment.this,
-						DIALOG_RESULT);
-				dialog.show(manager, DIALOG_CUSTOM_ITEM);
+				showAddItemDialog();
 				break;
 			case android.R.id.home:
 				requireActivity().finish();
@@ -272,7 +262,17 @@ public class CustomMaintenanceItemFragment extends Fragment
 		}
 		return true;
 	}
-
+	private void showAddItemDialog(){
+		// set edit item id to 0 to indicate adding record
+		_editItemId = 0;
+		// show dialog to add
+		FragmentManager manager = requireActivity().getSupportFragmentManager();
+		CustomMaintenanceItemEditorFragment dialog =
+				CustomMaintenanceItemEditorFragment.newInstance();
+		dialog.setTargetFragment(CustomMaintenanceItemFragment.this,
+				DIALOG_RESULT);
+		dialog.show(manager, DIALOG_CUSTOM_ITEM);
+	}
 	@NonNull
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {

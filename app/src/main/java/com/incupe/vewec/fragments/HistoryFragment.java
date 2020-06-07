@@ -24,13 +24,13 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.incupe.vewec.MaintenanceEditorActivity;
 import com.incupe.vewec.R;
 import com.incupe.vewec.cursoradapter.HistoryCursorAdapter;
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract;
 import com.incupe.vewec.utilities.UserDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class HistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int LOADER_ID = 0;
@@ -103,21 +103,44 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 					}
 				});
 
-		sheetView.findViewById(R.id.bottom_sheet_delete)
-				.setOnClickListener(new View.OnClickListener() {
+		sheetView.findViewById(R.id.bottom_sheet_delete).setOnClickListener(
+				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						UserDialog.showDeleteConfirmationDialog(getContext(),
+						UserDialog.showDeleteConfirmationDialog(
+								getContext(),
 								getString(R.string.are_you_sure),
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
+										Uri maintenanceUri = ContentUris.withAppendedId(
+												MaintenanceEntry.CONTENT_URI, _longClickId);
+										final Uri odoUri = MaintenanceEditorFragment
+												.getOdometerUri(requireContext(), maintenanceUri);
+
 										requireContext().getContentResolver().delete(
-												ContentUris.withAppendedId(
-														MaintenanceEntry.CONTENT_URI, _longClickId),
+												maintenanceUri,
 												null,
 												null);
 										bottomSheetDialog.hide();
+
+										UserDialog.showDialog(
+												requireContext(),
+												"",
+												getString(R.string.maintenance_deleted_confirm_delete_odo_too),
+												getString(R.string.yes),
+												getString(R.string.no),
+												new DialogInterface.OnClickListener() {
+													@Override
+													public void onClick(DialogInterface dialog, int which) {
+														requireContext().getContentResolver().delete(
+																odoUri,
+																null,
+																null);
+													}
+												},
+												null,
+												null);
 									}
 								});
 					}
