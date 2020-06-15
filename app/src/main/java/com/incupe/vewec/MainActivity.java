@@ -20,6 +20,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -53,6 +56,20 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		try {
+			MobileAds.initialize(this, new OnInitializationCompleteListener() {
+				@Override
+				public void onInitializationComplete(InitializationStatus initializationStatus) {
+				}
+			});
+			AdView adView = findViewById(R.id.adView);
+			AdRequest adRequest = new AdRequest.Builder().build();
+			adView.loadAd(adRequest);
+		} catch (Exception e) {
+			if (e.getMessage() != null)
+				Log.v("CHECK_ME", e.getMessage());
+		}
+
 		// run code for only first time app opened
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if (!prefs.getBoolean("firstTime", false)) {
@@ -62,19 +79,13 @@ public class MainActivity extends AppCompatActivity {
 			editor.apply();
 		}
 
-
 		if (PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.pref_get_started), true)) {
 			Intent intent = new Intent(this, GetStartedActivity.class);
 			startActivityForResult(intent, REQUEST_GET_STARTED_MESSAGE);
 		}
-//		setDefaultPreferenceValues();
 
 		// Load an ad into the AdMob banner view.
-		AdView adView = findViewById(R.id.adView);
-		AdRequest adRequest = new AdRequest.Builder().build();
-		adView.loadAd(adRequest);
-
 		final ProgressBar progressBar = findViewById(R.id.progress_bar);
 		final RelativeLayout rlContent = findViewById(R.id.rl_content);
 

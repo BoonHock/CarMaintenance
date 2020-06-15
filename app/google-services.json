@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "1098509762510",
-    "firebase_url": "https://car-maintenance-bb9eb.firebaseio.com",
-    "project_id": "car-maintenance-bb9eb",
-    "storage_bucket": "car-maintenance-bb9eb.appspot.com"
+    "project_number": "165593976815",
+    "firebase_url": "https://vewec-56895.firebaseio.com",
+    "project_id": "vewec-56895",
+    "storage_bucket": "vewec-56895.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1098509762510:android:c9f1bbf23064776276f59f",
+        "mobilesdk_app_id": "1:165593976815:android:2a7f0094a13f571404701a",
         "android_client_info": {
           "package_name": "com.incupe.vewec"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1098509762510-jp35eeg31eq89r8e7kt7bfp7q57vpjuj.apps.googleusercontent.com",
+          "client_id": "165593976815-9aterr46ng9ct9pvvucoagl45e7isuke.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.incupe.vewec",
@@ -23,20 +23,20 @@
           }
         },
         {
-          "client_id": "1098509762510-635mu96stimpkm4gp96ud79gi0u0tm9s.apps.googleusercontent.com",
+          "client_id": "165593976815-p0e97n89t4r952ngd7pvh39qrrjqge1g.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB_DuM_4Q_NFk337gFEeXn3KYWIQU6sJZ0"
+          "current_key": "AIzaSyDPn_THZuItlZtw97OqNrRVrb20E1spzdo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1098509762510-635mu96stimpkm4gp96ud79gi0u0tm9s.apps.googleusercontent.com",
+              "client_id": "165593976815-p0e97n89t4r952ngd7pvh39qrrjqge1g.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
