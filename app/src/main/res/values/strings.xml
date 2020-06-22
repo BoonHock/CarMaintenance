@@ -102,15 +102,15 @@
 	<string name="on">on</string>
 	<string name="whichever_comes_first">Whichever comes first</string>
 	<string name="title_activity_ad_test">AdActivityTest</string>
-	<string name="action_settings">Settings</string>
+	<string name="nav_settings">Settings</string>
 
 	<string name="hello_world">Hello world!</string>
-<!-- NEW APP ID FOR dev.incupe@gmail.com	-->
-<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041~4064661189</string>-->
-<!-- NEW AD UNIT ID FOR dev.incupe@gmail.com	-->
-<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>-->
-<!-- for testing -->
-<!--	<string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+	<!-- NEW APP ID FOR dev.incupe@gmail.com	-->
+	<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041~4064661189</string>-->
+	<!-- NEW AD UNIT ID FOR dev.incupe@gmail.com	-->
+	<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>-->
+	<!-- for testing -->
+	<!--	<string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
 
 	<string name="ad_app_id">ca-app-pub-7500841506634041~4064661189</string>
 	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>
@@ -228,4 +228,14 @@
 	<string name="back_of_vehicle">Back of vehicle</string>
 	<string name="maintenance_deleted_confirm_delete_odo_too">
 		Maintenance deleted. Do you want to delete odometer record too?</string>
+	<string name="menu_home">Home</string>
+	<string name="menu_fuel_price">Fuel price</string>
+	<string name="vewec">Vewec</string>
+	<string name="title_activity_main2">MainActivity2</string>
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
+	<string name="nav_header_title">Android Studio</string>
+	<string name="nav_header_subtitle">android.studio@android.com</string>
+	<string name="nav_header_desc">Navigation header</string>
+	<string name="fuel">Fuel</string>
 </resources>

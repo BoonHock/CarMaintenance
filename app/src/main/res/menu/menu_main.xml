@@ -13,10 +13,6 @@
 		android:title="@string/custom_maintenance_item"
 		app:showAsAction="never" />
 	<item
-		android:id="@+id/action_settings"
-		android:title="@string/action_settings"
-		app:showAsAction="never" />
-	<item
 		android:id="@+id/action_clear_preferences"
 		android:title="@string/clear_preferences"
 		android:visible="false"

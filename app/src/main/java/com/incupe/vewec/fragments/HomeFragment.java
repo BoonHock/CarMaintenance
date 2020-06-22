@@ -1,35 +1,25 @@
-package com.incupe.vewec;
+package com.incupe.vewec.fragments;
 
 import android.animation.Animator;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,15 +28,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.incupe.vewec.CategoryAdapter;
+import com.incupe.vewec.CustomMaintenanceItemActivity;
+import com.incupe.vewec.MaintenanceEditorActivity;
+import com.incupe.vewec.OdometerEditorActivity;
+import com.incupe.vewec.R;
+import com.incupe.vewec.VehicleEditorActivity;
 import com.incupe.vewec.data.UserVehicleContract;
-import com.incupe.vewec.fragments.CustomMaintenanceItemFragment;
 import com.incupe.vewec.objects.FirebaseObj;
 import com.incupe.vewec.objects.VehicleTemplate;
 import com.incupe.vewec.utilities.Misc;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class HomeFragment extends Fragment {
 	private AppBarConfiguration mAppBarConfiguration;
 
 	private boolean _isOpenFab = true;
@@ -54,52 +49,27 @@ public class MainActivity extends AppCompatActivity {
 
 	private FloatingActionButton _fabMenu;
 	private LinearLayout _llMask;
+	LinearLayout _llFabVehicle;
+	LinearLayout _llFabOdometer;
+	LinearLayout _llFabMaintenance;
+	LinearLayout _llFabCustomItem;
 
 	private final int REQUEST_GET_STARTED_MESSAGE = 0;
 
+	@Nullable
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-		// Load an ad into the AdMob banner view.
-		AdView adView = findViewById(R.id.adView);
-		AdRequest adRequest = new AdRequest.Builder().build();
-		adView.loadAd(adRequest);
+		final ProgressBar progressBar = root.findViewById(R.id.progress_bar);
+		final RelativeLayout rlContent = root.findViewById(R.id.rl_content);
+		_llMask = root.findViewById(R.id.ll_mask);
+		_fabMenu = root.findViewById(R.id.fab);
+		_llFabVehicle = root.findViewById(R.id.ll_fab_vehicle);
+		_llFabOdometer = root.findViewById(R.id.ll_fab_odometer);
+		_llFabMaintenance = root.findViewById(R.id.ll_fab_maintenance);
+		_llFabCustomItem = root.findViewById(R.id.ll_fab_custom_item);
 
-		// run code for only first time app opened
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!prefs.getBoolean("firstTime", false)) {
-			runFirstTime();
-			SharedPreferences.Editor editor = prefs.edit();
-			editor.putBoolean("firstTime", true);
-			editor.apply();
-		}
-
-		if (PreferenceManager.getDefaultSharedPreferences(this)
-				.getBoolean(getString(R.string.pref_get_started), true)) {
-			Intent intent = new Intent(this, GetStartedActivity.class);
-			startActivityForResult(intent, REQUEST_GET_STARTED_MESSAGE);
-		}
-
-		final ProgressBar progressBar = findViewById(R.id.progress_bar);
-		final RelativeLayout rlContent = findViewById(R.id.rl_content);
-
-		Toolbar toolbar = findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
-		DrawerLayout drawer = findViewById(R.id.drawer_layout);
-		NavigationView navigationView = findViewById(R.id.nav_view);
-		// Passing each menu ID as a set of Ids because each
-		// menu should be considered as top level destinations.
-		mAppBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.nav_home)
-				.setDrawerLayout(drawer)
-				.build();
-		NavController navController = Navigation.findNavController(this, R.id.main_view);
-		NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-		NavigationUI.setupWithNavController(navigationView, navController);
-
-		_llMask = findViewById(R.id.ll_mask);
 		_llMask.setVisibility(View.GONE);
 
 		setupFabMenu();
@@ -126,12 +96,13 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		ViewPager viewPager = findViewById(R.id.viewpager);
-		CategoryAdapter categoryAdapter = new CategoryAdapter(this, getSupportFragmentManager(), 1);
+		ViewPager viewPager = root.findViewById(R.id.viewpager);
+		CategoryAdapter categoryAdapter = new CategoryAdapter(requireContext(),
+				requireActivity().getSupportFragmentManager(), 1);
 		viewPager.setAdapter(categoryAdapter);
 
 		// Find the tab layout that shows the tabs
-		TabLayout tabLayout = findViewById(R.id.tabs);
+		TabLayout tabLayout = root.findViewById(R.id.tabs);
 
 		// Connect the tab layout with the view pager. This will
 		//   1. Update the tab layout when the view pager is swiped
@@ -146,9 +117,11 @@ public class MainActivity extends AppCompatActivity {
 				hideFabMenu();
 			}
 		});
-		Misc.startNoInternetActivityIfNoNetwork(this);
+		Misc.startNoInternetActivityIfNoNetwork(requireContext());
 
 		getDeviceFirebaseToken();
+
+		return root;
 	}
 
 	private void getDeviceFirebaseToken() {
@@ -173,74 +146,7 @@ public class MainActivity extends AppCompatActivity {
 				});
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-		Intent intent;
-		switch (item.getItemId()) {
-			case R.id.action_vehicle_template:
-				intent = new Intent(this, VehicleTemplateActivity.class);
-				startActivity(intent);
-				return true;
-//			case R.id.action_settings:
-//				intent = new Intent(this, SettingsActivity.class);
-//				startActivity(intent);
-//				return true;
-			case R.id.action_custom_maintenance_item:
-				intent = new Intent(this, CustomMaintenanceItemActivity.class);
-				startActivity(intent);
-				return true;
-			case R.id.action_clear_preferences:
-
-				PreferenceManager.getDefaultSharedPreferences(this).edit().clear().apply();
-//				getPreferences(MODE_PRIVATE).edit().clear().apply();
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		final int REQUEST_GET_STARTED_VEHICLE_EDITOR = 1;
-		final int REQUEST_GET_STARTED_ODOMETER_EDITOR = 2;
-		Intent intent;
-
-		if (resultCode == RESULT_OK) {
-			switch (requestCode) {
-				case REQUEST_GET_STARTED_MESSAGE:
-					intent = new Intent(this, VehicleEditorActivity.class);
-					startActivityForResult(intent, REQUEST_GET_STARTED_VEHICLE_EDITOR);
-					break;
-				case REQUEST_GET_STARTED_VEHICLE_EDITOR:
-					intent = new Intent(this, OdometerEditorActivity.class);
-					startActivityForResult(intent, REQUEST_GET_STARTED_ODOMETER_EDITOR);
-					break;
-				case REQUEST_GET_STARTED_ODOMETER_EDITOR:
-					// END OF TUTORIAL
-					PreferenceManager.getDefaultSharedPreferences(this)
-							.edit()
-							.putBoolean(getString(R.string.pref_get_started), false)
-							.apply();
-					break;
-			}
-		}
-	}
-
 	private void setupFabMenu() {
-		_fabMenu = findViewById(R.id.fab);
-
-		LinearLayout _llFabVehicle = findViewById(R.id.ll_fab_vehicle);
-		LinearLayout _llFabOdometer = findViewById(R.id.ll_fab_odometer);
-		LinearLayout _llFabMaintenance = findViewById(R.id.ll_fab_maintenance);
-		LinearLayout _llFabCustomItem = findViewById(R.id.ll_fab_custom_item);
-
 		_fabButtons = new ArrayList<>();
 		_fabButtons.add(_llFabVehicle);
 		_fabButtons.add(_llFabOdometer);
@@ -266,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				hideFabMenu();
-				Intent intent = new Intent(MainActivity.this, VehicleEditorActivity.class);
+				Intent intent = new Intent(requireActivity(), VehicleEditorActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -274,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				hideFabMenu();
-				Intent intent = new Intent(MainActivity.this, OdometerEditorActivity.class);
+				Intent intent = new Intent(requireActivity(), OdometerEditorActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -282,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				hideFabMenu();
-				Intent intent = new Intent(MainActivity.this, MaintenanceEditorActivity.class);
+				Intent intent = new Intent(requireActivity(), MaintenanceEditorActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -290,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				hideFabMenu();
-				Intent intent = new Intent(MainActivity.this, CustomMaintenanceItemActivity.class);
+				Intent intent = new Intent(requireActivity(), CustomMaintenanceItemActivity.class);
 				intent.putExtra(CustomMaintenanceItemFragment.EXTRA_ADD_ITEM, true);
 				startActivity(intent);
 			}
@@ -306,8 +212,8 @@ public class MainActivity extends AppCompatActivity {
 		for (View v : _fabButtons) {
 			if (v.getId() == R.id.ll_fab_vehicle) {
 				// TODO: temporary limit only one vehicle allowed
-				if (UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
-					findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
+				if (UserVehicleContract.UserVehicleEntry.getCount(requireContext()) > 0) {
+					_llFabVehicle.setVisibility(View.GONE);
 				} else {
 					showLinearLayoutFab(v);
 				}
@@ -316,8 +222,8 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}
 //		// TODO: temporary limit only one vehicle allowed
-//		if (UserVehicleContract.UserVehicleEntry.getCount(this) > 0) {
-//			findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
+//		if (UserVehicleContract.UserVehicleEntry.getCount(requireContext()) > 0) {
+//			requireActivity().findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
 //		} else {
 //			showLinearLayoutFab(_llFabVehicle);
 //		}
@@ -369,16 +275,5 @@ public class MainActivity extends AppCompatActivity {
 
 		llFab.setVisibility(View.VISIBLE);
 		llFab.animate().translationY(0).alpha(1);
-	}
-
-	private void runFirstTime() {
-		SettingsActivity.SettingsFragment.setOdoReminderAlarm(this);
-	}
-
-	@Override
-	public boolean onSupportNavigateUp() {
-		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-		return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-				|| super.onSupportNavigateUp();
 	}
 }
