@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".FuelEditorActivity">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@id/adView"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/vehicle" />
+
+			<Spinner
+				android:id="@+id/spinner_vehicle"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:paddingStart="0dp"
+				android:paddingEnd="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/odometer" />
+
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="2">
+
+				<EditText
+					android:id="@+id/edit_odometer"
+					style="@style/EditorFieldStyle"
+					android:hint="@string/hint_odometer"
+					android:importantForAutofill="no"
+					android:inputType="number"
+					android:maxLength="9" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingStart="4dp"
+					android:paddingEnd="0dp"
+					android:text="@string/kilometer"
+					android:textAppearance="?android:textAppearanceMedium" />
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+
+	<com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+		android:id="@+id/adView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		ads:adSize="BANNER"
+		ads:adUnitId="@string/ad_banner_id" />
+</RelativeLayout>

@@ -3,12 +3,8 @@ package com.incupe.vewec;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +21,7 @@ import androidx.preference.PreferenceManager;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.navigation.NavigationView;
+import com.incupe.vewec.fragments.FuelPriceFragment;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -74,9 +71,16 @@ public class Main2Activity extends AppCompatActivity {
 				new NavigationView.OnNavigationItemSelectedListener() {
 					@Override
 					public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-						if (item.getItemId() == R.id.nav_settings) {
-							Intent intent = new Intent(Main2Activity.this, SettingsActivity.class);
-							startActivity(intent);
+						Intent intent;
+						switch (item.getItemId()) {
+							case R.id.nav_settings:
+								intent = new Intent(Main2Activity.this, SettingsActivity.class);
+								startActivity(intent);
+								break;
+							case R.id.nav_fuel_price:
+								intent = new Intent(Main2Activity.this, FuelPriceFragment.class);
+								startActivity(intent);
+								break;
 						}
 						drawer.closeDrawer(GravityCompat.START);
 						return true;
@@ -164,14 +168,5 @@ public class Main2Activity extends AppCompatActivity {
 
 	private void runFirstTime() {
 		SettingsActivity.SettingsFragment.setOdoReminderAlarm(this);
-	}
-
-	private class DrawerItemClickListener implements ListView.OnItemClickListener {
-		@Override
-		public void onItemClick(AdapterView parent, View view, int position, long id) {
-
-			drawer.closeDrawer(Gravity.LEFT);
-
-		}
 	}
 }

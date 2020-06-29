@@ -14,10 +14,39 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 		<activity
-			android:name=".MainActivity"
-			android:label="@string/vewec"
-			android:theme="@style/AppTheme.NoActionBar">
+			android:name=".FuelPriceActivity"
+			android:label="@string/fuel_price"
+			android:parentActivityName=".Main2Activity">
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
+		<!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
+		<meta-data
+			android:name="com.google.android.gms.ads.APPLICATION_ID"
+			android:value="@string/ad_app_id" />
+
+		<receiver android:name=".NotificationReceiver" />
+
+		<provider
+			android:name=".data.VehicleMaintenanceProvider"
+			android:authorities="com.incupe.vewec"
+			android:exported="false" />
+
+		<meta-data
+			android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+			android:value="true" />
+
+		<service android:name="com.google.firebase.messaging.FirebaseMessagingService">
+			<intent-filter>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
+			</intent-filter>
+		</service>
+
+		<activity
+			android:name=".FuelEditorActivity"
+			android:label="@string/fuel" />
 		<activity
 			android:name=".Main2Activity"
 			android:label="@string/vewec"
@@ -28,44 +57,39 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
-		<meta-data
-			android:name="com.google.android.gms.ads.APPLICATION_ID"
-			android:value="@string/ad_app_id" />
-
 		<activity
 			android:name=".GetStartedActivity"
 			android:noHistory="true" />
 		<activity
 			android:name=".NoInternetActivity"
 			android:label="@string/no_internet_connection"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName=".Main2Activity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
 			android:name=".CustomMaintenanceItemActivity"
 			android:label="@string/custom_maintenance_item"
-			android:parentActivityName=".MainActivity"
+			android:parentActivityName=".Main2Activity"
 			android:windowSoftInputMode="adjustResize">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
 			android:name=".SettingsActivity"
 			android:label="@string/title_activity_settings"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName=".Main2Activity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
 			android:name=".CarVariantTutorialActivity"
@@ -79,65 +103,47 @@
 		</activity>
 		<activity
 			android:name=".MaintenanceEditorActivity"
-			android:parentActivityName=".MainActivity"
+			android:parentActivityName=".Main2Activity"
 			android:windowSoftInputMode="stateAlwaysHidden">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
 			android:name=".OdometerEditorActivity"
 			android:label="@string/odometer"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName=".Main2Activity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
 			android:name=".VehicleTemplateActivity"
 			android:label="@string/vehicle_template"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName=".Main2Activity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
 			android:name=".VehicleEditorActivity"
-			android:parentActivityName=".MainActivity">
+			android:parentActivityName=".Main2Activity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.MainActivity" />
+				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
-
-		<receiver android:name=".NotificationReceiver" />
-
-		<provider
-			android:name=".data.VehicleMaintenanceProvider"
-			android:authorities="com.incupe.vewec"
-			android:exported="false" />
-
 		<activity
 			android:name="com.google.android.gms.ads.AdActivity"
 			android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
 			android:theme="@android:style/Theme.Translucent" />
-
-		<meta-data
-			android:name="com.google.android.gms.ads.AD_MANAGER_APP"
-			android:value="true" />
-
-		<service android:name="com.google.firebase.messaging.FirebaseMessagingService">
-			<intent-filter>
-				<action android:name="com.google.firebase.MESSAGING_EVENT" />
-			</intent-filter>
-		</service>
 	</application>
 
 </manifest>

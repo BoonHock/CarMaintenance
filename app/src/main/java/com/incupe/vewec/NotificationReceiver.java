@@ -30,7 +30,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 		NotificationManager notificationManager = (NotificationManager)
 				context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		Intent repeatingIntent = new Intent(context, MainActivity.class);
+		Intent repeatingIntent = new Intent(context, Main2Activity.class);
 		repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,

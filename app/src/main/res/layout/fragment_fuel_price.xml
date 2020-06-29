@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<TableLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal">
+
+		<TableRow>
+
+			<TextView
+				android:layout_marginEnd="8dp"
+				android:text="Period:" />
+
+			<TextView tools:text="27 June 2020 — 1 July 2020" />
+		</TableRow>
+
+		<TableRow>
+
+			<TextView
+				android:layout_marginEnd="8dp"
+				android:text="Updated:" />
+
+			<TextView tools:text="27 June 2020 18:47" />
+		</TableRow>
+	</TableLayout>
+
+	<TableLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal">
+
+		<TableRow>
+
+			<LinearLayout android:orientation="horizontal">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Ron 95" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					tools:text="MYR 1.50 / L" />
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:contentDescription="@string/arrow_indicator"
+					tools:src="@drawable/ic_arrow_drop_down_green_24" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/fuel_down"
+					tools:text="0.05" />
+			</LinearLayout>
+		</TableRow>
+
+		<TableRow>
+
+			<LinearLayout android:orientation="horizontal">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Ron 97" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					tools:text="MYR 1.50 / L" />
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:contentDescription="@string/arrow_indicator"
+					tools:src="@drawable/ic_arrow_drop_down_green_24" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/fuel_down"
+					tools:text="0.05" />
+			</LinearLayout>
+		</TableRow>
+
+		<TableRow>
+
+			<LinearLayout android:orientation="horizontal">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Diesel" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					tools:text="MYR 1.50 / L" />
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:contentDescription="@string/arrow_indicator"
+					tools:src="@drawable/ic_arrow_drop_down_green_24" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/fuel_down"
+					tools:text="0.05" />
+			</LinearLayout>
+		</TableRow>
+	</TableLayout>
+</LinearLayout>
