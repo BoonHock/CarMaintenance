@@ -12,6 +12,10 @@
 	<color name="urgency2">#E75F40</color>
 	<color name="urgency1">#C03823</color>
 
-<!--	<color name="fuel_up"></color>-->
+	<!--	<color name="fuel_up"></color>-->
 	<color name="fuel_down">#00AA00</color>
+	<color name="fuel_up">#C03823</color>
+
+	<color name="fuel_forecast">#FF424242</color>
+
 </resources>

@@ -78,7 +78,7 @@ public class Main2Activity extends AppCompatActivity {
 								startActivity(intent);
 								break;
 							case R.id.nav_fuel_price:
-								intent = new Intent(Main2Activity.this, FuelPriceFragment.class);
+								intent = new Intent(Main2Activity.this, FuelPriceActivity.class);
 								startActivity(intent);
 								break;
 						}

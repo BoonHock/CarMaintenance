@@ -238,4 +238,10 @@
 	<string name="maintenance">Maintenance</string>
 	<string name="maintenance_item">Maintenance item</string>
 	<string name="arrow_indicator">Arrow indicator</string>
+	<string name="label_period">Period:</string>
+	<string name="label_updated">Updated:</string>
+	<string name="ron_95">Ron 95</string>
+	<string name="diesel">Diesel</string>
+	<string name="future_price_forecasts">Future price forecasts:</string>
+	<string name="ron_97">Ron 97</string>
 </resources>
