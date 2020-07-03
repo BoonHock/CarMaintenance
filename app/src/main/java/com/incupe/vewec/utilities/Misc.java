@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+
 import com.incupe.vewec.NoInternetActivity;
 import com.incupe.vewec.R;
 
@@ -21,17 +23,18 @@ import java.util.Locale;
 public class Misc {
 	private static final String LOG_TAG = Misc.class.getSimpleName();
 
-	public static String getDistanceWithUnit(int distance, Context context) {
+	@NonNull
+	public static String getDistanceWithUnit(int distance, @NonNull Context context) {
 		return NumberFormat.getNumberInstance(Locale.getDefault())
 				.format(distance) + " " + context.getString(R.string.kilometer);
 	}
 
 	/*
 	 * https://stackoverflow.com/a/28713754/6039142
-	 * when add listview inside another listview. the inner listview will be "collapsed". cant
+	 * when add ListView inside another ListView. the inner ListView will be "collapsed". cant
 	 * see full list of items. this will resize it to show full items
 	 * */
-	public static void setListViewDynamicHeight(ListView mListView) {
+	public static void setListViewDynamicHeight(@NonNull ListView mListView) {
 		ListAdapter mListAdapter = mListView.getAdapter();
 		if (mListAdapter == null) {
 			// when adapter is null
@@ -53,7 +56,7 @@ public class Misc {
 	/**
 	 * https://stackoverflow.com/questions/1109022/close-hide-android-soft-keyboard
 	 */
-	public static void hideKeyboard(Activity activity) {
+	public static void hideKeyboard(@NonNull Activity activity) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 		//Find the currently focused view, so we can grab the correct window token from it.
 		View view = activity.getCurrentFocus();
@@ -66,7 +69,7 @@ public class Misc {
 		}
 	}
 
-	public static void showKeyboard(Activity activity, EditText editText) {
+	public static void showKeyboard(@NonNull Activity activity, EditText editText) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		if (imm != null) {
 			imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
@@ -80,10 +83,13 @@ public class Misc {
 		}
 	}
 
-	public static boolean isNetworkAvailable(Context context) {
+	public static boolean isNetworkAvailable(@NonNull Context context) {
 		ConnectivityManager connectivityManager
 				= (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+		if (connectivityManager != null) {
+			NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+			return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+		}
+		return false;
 	}
 }

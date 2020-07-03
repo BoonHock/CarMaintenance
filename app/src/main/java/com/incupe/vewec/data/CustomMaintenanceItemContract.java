@@ -21,10 +21,8 @@ public class CustomMaintenanceItemContract {
 		public static final String COLUMN_DISTANCE_INTERVAL = "distance_interval";
 		public static final String COLUMN_DURATION_INTERVAL = "duration_interval";
 
-		public static final int INSPECT_VALUE = FirebaseContract
-				.FirebaseMaintenanceDetailsEntry.INSPECT;
-		public static final int REPLACE_VALUE = FirebaseContract
-				.FirebaseMaintenanceDetailsEntry.REPLACE;
+		public static final int INSPECT_VALUE = FirebaseContract.MaintenanceDetails.INSPECT;
+		public static final int REPLACE_VALUE = FirebaseContract.MaintenanceDetails.REPLACE;
 
 		public static final int ITEM_NAME_MAX_LENGTH =
 				com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry.ITEM_NAME_MAX_LENGTH;

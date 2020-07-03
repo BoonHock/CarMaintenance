@@ -32,7 +32,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.incupe.vewec.data.FirebaseContract.FirebaseMaintenanceDetailsEntry;
+import com.incupe.vewec.data.FirebaseContract.MaintenanceDetails;
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;

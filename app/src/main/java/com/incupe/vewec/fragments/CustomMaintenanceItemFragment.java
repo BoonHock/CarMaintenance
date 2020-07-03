@@ -34,6 +34,7 @@ import com.incupe.vewec.cursoradapter.CustomMaintenanceItemCursorAdapter;
 import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.utilities.UserDialog;
 
+// TODO: fragment crashes when screen rotates!!!
 public class CustomMaintenanceItemFragment extends Fragment
 		implements LoaderManager.LoaderCallbacks<Cursor> {
 	public static final String EXTRA_ADD_ITEM = "EXTRA_ADD_ITEM";
@@ -153,11 +154,17 @@ public class CustomMaintenanceItemFragment extends Fragment
 		// Kick off the loader
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
-		if (requireActivity().getIntent().getSerializableExtra(EXTRA_ADD_ITEM) != null) {
+		return rootView;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		if (getActivity() != null &&
+				getActivity().getIntent().getSerializableExtra(EXTRA_ADD_ITEM) != null) {
 			showAddItemDialog();
 		}
-
-		return rootView;
 	}
 
 	@Override
@@ -262,7 +269,8 @@ public class CustomMaintenanceItemFragment extends Fragment
 		}
 		return true;
 	}
-	private void showAddItemDialog(){
+
+	private void showAddItemDialog() {
 		// set edit item id to 0 to indicate adding record
 		_editItemId = 0;
 		// show dialog to add
@@ -273,6 +281,7 @@ public class CustomMaintenanceItemFragment extends Fragment
 				DIALOG_RESULT);
 		dialog.show(manager, DIALOG_CUSTOM_ITEM);
 	}
+
 	@NonNull
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {

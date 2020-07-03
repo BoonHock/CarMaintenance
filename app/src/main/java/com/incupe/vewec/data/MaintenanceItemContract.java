@@ -24,10 +24,8 @@ public class MaintenanceItemContract {
 		public static final String COLUMN_ITEM = "item";
 		public static final String COLUMN_INSPECT_REPLACE = "inspect_replace";
 
-		public static final int INSPECT_VALUE = FirebaseContract
-				.FirebaseMaintenanceDetailsEntry.INSPECT;
-		public static final int REPLACE_VALUE = FirebaseContract
-				.FirebaseMaintenanceDetailsEntry.REPLACE;
+		public static final int INSPECT_VALUE = FirebaseContract.MaintenanceDetails.INSPECT;
+		public static final int REPLACE_VALUE = FirebaseContract.MaintenanceDetails.REPLACE;
 
 		// checked with vendor's items. their maximum are about 40 characters
 		public static final int ITEM_NAME_MAX_LENGTH = 50;

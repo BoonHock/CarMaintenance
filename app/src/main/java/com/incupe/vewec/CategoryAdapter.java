@@ -31,8 +31,8 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 				return _context.getString(R.string.odometer);
 			case 2:
 				return _context.getString(R.string.tab_history);
-			case 3:
-				return _context.getString(R.string.fuel);
+//			case 3:
+//				return _context.getString(R.string.fuel);
 			default:
 				return _context.getString(R.string.tab_vehicles);
 		}
@@ -47,7 +47,7 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 				return new OdometerFragment();
 			case 2:
 				return new HistoryFragment();
-			case 3:
+//			case 3:
 				// TODO
 //				return new HistoryFragment();
 			default:

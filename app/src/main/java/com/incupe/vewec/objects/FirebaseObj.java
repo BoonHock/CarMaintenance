@@ -56,7 +56,7 @@ public abstract class FirebaseObj {
 					for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 						MaintenanceItem item = snapshot.getValue(MaintenanceItem.class);
 						if (item != null && item.getInspect_replace() ==
-								FirebaseContract.FirebaseMaintenanceDetailsEntry.REPLACE) {
+								FirebaseContract.MaintenanceDetails.REPLACE) {
 							// as discussed on 20200521, show replace items only for now
 							maintenanceItems.add(snapshot.getValue(MaintenanceItem.class));
 						}

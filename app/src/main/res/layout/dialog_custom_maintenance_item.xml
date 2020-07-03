@@ -1,78 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/dlg_custom_item"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	android:padding="16dp">
+    android:id="@+id/dlg_custom_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<TextView
-			style="@style/CategoryStyle"
-			android:text="@string/item_name" />
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/item_name" />
 
-		<EditText
-			android:id="@+id/edit_item_name"
-			style="@style/EditorFieldStyle"
-			android:hint="@string/item_name"
-			android:importantForAutofill="no"
-			android:inputType="text" />
-	</LinearLayout>
+        <EditText
+            android:id="@+id/edit_item_name"
+            style="@style/EditorFieldStyle"
+            android:hint="@string/item_name"
+            android:importantForAutofill="no"
+            android:inputType="text" />
+    </LinearLayout>
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<TextView
-			style="@style/CategoryStyle"
-			android:text="@string/inspect_or_replace" />
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/inspect_or_replace" />
 
-		<Spinner
-			android:id="@+id/spinner_inspect_replace"
-			style="@style/EditorFieldStyle"
-			android:layout_height="48dp"
-			android:paddingStart="0dp"
-			android:paddingEnd="16dp"
-			android:spinnerMode="dropdown" />
-	</LinearLayout>
+        <Spinner
+            android:id="@+id/spinner_inspect_replace"
+            style="@style/EditorFieldStyle"
+            android:layout_height="48dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<TextView
-			style="@style/CategoryStyle"
-			android:text="@string/distance_interval_km" />
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/distance_interval_km" />
 
-		<EditText
-			android:id="@+id/edit_distance_interval"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="2"
-			android:hint="@string/kilometer"
-			android:importantForAutofill="no"
-			android:inputType="number" />
-	</LinearLayout>
+        <EditText
+            android:id="@+id/edit_distance_interval"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="@string/kilometer"
+            android:importantForAutofill="no"
+            android:inputType="number" />
+    </LinearLayout>
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<TextView
-			style="@style/CategoryStyle"
-			android:text="@string/duration_interval_month" />
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/duration_interval_month" />
 
-		<EditText
-			android:id="@+id/edit_duration_interval"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="2"
-			android:hint="@string/months_cap"
-			android:importantForAutofill="no"
-			android:inputType="number"
-			android:maxLength="2" />
-	</LinearLayout>
+        <EditText
+            android:id="@+id/edit_duration_interval"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="@string/months_cap"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="2" />
+    </LinearLayout>
 </LinearLayout>

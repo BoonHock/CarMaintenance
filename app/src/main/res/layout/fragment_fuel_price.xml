@@ -8,14 +8,16 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:padding="16dp">
+		android:paddingStart="16dp"
+		android:paddingTop="24dp"
+		android:paddingEnd="16dp"
+		android:paddingBottom="24dp">
 
 		<TextView
 			android:id="@+id/txt_period"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_horizontal"
-			android:layout_marginTop="8dp"
 			android:layout_marginBottom="4dp"
 			android:textColor="@color/colorPrimaryDark"
 			android:textSize="18sp"
@@ -67,10 +69,11 @@
 					android:background="@drawable/border_top_bottom_primary"
 					android:gravity="center_vertical"
 					android:padding="8dp"
+					android:textAllCaps="true"
 					android:textColor="@color/colorPrimary"
 					android:textSize="18sp"
 					android:textStyle="bold"
-					tools:text="MYR 1.50 / L" />
+					tools:text="myr 1.50 / L" />
 
 				<TextView
 					android:id="@+id/txt_price_change_ron95"
@@ -79,10 +82,10 @@
 					android:layout_column="2"
 					android:layout_gravity="center_vertical"
 					android:background="@drawable/border_top_bottom_right_primary"
-					android:drawableStart="@drawable/ic_arrow_drop_down_green_24"
 					android:gravity="center_vertical"
 					android:padding="8dp"
 					android:textColor="@color/fuel_down"
+					tools:drawableStart="@drawable/ic_arrow_drop_down_green_24"
 					tools:text="-0.05" />
 			</TableRow>
 
@@ -103,10 +106,11 @@
 					android:background="@drawable/border_top_bottom_primary"
 					android:gravity="center_vertical"
 					android:padding="8dp"
+					android:textAllCaps="true"
 					android:textColor="@color/colorPrimary"
 					android:textSize="18sp"
 					android:textStyle="bold"
-					tools:text="MYR 1.50 / L" />
+					tools:text="myr 1.50 / L" />
 
 				<TextView
 					android:id="@+id/txt_price_change_ron97"
@@ -115,10 +119,10 @@
 					android:layout_column="2"
 					android:layout_gravity="center_vertical"
 					android:background="@drawable/border_top_bottom_right_primary"
-					android:drawableStart="@drawable/ic_arrow_drop_up_red_24"
 					android:gravity="center_vertical"
 					android:padding="8dp"
 					android:textColor="@color/fuel_up"
+					tools:drawableStart="@drawable/ic_arrow_drop_up_red_24"
 					tools:text="+0.05" />
 			</TableRow>
 
@@ -139,10 +143,11 @@
 					android:background="@drawable/border_top_bottom_primary"
 					android:gravity="center_vertical"
 					android:padding="8dp"
+					android:textAllCaps="true"
 					android:textColor="@color/colorPrimary"
 					android:textSize="18sp"
 					android:textStyle="bold"
-					tools:text="MYR 1.50 / L" />
+					tools:text="myr 1.50 / L" />
 
 				<TextView
 					android:id="@+id/txt_price_change_diesel"
@@ -151,10 +156,10 @@
 					android:layout_column="2"
 					android:layout_gravity="center_vertical"
 					android:background="@drawable/border_top_bottom_right_primary"
-					android:drawableStart="@drawable/ic_arrow_drop_down_green_24"
 					android:gravity="center_vertical"
 					android:padding="8dp"
 					android:textColor="@color/fuel_down"
+					tools:drawableStart="@drawable/ic_arrow_drop_down_green_24"
 					tools:text="-0.05" />
 			</TableRow>
 		</TableLayout>
@@ -162,17 +167,42 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
 			android:layout_marginTop="32dp"
 			android:layout_marginBottom="8dp"
-			android:text="@string/future_price_forecasts"
+			android:text="@string/price_forecasts"
 			android:textAppearance="?android:textAppearanceLarge"
 			android:textStyle="bold" />
 
-		<TableLayout
+		<TextView
+			android:id="@+id/txt_forecast_unavailable"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/no_forecast_available"
+			android:textAppearance="?android:textAppearanceMedium"
+			android:textStyle="italic"
+			android:visibility="gone"
+			tools:visibility="visible" />
+
+		<TextView
+			android:id="@+id/txt_forecast_period"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_horizontal"
-			android:stretchColumns="1">
+			android:layout_marginBottom="12dp"
+			android:textAppearance="?android:textAppearanceMedium"
+			android:visibility="gone"
+			tools:text="27 June 2020 — 1 July 2020"
+			tools:visibility="visible" />
+
+		<TableLayout
+			android:id="@+id/table_forecast"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:stretchColumns="1"
+			android:visibility="gone"
+			tools:visibility="visible">
 
 			<TableRow android:layout_marginBottom="8dp">
 
@@ -183,6 +213,7 @@
 					android:text="@string/ron_95" />
 
 				<TextView
+					android:id="@+id/txt_forecast_ron95"
 					android:layout_width="wrap_content"
 					android:layout_height="match_parent"
 					android:layout_column="1"
@@ -190,10 +221,11 @@
 					android:background="@drawable/border_top_bottom_right_forecast"
 					android:gravity="center_vertical"
 					android:padding="8dp"
+					android:textAllCaps="true"
 					android:textColor="@color/fuel_forecast"
 					android:textSize="18sp"
 					android:textStyle="bold"
-					tools:text="MYR 1.50 ± 0.05 / L" />
+					tools:text="myr 1.50 ± 0.05 / L" />
 			</TableRow>
 
 			<TableRow android:layout_marginBottom="8dp">
@@ -205,6 +237,7 @@
 					android:text="@string/ron_97" />
 
 				<TextView
+					android:id="@+id/txt_forecast_ron97"
 					android:layout_width="wrap_content"
 					android:layout_height="match_parent"
 					android:layout_column="1"
@@ -212,10 +245,11 @@
 					android:background="@drawable/border_top_bottom_right_forecast"
 					android:gravity="center_vertical"
 					android:padding="8dp"
+					android:textAllCaps="true"
 					android:textColor="@color/fuel_forecast"
 					android:textSize="18sp"
 					android:textStyle="bold"
-					tools:text="MYR 1.50 ± 0.05 / L" />
+					tools:text="myr 1.50 ± 0.05 / L" />
 			</TableRow>
 
 			<TableRow android:layout_marginBottom="8dp">
@@ -227,6 +261,7 @@
 					android:text="@string/diesel" />
 
 				<TextView
+					android:id="@+id/txt_forecast_diesel"
 					android:layout_width="wrap_content"
 					android:layout_height="match_parent"
 					android:layout_column="1"
@@ -234,10 +269,11 @@
 					android:background="@drawable/border_top_bottom_right_forecast"
 					android:gravity="center_vertical"
 					android:padding="8dp"
+					android:textAllCaps="true"
 					android:textColor="@color/fuel_forecast"
 					android:textSize="18sp"
 					android:textStyle="bold"
-					tools:text="MYR 1.50 ± 0.05 / L" />
+					tools:text="myr 1.50 ± 0.05 / l" />
 			</TableRow>
 		</TableLayout>
 
