@@ -1,15 +1,29 @@
 package com.incupe.vewec.fragments;
 
+import android.Manifest;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
@@ -22,10 +36,18 @@ import com.incupe.vewec.data.FirebaseContract;
 import com.incupe.vewec.objects.FuelPrice;
 import com.incupe.vewec.utilities.DateUtilities;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class FuelPriceFragment extends Fragment {
+	private static final int REQUEST_STORAGE_PERMISSION = 1;
+	private static final String FILE_PROVIDER_AUTHORITY = "com.incupe.vewec.fileProvider";
+
 	private TextView _txtPeriod;
 	private TextView _txtUpdatedOn;
 	private TextView _txtPriceRon95;
@@ -42,6 +64,11 @@ public class FuelPriceFragment extends Fragment {
 	private TextView _txtForecastPeriod;
 
 	private TableLayout _tableForecast;
+
+	private Button _btnShare;
+
+	private LinearLayout _llMask;
+	private ProgressBar _progressBar;
 
 	private FirebaseDatabase _firebaseDatabase;
 	private DatabaseReference _dbActualReference;
@@ -76,6 +103,17 @@ public class FuelPriceFragment extends Fragment {
 		_txtForecastPeriod = rootView.findViewById(R.id.txt_forecast_period);
 
 		_tableForecast = rootView.findViewById(R.id.table_forecast);
+		_btnShare = rootView.findViewById(R.id.btn_share);
+
+		if (container != null) {
+			_llMask = container.getRootView().findViewById(R.id.ll_mask);
+			_progressBar = container.getRootView().findViewById(R.id.progress_bar);
+		}
+		// display loading. will remove after all loaded
+		if (_llMask != null && _progressBar != null) {
+			_llMask.setVisibility(View.VISIBLE);
+			_progressBar.setVisibility(View.VISIBLE);
+		}
 
 		_firebaseDatabase = FirebaseDatabase.getInstance();
 		_dbActualReference = _firebaseDatabase.getReference()
@@ -85,7 +123,46 @@ public class FuelPriceFragment extends Fragment {
 				.child(FirebaseContract.FuelPrice.FUEL_PRICE_KEY)
 				.child(FirebaseContract.FuelPrice.FORECAST_KEY);
 
+		_btnShare.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (ContextCompat.checkSelfPermission(requireActivity(),
+						Manifest.permission.WRITE_EXTERNAL_STORAGE)
+						!= PackageManager.PERMISSION_GRANTED) {
+					requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+									Manifest.permission.READ_EXTERNAL_STORAGE},
+							REQUEST_STORAGE_PERMISSION);
+				} else {
+					takeScreenshotNShare();
+				}
+			}
+		});
+
 		return rootView;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   @NonNull String[] permissions,
+										   @NonNull int[] grantResults) {
+		if (requestCode == REQUEST_STORAGE_PERMISSION) {
+			if (grantResults.length > 0
+					&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				takeScreenshotNShare();
+			}
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		attachDatabaseListener();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		detachDatabaseListener();
 	}
 
 	private void setupPriceChangeTextView(TextView txtPriceChange, double priceChange) {
@@ -233,6 +310,8 @@ public class FuelPriceFragment extends Fragment {
 
 						}
 					}
+					_llMask.setVisibility(View.GONE);
+					_progressBar.setVisibility(View.GONE);
 				}
 
 				@Override
@@ -247,15 +326,129 @@ public class FuelPriceFragment extends Fragment {
 		}
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		attachDatabaseListener();
+	private void takeScreenshotNShare() {
+		Date now = new Date();
+		android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+		try {
+			// create bitmap screen capture
+			View v1 = requireActivity().getWindow().getDecorView().getRootView();
+			v1.setDrawingCacheEnabled(true);
+			Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+			v1.setDrawingCacheEnabled(false);
+
+			saveImage(requireContext(), bitmap);
+		} catch (Throwable e) {
+			// Several error may come out with file handling or DOM
+			e.printStackTrace();
+		}
 	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		detachDatabaseListener();
+	private void saveImage(Context context, Bitmap image) {
+		String savedImagePath = null;
+
+		Calendar calendar = Calendar.getInstance();
+		// Create the new file in the external storage
+		String imageFileName = "IMG_" + calendar.get(Calendar.YEAR)
+				+ calendar.get(Calendar.MONTH)
+				+ calendar.get(Calendar.DAY_OF_MONTH) + "_"
+				+ calendar.get(Calendar.HOUR_OF_DAY)
+				+ calendar.get(Calendar.MINUTE)
+				+ calendar.get(Calendar.SECOND) + ".jpg";
+
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			ContentValues values = new ContentValues();
+			values.put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName);
+			values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+			values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000);
+			values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+			values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Vewec");
+			values.put(MediaStore.Images.Media.IS_PENDING, true);
+			// RELATIVE_PATH and IS_PENDING are introduced in API 29.
+
+			Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+			if (uri != null) {
+				try {
+					OutputStream outputStream = context.getContentResolver().openOutputStream(uri);
+
+					if (outputStream != null) {
+						try {
+							image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+							outputStream.close();
+							shareImage(context, uri);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				values.put(MediaStore.Images.Media.IS_PENDING, false);
+				context.getContentResolver().update(uri, values, null, null);
+			}
+
+		} else {
+			File storageDir = new File(
+					Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+							+ "/Vewec");
+			boolean success = true;
+			if (!storageDir.exists()) {
+				success = storageDir.mkdirs();
+			}
+
+			// Save the new Bitmap
+			if (success) {
+				File imageFile = new File(storageDir, imageFileName);
+				savedImagePath = imageFile.getAbsolutePath();
+				try {
+					OutputStream fOut = new FileOutputStream(imageFile);
+					image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+					fOut.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				// Add the image to the system gallery
+				galleryAddPic(context, savedImagePath);
+
+				// TODO: share image
+				shareImage(requireContext(), savedImagePath);
+			}
+		}
+	}
+
+	/**
+	 * Helper method for adding the photo to the system photo gallery so it can be accessed
+	 * from other apps.
+	 * ONLY FOR API < 29
+	 *
+	 * @param imagePath The path of the saved image
+	 */
+	private void galleryAddPic(Context context, String imagePath) {
+		Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+		File f = new File(imagePath);
+		Uri contentUri = Uri.fromFile(f);
+		mediaScanIntent.setData(contentUri);
+		context.sendBroadcast(mediaScanIntent);
+	}
+
+	// this is called by API < 29. will take image path and convert to uri
+	// then call shareImage() which take uri param
+	private void shareImage(Context context, String imagePath) {
+		// Create the share intent and start the share activity
+		File imageFile = new File(imagePath);
+		Uri imageUri = FileProvider.getUriForFile(context, FILE_PROVIDER_AUTHORITY, imageFile);
+		shareImage(context, imageUri);
+	}
+
+	private void shareImage(Context context, Uri imageUri) {
+		Intent shareIntent = new Intent(Intent.ACTION_SEND);
+		shareIntent.setType("image/*");
+		shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+		shareIntent.putExtra(Intent.EXTRA_TEXT,
+				"Check out the latest fuel prices.\n" +
+						"Get your latest weekly fuel prices updates from Vewec:\n" +
+						"https://bit.ly/2Z4SidX");
+		context.startActivity(Intent.createChooser(shareIntent, "Share image"));
 	}
 }

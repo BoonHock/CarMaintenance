@@ -3,6 +3,7 @@ package com.incupe.vewec;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,8 +21,11 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.incupe.vewec.fragments.FuelPriceFragment;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -81,20 +85,47 @@ public class Main2Activity extends AppCompatActivity {
 								intent = new Intent(Main2Activity.this, FuelPriceActivity.class);
 								startActivity(intent);
 								break;
+//							case R.id.nav_share:
+//								intent = new Intent(Intent.ACTION_SEND);
+//								intent.setType("text/plain");
+//								intent.putExtra(android.content.Intent.EXTRA_TEXT,
+//										"Hi! Vewec is doing a great job at helping me " +
+//												"manage my vehicle's maintenance and trips. " +
+//												"You can get it too.\n" +
+//												"https://vewecweb.wixsite.com/app-installation");
+//								startActivity(Intent.createChooser(intent, "Share now"));
+//								break;
 						}
 						drawer.closeDrawer(GravityCompat.START);
 						return true;
 					}
 				});
-//		navigationView.getMenu().findItem(R.id.nav_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//			@Override
-//			public boolean onMenuItemClick(MenuItem item) {
-//
-//				Toast.makeText(Main2Activity.this, "", Toast.LENGTH_SHORT).show();
-//				return false;
-//			}
-//		});
 
+		FirebaseInstanceId.getInstance().getInstanceId()
+				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+					@Override
+					public void onComplete(@NonNull Task<InstanceIdResult> task) {
+						if (!task.isSuccessful()) {
+							Log.w("CHECK_ME", "getInstanceId failed", task.getException());
+							return;
+						}
+
+						// Get new Instance ID token
+						InstanceIdResult result = task.getResult();
+						if (result != null) {
+							String token = result.getToken();
+
+							// Log and toast
+							Log.v("CHECK_ME", token);
+
+//							ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//							ClipData clip = ClipData.newPlainText("firebase_token", token);
+//							if (clipboard != null) {
+//								clipboard.setPrimaryClip(clip);
+//							}
+						}
+					}
+				});
 	}
 
 	@Override

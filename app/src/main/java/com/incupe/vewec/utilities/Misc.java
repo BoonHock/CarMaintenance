@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import com.incupe.vewec.NoInternetActivity;
 import com.incupe.vewec.R;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.Locale;
 

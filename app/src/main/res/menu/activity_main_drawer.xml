@@ -11,10 +11,18 @@
 		<item
 			android:id="@+id/nav_fuel_price"
 			android:icon="@drawable/ic_gas_station_grey_24dp"
-			android:title="@string/fuel_price" />
+			android:title="@string/fuel_prices" />
 		<item
 			android:id="@+id/nav_settings"
 			android:icon="@drawable/ic_settings_grey_24dp"
 			android:title="@string/nav_settings" />
+<!--		<item-->
+<!--			android:id="@+id/nav_help"-->
+<!--			android:icon="@drawable/ic_help_grey_24"-->
+<!--			android:title="@string/help" />-->
+<!--		<item-->
+<!--			android:id="@+id/nav_share"-->
+<!--			android:icon="@drawable/ic_settings_grey_24dp"-->
+<!--			android:title="@string/share" />-->
 	</group>
 </menu>

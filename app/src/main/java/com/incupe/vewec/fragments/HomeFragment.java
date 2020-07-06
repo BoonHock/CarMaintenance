@@ -50,7 +50,7 @@ public class HomeFragment extends Fragment {
 	private FloatingActionButton _fabMenu;
 	private LinearLayout _llMask;
 	private LinearLayout _llFabVehicle;
-	//	private LinearLayout _llFabFuel;
+	private LinearLayout _llFabFuel;
 	private LinearLayout _llFabOdometer;
 	private LinearLayout _llFabMaintenance;
 	private LinearLayout _llFabCustomItem;
@@ -65,7 +65,7 @@ public class HomeFragment extends Fragment {
 		_llMask = root.findViewById(R.id.ll_mask);
 		_fabMenu = root.findViewById(R.id.fab);
 		_llFabVehicle = root.findViewById(R.id.ll_fab_vehicle);
-//		_llFabFuel = root.findViewById(R.id.ll_fab_fuel);
+		_llFabFuel = root.findViewById(R.id.ll_fab_fuel);
 		_llFabOdometer = root.findViewById(R.id.ll_fab_odometer);
 		_llFabMaintenance = root.findViewById(R.id.ll_fab_maintenance);
 		_llFabCustomItem = root.findViewById(R.id.ll_fab_custom_item);

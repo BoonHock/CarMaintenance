@@ -5,6 +5,8 @@
 	<uses-permission android:name="android.permission.SET_ALARM" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 	<application
 		android:allowBackup="true"
@@ -13,26 +15,26 @@
 		android:roundIcon="@mipmap/ic_launcher"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
-		<activity
-			android:name=".FuelPriceActivity"
-			android:label="@string/fuel_price"
-			android:parentActivityName=".Main2Activity">
-			<!-- Parent activity meta-data to support 4.0 and lower -->
+		<provider
+			android:name="androidx.core.content.FileProvider"
+			android:authorities="com.incupe.vewec.fileProvider"
+			android:exported="false"
+			android:grantUriPermissions="true">
 			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.Main2Activity" />
-		</activity>
-		<!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
-		<meta-data
-			android:name="com.google.android.gms.ads.APPLICATION_ID"
-			android:value="@string/ad_app_id" />
-
-		<receiver android:name=".NotificationReceiver" />
-
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/file_paths" />
+		</provider>
 		<provider
 			android:name=".data.VehicleMaintenanceProvider"
 			android:authorities="com.incupe.vewec"
 			android:exported="false" />
+
+		<receiver android:name=".NotificationReceiver" />
+
+		<!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
+		<meta-data
+			android:name="com.google.android.gms.ads.APPLICATION_ID"
+			android:value="@string/ad_app_id" />
 
 		<meta-data
 			android:name="com.google.android.gms.ads.AD_MANAGER_APP"
@@ -45,9 +47,6 @@
 		</service>
 
 		<activity
-			android:name=".FuelEditorActivity"
-			android:label="@string/fuel" />
-		<activity
 			android:name=".Main2Activity"
 			android:label="@string/vewec"
 			android:theme="@style/AppTheme.NoActionBar">
@@ -57,6 +56,18 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity
+			android:name=".FuelPriceActivity"
+			android:label="@string/fuel_prices"
+			android:parentActivityName=".Main2Activity">
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.Main2Activity" />
+		</activity>
+		<activity
+			android:name=".FuelEditorActivity"
+			android:label="@string/fuel" />
 		<activity
 			android:name=".GetStartedActivity"
 			android:noHistory="true" />

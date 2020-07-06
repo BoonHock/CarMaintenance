@@ -76,28 +76,28 @@
 
 			</LinearLayout>
 
-<!--			<LinearLayout-->
-<!--				android:id="@+id/ll_fab_fuel"-->
-<!--				style="@style/main_activity_fab"-->
-<!--				android:orientation="horizontal"-->
-<!--				android:visibility="visible">-->
+			<LinearLayout
+				android:id="@+id/ll_fab_fuel"
+				style="@style/main_activity_fab"
+				android:orientation="horizontal"
+				android:visibility="gone">
 
-<!--				<TextView-->
-<!--					android:layout_width="wrap_content"-->
-<!--					android:layout_height="wrap_content"-->
-<!--					android:layout_gravity="center"-->
-<!--					android:layout_marginEnd="@dimen/fab_margin"-->
-<!--					android:text="@string/fuel"-->
-<!--					android:textAppearance="?android:textAppearanceMedium"-->
-<!--					android:textColor="@android:color/white" />-->
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:layout_marginEnd="@dimen/fab_margin"
+					android:text="@string/fuel"
+					android:textAppearance="?android:textAppearanceMedium"
+					android:textColor="@android:color/white" />
 
-<!--				<com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--					android:layout_width="wrap_content"-->
-<!--					android:layout_height="wrap_content"-->
-<!--					android:src="@drawable/ic_gas_station_white_24dp"-->
-<!--					app:borderWidth="0dp" />-->
+				<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_gas_station_white_24dp"
+					app:borderWidth="0dp" />
 
-<!--			</LinearLayout>-->
+			</LinearLayout>
 
 			<LinearLayout
 				android:id="@+id/ll_fab_maintenance"
