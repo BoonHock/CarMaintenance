@@ -250,7 +250,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 			return;
 		}
 		final int vehicle = getSelectedVehicleId();
-		final long date = getCalendarAtMidnight();
+		final long date = DateUtilities.getCalendarAtMidnight(_calendarOdometer).getTimeInMillis();
 		final int distance = Integer.parseInt(_editOdometer.getText().toString());
 
 		if (distance < OdometerEntry.DISTANCE_MIN) {
@@ -494,7 +494,7 @@ public class OdometerEditorActivity extends AppCompatActivity {
 		_calendarOdometer.set(Calendar.MINUTE, 0);
 		_calendarOdometer.set(Calendar.SECOND, 0);
 		_calendarOdometer.set(Calendar.MILLISECOND, 0);
-		return _calendarOdometer.getTime().getTime();
+		return _calendarOdometer.getTimeInMillis();
 	}
 
 	public static int bigDiff(

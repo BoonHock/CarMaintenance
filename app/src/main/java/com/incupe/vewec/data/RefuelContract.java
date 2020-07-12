@@ -7,10 +7,13 @@ import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
 
 public class RefuelContract {
 	public static final String PATH_REFUEL = "REFUEL";
+	public static final String PATH_REFUEL_VEHICLE = PATH_REFUEL + "/vehicle";
 
 	public static final class RefuelEntry implements BaseColumns {
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(
 				APP_MASTER_CONTRACT.BASE_CONTENT_URI, PATH_REFUEL);
+		public static final Uri CONTENT_URI_VEHICLE = Uri.withAppendedPath(
+				APP_MASTER_CONTRACT.BASE_CONTENT_URI, PATH_REFUEL_VEHICLE);
 
 		public static final String TABLE_NAME = "refuel";
 		public static final String _ID = BaseColumns._ID;

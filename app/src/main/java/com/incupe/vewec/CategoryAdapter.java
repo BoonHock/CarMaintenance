@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.incupe.vewec.fragments.HistoryFragment;
 import com.incupe.vewec.fragments.OdometerFragment;
+import com.incupe.vewec.fragments.RefuelFragment;
 import com.incupe.vewec.fragments.UpcomingFragment;
 import com.incupe.vewec.fragments.UserVehicleFragment;
 
@@ -31,8 +32,8 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 				return _context.getString(R.string.odometer);
 			case 2:
 				return _context.getString(R.string.tab_history);
-//			case 3:
-//				return _context.getString(R.string.fuel);
+			case 3:
+				return _context.getString(R.string.refuel);
 			default:
 				return _context.getString(R.string.tab_vehicles);
 		}
@@ -47,9 +48,8 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 				return new OdometerFragment();
 			case 2:
 				return new HistoryFragment();
-//			case 3:
-				// TODO
-//				return new HistoryFragment();
+			case 3:
+				return new RefuelFragment();
 			default:
 				return new UserVehicleFragment();
 		}
@@ -57,6 +57,6 @@ public class CategoryAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 4;
+		return 5;
 	}
 }

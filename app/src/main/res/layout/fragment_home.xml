@@ -77,17 +77,16 @@
 			</LinearLayout>
 
 			<LinearLayout
-				android:id="@+id/ll_fab_fuel"
+				android:id="@+id/ll_fab_refuel"
 				style="@style/main_activity_fab"
-				android:orientation="horizontal"
-				android:visibility="gone">
+				android:orientation="horizontal">
 
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center"
 					android:layout_marginEnd="@dimen/fab_margin"
-					android:text="@string/fuel"
+					android:text="@string/refuel"
 					android:textAppearance="?android:textAppearanceMedium"
 					android:textColor="@android:color/white" />
 
@@ -95,29 +94,6 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:src="@drawable/ic_gas_station_white_24dp"
-					app:borderWidth="0dp" />
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/ll_fab_maintenance"
-				style="@style/main_activity_fab"
-				android:orientation="horizontal"
-				android:visibility="visible">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center"
-					android:layout_marginEnd="@dimen/fab_margin"
-					android:text="@string/maintenance"
-					android:textAppearance="?android:textAppearanceMedium"
-					android:textColor="@android:color/white" />
-
-				<com.google.android.material.floatingactionbutton.FloatingActionButton
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:src="@drawable/ic_build_24dp"
 					app:borderWidth="0dp" />
 
 			</LinearLayout>
@@ -141,6 +117,29 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:src="@drawable/ic_near_me_24dp"
+					app:borderWidth="0dp" />
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/ll_fab_maintenance"
+				style="@style/main_activity_fab"
+				android:orientation="horizontal"
+				android:visibility="visible">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:layout_marginEnd="@dimen/fab_margin"
+					android:text="@string/maintenance"
+					android:textAppearance="?android:textAppearanceMedium"
+					android:textColor="@android:color/white" />
+
+				<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_build_24dp"
 					app:borderWidth="0dp" />
 
 			</LinearLayout>

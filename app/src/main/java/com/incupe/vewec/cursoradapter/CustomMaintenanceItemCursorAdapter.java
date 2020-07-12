@@ -31,7 +31,7 @@ public class CustomMaintenanceItemCursorAdapter extends CursorAdapter {
 		TextView txtItem = view.findViewById(R.id.txt_item);
 		TextView txtInspectReplace = view.findViewById(R.id.txt_inspect_replace);
 		TextView txtSeparator = view.findViewById(R.id.txt_separator);
-		TextView txtDistance = view.findViewById(R.id.txt_distance);
+		TextView txtDistance = view.findViewById(R.id.txt_value);
 		TextView txtDuration = view.findViewById(R.id.txt_duration);
 
 		int intDistanceInterval = cursor.getInt(cursor.getColumnIndexOrThrow(

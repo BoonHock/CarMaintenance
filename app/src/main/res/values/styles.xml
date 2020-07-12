@@ -52,7 +52,6 @@
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_weight">1</item>
-		<item name="android:paddingTop">16dp</item>
 		<item name="android:textColor">@android:color/holo_red_dark</item>
 		<item name="android:fontFamily">sans-serif-medium</item>
 		<item name="android:textAppearance">?android:textAppearanceSmall</item>
@@ -63,8 +62,6 @@
 		<item name="android:layout_weight">2</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:layout_width">0dp</item>
-		<item name="android:fontFamily">sans-serif-light</item>
-		<item name="android:textAppearance">?android:textAppearanceMedium</item>
 	</style>
 
 	<style name="maintenanceEditorTxtItem">
@@ -95,11 +92,11 @@
 	</style>
 
 	<style name="editTextPrice">
-		<item name="android:hint">@string/price</item>
 		<item name="android:importantForAutofill" tools:targetApi="o">no</item>
 		<item name="android:inputType">numberDecimal</item>
 		<item name="android:maxLength">8</item>
 	</style>
+
 	<style name="fuel_price_fuel_name">
 		<item name="android:layout_width">wrap_content</item>
 		<item name="android:layout_height">wrap_content</item>

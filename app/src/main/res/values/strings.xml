@@ -54,7 +54,7 @@
 	<string name="date">Date</string>
 	<string name="hint_odometer">Odometer reading</string>
 	<string name="no_vehicle_found">No vehicle found. Add a vehicle and retry.</string>
-	<string name="odometer_not_provided">Odometer value not provided</string>
+	<string name="odometer_not_provided">Odometer value not provided.</string>
 	<string name="odometer_deleted">Odometer deleted</string>
 	<string name="empty_here">It\'s empty here…</string>
 	<string name="add_vehicle_to_get_started">Add a vehicle to get started</string>
@@ -106,12 +106,12 @@
 
 	<string name="hello_world">Hello world!</string>
 	<!-- for testing -->
-	<!--	<string name="ad_app_id">ca-app-pub-3940256099942544~3347511713</string>-->
-	<!--	<string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+	<string name="ad_app_id">ca-app-pub-3940256099942544~3347511713</string>
+	<string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>
 	<!-- TODO: change to release version's ad ID before releases -->
 	<!-- for release	-->
-	<string name="ad_app_id">ca-app-pub-7500841506634041~4064661189</string>
-	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>
+	<!--	<string name="ad_app_id">ca-app-pub-7500841506634041~4064661189</string>-->
+	<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>-->
 
 	<string name="title_activity_settings">Settings</string>
 
@@ -241,13 +241,21 @@
 	<string name="arrow_indicator">Arrow indicator</string>
 	<string name="label_period">Period:</string>
 	<string name="label_updated">Updated:</string>
-	<string name="ron_95">Ron 95</string>
+	<string name="ron_95">RON 95</string>
+	<string name="ron_97">RON 97</string>
 	<string name="diesel">Diesel</string>
 	<string name="price_forecasts">Price forecasts</string>
-	<string name="ron_97">Ron 97</string>
 	<string name="litre">L</string>
 	<string name="no_forecast_available">No forecast available yet…
 		We are still reading the stars…</string>
 	<string name="help">Help</string>
 	<string name="share">Share</string>
+	<string name="volume">Volume</string>
+	<string name="full_tank">Full tank</string>
+	<string name="optional">Optional</string>
+	<string name="providing_odometer_refuel">Providing odometer information will give you analysis of your vehicle\'s fuel consumption.</string>
+	<string name="refuel">Refuel</string>
+	<string name="price_not_provided">Price not provided.</string>
+	<string name="volume_not_provided">Volume not provided.</string>
+	<string name="refuel_delete">Refuel deleted.</string>
 </resources>

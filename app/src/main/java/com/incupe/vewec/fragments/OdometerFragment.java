@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +21,12 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.incupe.vewec.OdometerEditorActivity;
 import com.incupe.vewec.R;
 import com.incupe.vewec.cursoradapter.OdometerCursorAdapter;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 import com.incupe.vewec.utilities.UserDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class OdometerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private OdometerCursorAdapter _odometerAdapter;
@@ -116,18 +115,6 @@ public class OdometerFragment extends Fragment implements LoaderManager.LoaderCa
 				});
 
 		rootView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
-
-		Cursor tmp = requireContext().getContentResolver().query(
-				OdometerEntry.CONTENT_URI,
-				OdometerEntry.FULL_PROJECTION,
-				null,
-				null,
-				null);
-
-		if (tmp != null) {
-			Log.v("VEHICLE_ID_CHECK", "ODOMETER COUNT: " + tmp.getCount());
-			tmp.close();
-		}
 
 		return rootView;
 	}

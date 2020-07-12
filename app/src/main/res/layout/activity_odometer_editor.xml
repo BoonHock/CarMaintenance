@@ -16,6 +16,7 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
 			android:orientation="horizontal">
 
 			<TextView
@@ -34,11 +35,11 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
 			android:orientation="horizontal">
 
 			<TextView
 				style="@style/CategoryStyle"
-				android:layout_gravity="center_vertical"
 				android:text="@string/date" />
 
 			<EditText
@@ -53,6 +54,7 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
 			android:orientation="horizontal">
 
 			<TextView
@@ -62,12 +64,13 @@
 			<LinearLayout
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
-				android:layout_weight="2">
+				android:layout_weight="2"
+				android:gravity="center_vertical">
 
 				<EditText
 					android:id="@+id/edit_odometer"
 					style="@style/EditorFieldStyle"
-					android:hint="@string/hint_odometer"
+					android:hint="@string/odometer"
 					android:importantForAutofill="no"
 					android:inputType="number"
 					android:maxLength="9" />

@@ -39,7 +39,7 @@ public class OdometerCursorAdapter extends CursorAdapter {
 
 		TextView txtRegNo = view.findViewById(R.id.txt_reg_no);
 		TextView txtDate = view.findViewById(R.id.txt_date);
-		TextView txtDistance = view.findViewById(R.id.txt_distance);
+		TextView txtDistance = view.findViewById(R.id.txt_value);
 
 		txtRegNo.setText(regNo);
 		txtDate.setText(DateUtilities.dateToStringDate(date));

@@ -12,4 +12,9 @@
 		<item>@string/by_distance_interval</item>
 		<item>@string/by_duration_interval</item>
 	</string-array>
+	<string-array name="array_fuel_type">
+		<item>@string/ron_95</item>
+		<item>@string/ron_97</item>
+		<item>@string/diesel</item>
+	</string-array>
 </resources>

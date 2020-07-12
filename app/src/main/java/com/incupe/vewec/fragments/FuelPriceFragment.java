@@ -447,7 +447,7 @@ public class FuelPriceFragment extends Fragment {
 		shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
 		shareIntent.putExtra(Intent.EXTRA_TEXT,
 				"Check out the latest fuel prices.\n" +
-						"Get your latest weekly fuel prices updates from Vewec:\n" +
+						"Manage your vehicle easily with Vewec:\n" +
 						"https://bit.ly/2Z4SidX");
 		context.startActivity(Intent.createChooser(shareIntent, "Share image"));
 	}

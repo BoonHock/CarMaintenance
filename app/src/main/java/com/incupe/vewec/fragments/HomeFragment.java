@@ -33,6 +33,7 @@ import com.incupe.vewec.CustomMaintenanceItemActivity;
 import com.incupe.vewec.MaintenanceEditorActivity;
 import com.incupe.vewec.OdometerEditorActivity;
 import com.incupe.vewec.R;
+import com.incupe.vewec.RefuelEditorActivity;
 import com.incupe.vewec.VehicleEditorActivity;
 import com.incupe.vewec.data.UserVehicleContract;
 import com.incupe.vewec.objects.FirebaseObj;
@@ -50,7 +51,7 @@ public class HomeFragment extends Fragment {
 	private FloatingActionButton _fabMenu;
 	private LinearLayout _llMask;
 	private LinearLayout _llFabVehicle;
-	private LinearLayout _llFabFuel;
+	private LinearLayout _llFabRefuel;
 	private LinearLayout _llFabOdometer;
 	private LinearLayout _llFabMaintenance;
 	private LinearLayout _llFabCustomItem;
@@ -65,7 +66,7 @@ public class HomeFragment extends Fragment {
 		_llMask = root.findViewById(R.id.ll_mask);
 		_fabMenu = root.findViewById(R.id.fab);
 		_llFabVehicle = root.findViewById(R.id.ll_fab_vehicle);
-		_llFabFuel = root.findViewById(R.id.ll_fab_fuel);
+		_llFabRefuel = root.findViewById(R.id.ll_fab_refuel);
 		_llFabOdometer = root.findViewById(R.id.ll_fab_odometer);
 		_llFabMaintenance = root.findViewById(R.id.ll_fab_maintenance);
 		_llFabCustomItem = root.findViewById(R.id.ll_fab_custom_item);
@@ -149,7 +150,7 @@ public class HomeFragment extends Fragment {
 	private void setupFabMenu() {
 		_fabButtons = new ArrayList<>();
 		_fabButtons.add(_llFabVehicle);
-//		_fabButtons.add(_llFabFuel);
+		_fabButtons.add(_llFabRefuel);
 		_fabButtons.add(_llFabOdometer);
 		_fabButtons.add(_llFabMaintenance);
 		_fabButtons.add(_llFabCustomItem);
@@ -177,13 +178,14 @@ public class HomeFragment extends Fragment {
 				startActivity(intent);
 			}
 		});
-//		_llFabFuel.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				hideFabMenu();
-//
-//			}
-//		});
+		_llFabRefuel.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				hideFabMenu();
+				Intent intent = new Intent(requireActivity(), RefuelEditorActivity.class);
+				startActivity(intent);
+			}
+		});
 		_llFabOdometer.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

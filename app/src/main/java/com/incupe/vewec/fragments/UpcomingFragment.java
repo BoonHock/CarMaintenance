@@ -85,16 +85,19 @@ public class UpcomingFragment extends Fragment implements LoaderManager.LoaderCa
 		((ImageView) rootView.findViewById(R.id.empty_image))
 				.setImageResource(R.drawable.ic_sentiment_satisfied_24dp);
 
-		_upcomingMaintenanceCursorAdapter = new UpcomingMaintenanceCursorAdapter(getContext(), null);
+		_upcomingMaintenanceCursorAdapter =
+				new UpcomingMaintenanceCursorAdapter(getContext(), null);
 		listView.setAdapter(_upcomingMaintenanceCursorAdapter);
 
-		getLoaderManager().initLoader(USER_VEHICLE_LOADER, null, UpcomingFragment.this);
+		getLoaderManager().initLoader(USER_VEHICLE_LOADER,
+				null,
+				UpcomingFragment.this);
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent intent = new Intent(getContext(), MaintenanceEditorActivity.class);
-				intent.putExtra("vehicle_id", String.valueOf(id));
+				intent.putExtra(MaintenanceEditorActivity.EXTRA_VEHICLE_ID, String.valueOf(id));
 				startActivity(intent);
 			}
 		});

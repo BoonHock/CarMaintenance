@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.incupe.vewec.MaintenanceEditorActivity;
 import com.incupe.vewec.OdometerEditorActivity;
 import com.incupe.vewec.R;
 import com.incupe.vewec.cursoradapter.UpcomingMaintenanceCursorAdapter;
@@ -173,7 +174,8 @@ public class MaintenanceEditorFragment extends Fragment {
 			}
 		}
 
-		String extraVehicleId = requireActivity().getIntent().getStringExtra("vehicle_id");
+		String extraVehicleId = requireActivity().getIntent()
+				.getStringExtra(MaintenanceEditorActivity.EXTRA_VEHICLE_ID);
 		if (extraVehicleId != null) {
 			// user setting specific vehicle's maintenance. disable spinner
 			_editVehicleId = Integer.parseInt(extraVehicleId);

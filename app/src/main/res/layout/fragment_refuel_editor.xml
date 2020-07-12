@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/vehicle" />
+
+			<Spinner
+				android:id="@+id/spinner_vehicle"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:paddingStart="0dp"
+				android:paddingEnd="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/date" />
+
+			<EditText
+				android:id="@+id/edit_date"
+				style="@style/EditorFieldStyle"
+				android:focusable="false"
+				android:hint="@string/date"
+				android:importantForAutofill="no"
+				android:inputType="textNoSuggestions|date" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/fuel" />
+
+			<Spinner
+				android:id="@+id/spinner_fuel_type"
+				style="@style/EditorFieldStyle"
+				android:layout_height="48dp"
+				android:paddingStart="0dp"
+				android:paddingEnd="16dp"
+				android:spinnerMode="dropdown" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/price" />
+
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="2"
+				android:gravity="center_vertical">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:text="@string/myr"
+					android:textAppearance="?android:textAppearanceMedium" />
+
+				<EditText
+					android:id="@+id/edit_price"
+					style="@style/editTextPrice"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/dollar_sign"
+					android:importantForAutofill="no" />
+			</LinearLayout>
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:text="@string/volume" />
+
+			<RelativeLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="2">
+
+				<EditText
+					android:id="@+id/edit_volume"
+					style="@style/editTextPrice"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_alignParentStart="true"
+					android:layout_toStartOf="@id/txt_volume_unit"
+					android:hint="@string/volume"
+					android:importantForAutofill="no" />
+
+				<TextView
+					android:id="@+id/txt_volume_unit"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentEnd="true"
+					android:layout_centerVertical="true"
+					android:layout_marginStart="8dp"
+					android:text="@string/litre"
+					android:textAppearance="?android:textAppearanceMedium" />
+			</RelativeLayout>
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/CategoryStyle"
+				android:paddingBottom="4dp"
+				android:text="@string/odometer" />
+
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="2"
+				android:gravity="center_vertical">
+
+				<EditText
+					android:id="@+id/edit_odometer"
+					style="@style/EditorFieldStyle"
+					android:hint="@string/odometer"
+					android:importantForAutofill="no"
+					android:inputType="number"
+					android:maxLength="9" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="8dp"
+					android:text="@string/kilometer"
+					android:textAppearance="?android:textAppearanceMedium" />
+			</LinearLayout>
+		</LinearLayout>
+
+		<CheckBox
+			android:id="@+id/cb_full_tank"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="8dp"
+			android:text="@string/full_tank" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:text="@string/providing_odometer_refuel" />
+	</LinearLayout>
+</ScrollView>

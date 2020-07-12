@@ -19,6 +19,7 @@ import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
+import com.incupe.vewec.data.RefuelContract.RefuelEntry;
 import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
 
 public class VehicleMaintenanceProvider extends ContentProvider {
@@ -49,7 +50,11 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	private static final int MAINTENANCE_ITEM_ID = 51;
 
 	private static final int CUSTOM_MAINTENANCE_ITEM = 60;
-	private static final int CUSTOM_MAINTENANCE_ITEM_ID = 60;
+	private static final int CUSTOM_MAINTENANCE_ITEM_ID = 61;
+
+	private static final int REFUEL = 70;
+	private static final int REFUEL_ID = 71;
+	private static final int REFUEL_VEHICLE = 72;
 
 	/**
 	 * UriMatcher object to match a content URI to a corresponding code.
@@ -104,6 +109,13 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				CustomMaintenanceItemContract.PATH_CUSTOM_MAINTENANCE_ITEM + "/#",
 				CUSTOM_MAINTENANCE_ITEM_ID);
+
+		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
+				RefuelContract.PATH_REFUEL, REFUEL);
+		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
+				RefuelContract.PATH_REFUEL + "/#", REFUEL_ID);
+		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
+				RefuelContract.PATH_REFUEL_VEHICLE, REFUEL_VEHICLE);
 	}
 
 	/**
@@ -232,6 +244,20 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 						null,
 						sortOrder);
 				break;
+			case REFUEL_ID:
+				selection = RefuelEntry._ID + "=?";
+				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+				cursor = database.query(RefuelEntry.TABLE_NAME,
+						projection,
+						selection,
+						selectionArgs,
+						null,
+						null,
+						sortOrder);
+				break;
+			case REFUEL_VEHICLE:
+				cursor = selectRefuelWithVehicle(database);
+				break;
 			default:
 				throw new IllegalArgumentException("Cannot query unknown URI " + uri);
 		}
@@ -275,6 +301,8 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				return insertMaintenanceItem(uri, values);
 			case CUSTOM_MAINTENANCE_ITEM:
 				return insertCustomMaintenanceItem(uri, values);
+			case REFUEL:
+				return insertRefuel(uri, values);
 			default:
 				throw new IllegalArgumentException("Insertion is not supported for " + uri);
 		}
@@ -299,6 +327,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				break;
 			case CUSTOM_MAINTENANCE_ITEM_ID:
 				rowsDeleted = deleteCustomMaintenanceItem(uri);
+				break;
+			case REFUEL_ID:
+				rowsDeleted = deleteRefuel(uri);
 				break;
 			default:
 				throw new IllegalArgumentException("Deletion is not supported for " + uri);
@@ -328,9 +359,23 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				selection = CustomMaintenanceItemEntry._ID + "=?";
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				return updateCustomMaintenanceItem(values, selection, selectionArgs);
+			case REFUEL_ID:
+				selection = RefuelEntry._ID + "=?";
+				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+				return updateRefuel(values, selection, selectionArgs);
 			default:
 				throw new IllegalArgumentException("Update not supported for " + uri);
 		}
+	}
+
+	private boolean userVehicleDataNotValid(String regNo, String brand, String model,
+											String variant, int usage) {
+		return TextUtils.isEmpty(regNo)
+				|| TextUtils.isEmpty(brand)
+				|| TextUtils.isEmpty(model)
+				|| TextUtils.isEmpty(variant)
+				|| (usage != UserVehicleEntry.USAGE_NORMAL
+				&& usage != UserVehicleEntry.USAGE_SEVERE);
 	}
 
 	private Uri insertUserVehicle(Uri uri, ContentValues values) {
@@ -364,62 +409,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		return ContentUris.withAppendedId(uri, id);
 	}
 
-	private int updateUserVehicle(Uri uri, ContentValues values,
-								  String selection, String[] selectionArgs) {
-		if (values.size() == 0
-				|| !values.containsKey(UserVehicleEntry.COLUMN_REG_NO)
-				|| !values.containsKey(UserVehicleEntry.COLUMN_BRAND)
-				|| !values.containsKey(UserVehicleEntry.COLUMN_MODEL)
-				|| !values.containsKey(UserVehicleEntry.COLUMN_VARIANT)) {
-			return 0;
-		}
-		String regNo = values.getAsString(UserVehicleEntry.COLUMN_REG_NO);
-		String brand = values.getAsString(UserVehicleEntry.COLUMN_BRAND);
-		String model = values.getAsString(UserVehicleEntry.COLUMN_MODEL);
-		String variant = values.getAsString(UserVehicleEntry.COLUMN_VARIANT);
-		int usage = values.getAsInteger(UserVehicleEntry.COLUMN_USAGE);
-
-		if (userVehicleDataNotValid(regNo, brand, model, variant, usage)) {
-			throw new IllegalArgumentException("Failed to update row for "
-					+ uri + ". One or more columns not provided value.");
-		}
-
-		SQLiteDatabase database = _DbHelper.getWritableDatabase();
-
-		int rowsUpdated = database.update(UserVehicleEntry.TABLE_NAME,
-				values, selection, selectionArgs);
-
-		if (rowsUpdated != 0 && getContext() != null) {
-			notifyUris(getContext(),
-					UserVehicleEntry.CONTENT_URI,
-					OdometerEntry.CONTENT_URI,
-					MaintenanceEntry.CONTENT_URI);
-		}
-		// Return the number of rows updated
-		return rowsUpdated;
-	}
-
-	private int deleteUserVehicle(Uri uri) {
-		int rowsDeleted = deleteById(uri, UserVehicleEntry._ID, UserVehicleEntry.TABLE_NAME);
-		if (rowsDeleted != 0 && getContext() != null) {
-			notifyUris(getContext(),
-					UserVehicleEntry.CONTENT_URI,
-					OdometerEntry.CONTENT_URI,
-					MaintenanceEntry.CONTENT_URI);
-		}
-		return rowsDeleted;
-	}
-
-	private boolean userVehicleDataNotValid(String regNo, String brand, String model,
-											String variant, int usage) {
-		return TextUtils.isEmpty(regNo)
-				|| TextUtils.isEmpty(brand)
-				|| TextUtils.isEmpty(model)
-				|| TextUtils.isEmpty(variant)
-				|| (usage != UserVehicleEntry.USAGE_NORMAL
-				&& usage != UserVehicleEntry.USAGE_SEVERE);
-	}
-
 	private Uri insertOdometer(Uri uri, ContentValues values) {
 		SQLiteDatabase database = _DbHelper.getWritableDatabase();
 
@@ -440,42 +429,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		return ContentUris.withAppendedId(OdometerEntry.CONTENT_URI, id);
 	}
 
-	private int updateOdometer(ContentValues values,
-							   String selection, String[] selectionArgs) {
-		if (values.size() == 0
-				|| !values.containsKey(OdometerEntry.COLUMN_VEHICLE)
-				|| !values.containsKey(OdometerEntry.COLUMN_DATE)
-				|| !values.containsKey(OdometerEntry.COLUMN_DISTANCE)) {
-			return 0;
-		}
-
-		SQLiteDatabase database = _DbHelper.getWritableDatabase();
-		int rowsUpdated = database.update(OdometerEntry.TABLE_NAME,
-				values, selection, selectionArgs);
-
-		if (rowsUpdated > 0 && getContext() != null) {
-			notifyUris(getContext(),
-					UserVehicleEntry.CONTENT_URI,
-					OdometerEntry.CONTENT_URI,
-					MaintenanceEntry.CONTENT_URI);
-		}
-		// Return the number of rows updated
-		return rowsUpdated;
-	}
-
-	private int deleteOdometer(Uri uri) {
-		int rowsDeleted = deleteById(uri, OdometerEntry._ID, OdometerEntry.TABLE_NAME);
-
-		if (rowsDeleted != 0 && getContext() != null) {
-			notifyUris(getContext(),
-					UserVehicleEntry.CONTENT_URI,
-					OdometerEntry.CONTENT_URI,
-					MaintenanceEntry.CONTENT_URI);
-		}
-
-		return rowsDeleted;
-	}
-
 	private Uri insertMaintenance(Uri uri, ContentValues values) {
 		SQLiteDatabase database = _DbHelper.getWritableDatabase();
 
@@ -494,17 +447,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		}
 
 		return ContentUris.withAppendedId(MaintenanceEntry.CONTENT_URI, id);
-	}
-
-	private int deleteMaintenance(Uri uri) {
-		int rowsDeleted = deleteById(uri, MaintenanceEntry._ID, MaintenanceEntry.TABLE_NAME);
-		if (rowsDeleted > 0 && getContext() != null) {
-			notifyUris(getContext(),
-					UserVehicleEntry.CONTENT_URI,
-					OdometerEntry.CONTENT_URI,
-					MaintenanceEntry.CONTENT_URI);
-		}
-		return rowsDeleted;
 	}
 
 	private Uri insertMaintenanceDetails(Uri uri, ContentValues values) {
@@ -582,6 +524,79 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		return ContentUris.withAppendedId(CustomMaintenanceItemEntry.CONTENT_URI, id);
 	}
 
+	private Uri insertRefuel(Uri uri, ContentValues values) {
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+		long id = database.insert(RefuelEntry.TABLE_NAME, null, values);
+
+		if (id == -1) {
+			Log.e(LOG_TAG,
+					"Failed to insert row for insertRefuel: " + uri);
+			return null;
+		}
+		if (getContext() != null) {
+			notifyUris(getContext(), RefuelEntry.CONTENT_URI);
+		}
+		return ContentUris.withAppendedId(RefuelEntry.CONTENT_URI, id);
+	}
+
+	private int updateOdometer(ContentValues values,
+							   String selection, String[] selectionArgs) {
+		if (values.size() == 0
+				|| !values.containsKey(OdometerEntry.COLUMN_VEHICLE)
+				|| !values.containsKey(OdometerEntry.COLUMN_DATE)
+				|| !values.containsKey(OdometerEntry.COLUMN_DISTANCE)) {
+			return 0;
+		}
+
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+		int rowsUpdated = database.update(OdometerEntry.TABLE_NAME,
+				values, selection, selectionArgs);
+
+		if (rowsUpdated > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+		// Return the number of rows updated
+		return rowsUpdated;
+	}
+
+	private int updateUserVehicle(Uri uri, ContentValues values,
+								  String selection, String[] selectionArgs) {
+		if (values.size() == 0
+				|| !values.containsKey(UserVehicleEntry.COLUMN_REG_NO)
+				|| !values.containsKey(UserVehicleEntry.COLUMN_BRAND)
+				|| !values.containsKey(UserVehicleEntry.COLUMN_MODEL)
+				|| !values.containsKey(UserVehicleEntry.COLUMN_VARIANT)) {
+			return 0;
+		}
+		String regNo = values.getAsString(UserVehicleEntry.COLUMN_REG_NO);
+		String brand = values.getAsString(UserVehicleEntry.COLUMN_BRAND);
+		String model = values.getAsString(UserVehicleEntry.COLUMN_MODEL);
+		String variant = values.getAsString(UserVehicleEntry.COLUMN_VARIANT);
+		int usage = values.getAsInteger(UserVehicleEntry.COLUMN_USAGE);
+
+		if (userVehicleDataNotValid(regNo, brand, model, variant, usage)) {
+			throw new IllegalArgumentException("Failed to update row for "
+					+ uri + ". One or more columns not provided value.");
+		}
+
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+
+		int rowsUpdated = database.update(UserVehicleEntry.TABLE_NAME,
+				values, selection, selectionArgs);
+
+		if (rowsUpdated != 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+		// Return the number of rows updated
+		return rowsUpdated;
+	}
+
 	private int updateCustomMaintenanceItem(ContentValues values, String selection,
 											String[] selectionArgs) {
 		if (values.size() == 0
@@ -608,6 +623,74 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 					CustomMaintenanceItemEntry.CONTENT_URI);
 		}
 		return rowsUpdated;
+	}
+
+	private int updateRefuel(ContentValues values, String selection,
+							 String[] selectionArgs) {
+		if (values.size() == 0
+				|| !values.containsKey(RefuelEntry.COLUMN_VEHICLE)
+				|| !values.containsKey(RefuelEntry.COLUMN_DATE)
+				|| !values.containsKey(RefuelEntry.COLUMN_PRICE)
+				|| !values.containsKey(RefuelEntry.COLUMN_VOLUME)
+				|| !values.containsKey(RefuelEntry.COLUMN_ODOMETER)
+				|| !values.containsKey(RefuelEntry.COLUMN_FUEL_TYPE)
+				|| !values.containsKey(RefuelEntry.COLUMN_IS_FULL_TANK)) {
+			return 0;
+		}
+
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+		int rowsUpdated = database.update(RefuelEntry.TABLE_NAME,
+				values,
+				selection,
+				selectionArgs);
+
+		if (rowsUpdated > 0 && getContext() != null) {
+			notifyUris(getContext(), RefuelEntry.CONTENT_URI);
+		}
+		return rowsUpdated;
+	}
+
+	private int deleteUserVehicle(Uri uri) {
+		int rowsDeleted = deleteById(uri, UserVehicleEntry._ID, UserVehicleEntry.TABLE_NAME);
+		if (rowsDeleted != 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+		return rowsDeleted;
+	}
+
+	private int deleteOdometer(Uri uri) {
+		int rowsDeleted = deleteById(uri, OdometerEntry._ID, OdometerEntry.TABLE_NAME);
+
+		if (rowsDeleted != 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+
+		return rowsDeleted;
+	}
+
+	private int deleteMaintenance(Uri uri) {
+		int rowsDeleted = deleteById(uri, MaintenanceEntry._ID, MaintenanceEntry.TABLE_NAME);
+		if (rowsDeleted > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+		return rowsDeleted;
+	}
+
+	private int deleteRefuel(Uri uri) {
+		int rowsDeleted = deleteById(uri, RefuelEntry._ID, RefuelEntry.TABLE_NAME);
+		if (rowsDeleted != 0 && getContext() != null) {
+			notifyUris(getContext(), RefuelEntry.CONTENT_URI);
+		}
+		return rowsDeleted;
 	}
 
 	private int deleteCustomMaintenanceItem(Uri uri) {
@@ -647,6 +730,26 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 						+ " = " + UserVehicleEntry.TABLE_NAME + "." + UserVehicleEntry._ID
 						+ " ORDER BY " + OdometerEntry.TABLE_NAME + "."
 						+ OdometerEntry.COLUMN_DATE + " DESC;",
+				null);
+	}
+
+	private Cursor selectRefuelWithVehicle(SQLiteDatabase database) {
+		return database.rawQuery("SELECT "
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry._ID + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_VEHICLE + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_DATE + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_PRICE + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_VOLUME + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_ODOMETER + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_FUEL_TYPE + ","
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_IS_FULL_TANK + ","
+						+ UserVehicleEntry.TABLE_NAME + "." + UserVehicleEntry.COLUMN_REG_NO
+						+ " FROM " + RefuelEntry.TABLE_NAME + " JOIN "
+						+ UserVehicleEntry.TABLE_NAME + " ON "
+						+ RefuelEntry.TABLE_NAME + "." + RefuelEntry.COLUMN_VEHICLE + "="
+						+ UserVehicleEntry.TABLE_NAME + "." + UserVehicleEntry._ID
+						+ " ORDER BY " + RefuelEntry.TABLE_NAME + "."
+						+ RefuelEntry.COLUMN_DATE + " DESC;",
 				null);
 	}
 

@@ -74,7 +74,7 @@ public class CustomMaintenanceItemEditorFragment extends DialogFragment {
 				new InputFilter.LengthFilter(2)
 		});
 
-		ArrayAdapter spinnerAdapter = ArrayAdapter.createFromResource(
+		ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
 				requireContext(),
 				R.array.array_inspect_replace_options,
 				android.R.layout.simple_spinner_item);
