@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment;
 import com.incupe.vewec.fragments.RefuelEditorFragment;
 
 public class RefuelEditorActivity extends SingleFragmentActivity {
-	public static final String EXTRA_VEHICLE_ID = "EXTRA_VEHICLE_ID";
-
 	@Override
 	protected Fragment createFragment() {
 		return new RefuelEditorFragment();

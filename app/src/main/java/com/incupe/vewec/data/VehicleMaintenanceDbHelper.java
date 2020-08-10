@@ -22,7 +22,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	/**
 	 * Database version. If you change the database schema, you must increment the database version.
 	 */
-	private static final int DATABASE_VERSION = 7;
+	private static final int DATABASE_VERSION = 8;
 
 	/**
 	 * Constructs a new instance of {@link VehicleMaintenanceDbHelper}.
@@ -46,6 +46,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 		db.execSQL(CustomMaintenanceItemContract.CustomMaintenanceItemEntry.CREATE_TABLE);
 
 		runQueryIgnoreException(db, UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V5);
+		runQueryIgnoreException(db, RefuelContract.RefuelEntry.CREATE_TABLE);
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 		if (oldVersion < 5) {
 			runQueryIgnoreException(db, UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V5);
 		}
-		if (oldVersion < 7) {
+		if (oldVersion < 8) {
 			runQueryIgnoreException(db, RefuelContract.RefuelEntry.CREATE_TABLE);
 		}
 	}

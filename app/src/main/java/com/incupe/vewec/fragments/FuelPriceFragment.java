@@ -410,8 +410,6 @@ public class FuelPriceFragment extends Fragment {
 
 				// Add the image to the system gallery
 				galleryAddPic(context, savedImagePath);
-
-				// TODO: share image
 				shareImage(requireContext(), savedImagePath);
 			}
 		}

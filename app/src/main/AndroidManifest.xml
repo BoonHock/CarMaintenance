@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.incupe.vewec">
-	<!-- Include required permissions for Google Mobile Ads to run. -->
+
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.SET_ALARM" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,6 +16,10 @@
 		android:roundIcon="@mipmap/ic_launcher"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
+		<meta-data
+			android:name="com.google.android.wearable.standalone"
+			android:value="true" />
+
 		<provider
 			android:name="androidx.core.content.FileProvider"
 			android:authorities="com.incupe.vewec.fileProvider"
@@ -34,12 +39,13 @@
 		<meta-data
 			android:name="com.google.android.gms.ads.APPLICATION_ID"
 			android:value="@string/ad_app_id" />
-
 		<meta-data
 			android:name="com.google.android.gms.ads.AD_MANAGER_APP"
 			android:value="true" />
 
-		<service android:name="com.google.firebase.messaging.FirebaseMessagingService">
+		<service
+			android:name="com.google.firebase.messaging.FirebaseMessagingService"
+			android:exported="false">
 			<intent-filter>
 				<action android:name="com.google.firebase.MESSAGING_EVENT" />
 			</intent-filter>
@@ -56,9 +62,39 @@
 			</intent-filter>
 		</activity>
 		<activity
+			android:name=".NewsHomeActivity"
+			android:label="@string/news"
+			android:parentActivityName=".Main2Activity">
+
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.Main2Activity" />
+		</activity>
+		<activity
+			android:name=".NewsViewActivity"
+			android:parentActivityName=".NewsHomeActivity">
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.NewsHomeActivity" />
+<!--			https://developer.android.com/training/app-links/deep-linking-->
+<!--			<intent-filter>-->
+<!--				<action android:name="android.intent.action.VIEW" />-->
+<!--				<category android:name="android.intent.category.DEFAULT" />-->
+<!--				<category android:name="android.intent.category.BROWSABLE" />-->
+<!--				&lt;!&ndash; Accepts URIs that begin with "http://www.example.com/gizmos” &ndash;&gt;-->
+<!--				<data android:scheme="http"-->
+<!--					android:host="www.example.com"-->
+<!--					android:pathPrefix="/gizmos" />-->
+<!--				&lt;!&ndash; note that the leading "/" is required for pathPrefix&ndash;&gt;-->
+<!--			</intent-filter>-->
+		</activity>
+		<activity
 			android:name=".FuelPriceActivity"
 			android:label="@string/fuel_prices"
 			android:parentActivityName=".Main2Activity">
+
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"

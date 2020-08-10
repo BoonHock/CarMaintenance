@@ -18,20 +18,6 @@ public class FuelPrice {
 	public FuelPrice() {
 	}
 
-	public FuelPrice(String updated_by,
-					 long updated_on,
-					 long date_from,
-					 long date_to,
-					 HashMap<String, Double> prices,
-					 HashMap<String, Double> price_changes) {
-		this.updated_by = updated_by;
-		this.updated_on = updated_on;
-		this.date_from = date_from;
-		this.date_to = date_to;
-		this.prices = prices;
-		this.price_changes = price_changes;
-	}
-
 	/*
 	 * have to write this function this way because ternary operation will give
 	 * {Unboxing of HashMap 'get(key)' may produce 'NullPointerException'}

@@ -48,9 +48,6 @@ public class RefuelEditorFragment extends Fragment {
 	private CheckBox _cbFullTank;
 	private EditText _editOdometer;
 
-	private boolean _userEnteredPrice = false;
-
-	private int _editVehicleId = -1;
 	private List<Integer> _vehicleIds;
 	private Calendar _calendarOdometer;
 
@@ -118,10 +115,6 @@ public class RefuelEditorFragment extends Fragment {
 					_editDate.setText(DateUtilities.dateToStringDate(_calendarOdometer.getTime()));
 				}
 			};
-			if (_editVehicleId != -1) {
-				_spinnerVehicle.setSelection(_vehicleIds.indexOf(_editVehicleId));
-				_spinnerVehicle.setEnabled(false);
-			}
 
 			_editDate.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -139,7 +132,6 @@ public class RefuelEditorFragment extends Fragment {
 			if (_currentUri == null) {
 				requireActivity().invalidateOptionsMenu();
 			} else {
-				// TODO: get existing data from DB
 				_spinnerVehicle.setEnabled(false);
 				initVehicle(fuelTypeSpinnerAdapter);
 			}

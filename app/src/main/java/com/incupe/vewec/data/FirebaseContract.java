@@ -5,7 +5,8 @@ public class FirebaseContract {
 		public static final int INSPECT = 0;
 		public static final int REPLACE = 1;
 	}
-	public static final class FuelPrice{
+
+	public static final class FuelPrice {
 		public static final String FUEL_PRICE_KEY = "fuel_prices";
 		public static final String ACTUAL_KEY = "actual";
 		public static final String FORECAST_KEY = "forecast";
@@ -18,6 +19,9 @@ public class FirebaseContract {
 		public static final String PRICES_KEY = "prices";
 		public static final String DATE_TO_KEY = "date_to";
 		public static final String DATE_FROM_KEY = "date_from";
+	}
 
+	public static final class News {
+		public static final String NEWS_KEY = "news";
 	}
 }

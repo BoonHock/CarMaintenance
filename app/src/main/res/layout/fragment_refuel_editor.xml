@@ -175,11 +175,5 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="8dp"
 			android:text="@string/full_tank" />
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:text="@string/providing_odometer_refuel" />
 	</LinearLayout>
 </ScrollView>

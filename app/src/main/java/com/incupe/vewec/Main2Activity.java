@@ -2,6 +2,7 @@ package com.incupe.vewec;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -85,6 +86,10 @@ public class Main2Activity extends AppCompatActivity {
 								intent = new Intent(Main2Activity.this, FuelPriceActivity.class);
 								startActivity(intent);
 								break;
+							case R.id.nav_news:
+								intent = new Intent(Main2Activity.this, NewsHomeActivity.class);
+								startActivity(intent);
+								break;
 //							case R.id.nav_share:
 //								intent = new Intent(Intent.ACTION_SEND);
 //								intent.setType("text/plain");
@@ -126,6 +131,10 @@ public class Main2Activity extends AppCompatActivity {
 						}
 					}
 				});
+
+		Intent intent = getIntent();
+		String action = intent.getAction();
+		Uri data = intent.getData();
 	}
 
 	@Override
