@@ -12,14 +12,10 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.incupe.vewec.R;
-import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
-import com.incupe.vewec.objects.FirebaseObj;
-import com.incupe.vewec.objects.MaintenanceItem;
 import com.incupe.vewec.objects.UpcomingMaintenanceItem;
+import com.incupe.vewec.objects.UpcomingMaintenanceItems;
 import com.incupe.vewec.objects.UserVehicle;
-import com.incupe.vewec.objects.VehicleTemplate;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,82 +41,61 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 		TextView txtBrandModel = view.findViewById(R.id.txt_brand_model);
 		TextView txtOdometer = view.findViewById(R.id.txt_odometer);
 
-		final String firebaseVehicleId = VehicleTemplate
-				.getFirebaseVehicleIdFromList(FirebaseObj._vehicleTemplates,
-						userVehicle.get_brand(),
-						userVehicle.get_model(),
-						userVehicle.get_variant());
-
 		txtRegNo.setText(userVehicle.get_regNo());
 		txtBrandModel.setText(userVehicle.get_brandModelVariant());
 		txtOdometer.setText(String.format(Locale.getDefault(),
 				"%,d", userVehicle.getLatestOdometer(context)));
 
-		FirebaseObj.runCallbackMaintenanceDetails(firebaseVehicleId, new FirebaseObj() {
-			@Override
-			public void callback() {
-				displayUpcomingMaintenance(context, view,
-						firebaseVehicleId, userVehicle);
-			}
-		});
+		displayUpcomingMaintenance(context, view, userVehicle);
 	}
 
 	private void displayUpcomingMaintenance(
-			Context context, View view, String firebaseVehicleId,
+			Context context,
+			View view,
 			UserVehicle userVehicle) {
 
-		LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
 		LinearLayout llReplace = view.findViewById(R.id.ll_replace_items);
+		LinearLayout llInspect = view.findViewById(R.id.ll_inspect_items);
 
 		TextView txtInspect = view.findViewById(R.id.txt_inspect);
 		TextView txtReplace = view.findViewById(R.id.txt_replace);
 
-		List<List<UpcomingMaintenanceItem>> firebaseItems = FirebaseObj
-				.getUpcomingItemsByInspectReplace(context,
-						firebaseVehicleId,
-						userVehicle);
+		UpcomingMaintenanceItems upcomingMaintenanceItems =
+				UpcomingMaintenanceItems.getInstance(context, userVehicle);
 
-		List<UpcomingMaintenanceItem> upcomingItemsInspect = firebaseItems.get(0);
-		List<UpcomingMaintenanceItem> upcomingItemsReplace = firebaseItems.get(1);
-
-		upcomingItemsInspect.addAll(MaintenanceItem
-				.getUpcomingCustomItemNotInFirebase(context,
-						upcomingItemsInspect,
-						userVehicle,
-						MaintenanceItemEntry.INSPECT_VALUE));
-		upcomingItemsReplace.addAll(MaintenanceItem
-				.getUpcomingCustomItemNotInFirebase(context,
-						upcomingItemsReplace,
-						userVehicle,
-						MaintenanceItemEntry.REPLACE_VALUE));
-
-		Collections.sort(upcomingItemsInspect, new UpcomingMaintenanceItem.CustomComparator());
-		Collections.sort(upcomingItemsReplace, new UpcomingMaintenanceItem.CustomComparator());
-
-		llInspect.removeAllViews();
 		llReplace.removeAllViews();
+		llInspect.removeAllViews();
 
-		addMaintenanceItems(context, llInspect, upcomingItemsInspect);
-		addMaintenanceItems(context, llReplace, upcomingItemsReplace);
+		addMaintenanceItems(context, llReplace, upcomingMaintenanceItems.get_replaceItems());
+		addMaintenanceItems(context, llInspect, upcomingMaintenanceItems.get_inspectItems());
 
-		if (llInspect.getChildCount() == 0) {
-			txtInspect.setVisibility(View.GONE);
-		} else {
+		if (llInspect.getChildCount() != 0) {
 			txtInspect.setVisibility(View.VISIBLE);
 		}
-		if (llReplace.getChildCount() == 0) {
-			txtReplace.setVisibility(View.GONE);
-		} else {
+		if (llReplace.getChildCount() != 0) {
 			txtReplace.setVisibility(View.VISIBLE);
 		}
-
+		if (llInspect.getChildCount() == 0 && llReplace.getChildCount() == 0) {
+			view.findViewById(R.id.no_maintenance_items_for_vehicle).setVisibility(View.VISIBLE);
+		}
 		view.findViewById(R.id.progress_upcoming).setVisibility(View.GONE);
 	}
 
 	private void addMaintenanceItems(
-			Context context, LinearLayout llParent,
+			Context context,
+			LinearLayout llParent,
 			List<UpcomingMaintenanceItem> upcomingMaintenanceItems) {
+
 		for (UpcomingMaintenanceItem item : upcomingMaintenanceItems) {
+			// if item doesn't have any info about maintenance schedule
+			// no need to display as upcoming item
+			if (item.getDistance_interval() == 0 &&
+					item.getDuration_interval() == 0 &&
+					item.get_distanceLeft() == 0 &&
+					item.get_durationDaysLeft() == 0) {
+				continue;
+			}
+
 			View view = View.inflate(context, R.layout.template_upcoming_item, null);
 			LinearLayout llItem = view.findViewById(R.id.ll_item);
 			TextView txtItem = view.findViewById(R.id.txt_item);
@@ -133,7 +108,9 @@ public class UpcomingMaintenanceCursorAdapter extends CursorAdapter {
 
 			String upcomingDue = "";
 
-			if (item.getDistance_interval() != 0) {
+			if (item.getDistance_interval() != 0 ||
+					(item.getFirst_distance() != 0 &&
+							item.getFirst_distance() >= item.get_userVehicle().getLatestOdometer(context))) {
 				hasDistanceInterval = true;
 				upcomingDue = String.format(Locale.getDefault(), "%,d",
 						item.get_distanceLeft())

@@ -102,10 +102,11 @@ public class VehicleTemplate {
 	}
 
 	public static String getFirebaseVehicleIdFromList(
-			List<VehicleTemplate> vehicleTemplates, String findBrand,
-			String findModel, String findVariant) {
-		for (int i = 0, j = vehicleTemplates.size(); i < j; i++) {
-			VehicleTemplate vehicleTemplate = vehicleTemplates.get(i);
+			String findBrand,
+			String findModel,
+			String findVariant) {
+		for (int i = 0, j = FirebaseObj._vehicleTemplates.size(); i < j; i++) {
+			VehicleTemplate vehicleTemplate = FirebaseObj._vehicleTemplates.get(i);
 			if (vehicleTemplate.getBrand().toUpperCase().equals(findBrand.toUpperCase())
 					&& vehicleTemplate.getModel().toUpperCase().equals(findModel.toUpperCase())
 					&& vehicleTemplate.getVariant().toUpperCase().equals(findVariant.toUpperCase())) {

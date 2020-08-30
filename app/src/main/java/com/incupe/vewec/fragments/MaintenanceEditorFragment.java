@@ -42,17 +42,14 @@ import com.incupe.vewec.MaintenanceEditorActivity;
 import com.incupe.vewec.OdometerEditorActivity;
 import com.incupe.vewec.R;
 import com.incupe.vewec.cursoradapter.UpcomingMaintenanceCursorAdapter;
-import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
 import com.incupe.vewec.data.OdometerContract.OdometerEntry;
 import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
-import com.incupe.vewec.objects.FirebaseObj;
-import com.incupe.vewec.objects.MaintenanceItem;
 import com.incupe.vewec.objects.UpcomingMaintenanceItem;
+import com.incupe.vewec.objects.UpcomingMaintenanceItems;
 import com.incupe.vewec.objects.UserVehicle;
-import com.incupe.vewec.objects.VehicleTemplate;
 import com.incupe.vewec.utilities.DateUtilities;
 import com.incupe.vewec.utilities.SetupViews;
 import com.incupe.vewec.utilities.UserDialog;
@@ -60,7 +57,6 @@ import com.incupe.vewec.utilities.UserDialog;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,13 +86,12 @@ public class MaintenanceEditorFragment extends Fragment {
 	private EditText _editRemarks;
 	private EditText _editTotal;
 	private Button _btnSelectByTemplate;
-	private LinearLayout _llInspectItems;
-	private LinearLayout _llReplaceItems;
-	private LinearLayout _llReplace;
-	private LinearLayout _llInspect;
 
 	private ArrayList<Integer> _distanceIntervals;
 	private ArrayList<Integer> _durationIntervals;
+
+	private LinearLayout _llInspectItems;
+	private LinearLayout _llReplaceItems;
 
 	private int _editVehicleId = -1;
 	private boolean _isInit = true;
@@ -140,8 +135,6 @@ public class MaintenanceEditorFragment extends Fragment {
 		_editRemarks = view.findViewById(R.id.edit_remarks);
 		_editTotal = view.findViewById(R.id.edit_total);
 		_btnSelectByTemplate = view.findViewById(R.id.btn_select_by_template);
-		_llReplace = view.findViewById(R.id.ll_replace);
-		_llInspect = view.findViewById(R.id.ll_inspect);
 		_llInspectItems = view.findViewById(R.id.ll_inspect_items);
 		_llReplaceItems = view.findViewById(R.id.ll_replace_items);
 
@@ -511,123 +504,60 @@ public class MaintenanceEditorFragment extends Fragment {
 		if (cursor.getCount() > 0) {
 			final UserVehicle userVehicle = new UserVehicle(cursor);
 
-			final String firebaseVehicleId = VehicleTemplate
-					.getFirebaseVehicleIdFromList(FirebaseObj._vehicleTemplates,
-							userVehicle.get_brand(),
-							userVehicle.get_model(),
-							userVehicle.get_variant());
+			List<UpcomingMaintenanceItem> preCheckInspectList = new ArrayList<>();
+			List<UpcomingMaintenanceItem> preCheckReplaceList = new ArrayList<>();
 
-			FirebaseObj.runCallbackMaintenanceDetails(firebaseVehicleId, new FirebaseObj() {
-				@Override
-				public void callback() {
-					List<UpcomingMaintenanceItem> preCheckInspectList = new ArrayList<>();
-					List<UpcomingMaintenanceItem> preCheckReplaceList = new ArrayList<>();
-					Map<String, Double> initReplace = new HashMap<>();
-					Map<String, Double> initInspect = new HashMap<>();
+			UpcomingMaintenanceItems upcomingMaintenanceItems = UpcomingMaintenanceItems
+					.getInstance(requireContext(), userVehicle);
 
-					List<List<UpcomingMaintenanceItem>> firebaseItems = FirebaseObj
-							.getUpcomingItemsByInspectReplace(requireContext(),
-									firebaseVehicleId,
-									userVehicle);
-					List<UpcomingMaintenanceItem> itemsInspect = firebaseItems.get(0);
-					List<UpcomingMaintenanceItem> itemsReplace = firebaseItems.get(1);
+			Map<String, Double> initReplace = new HashMap<>();
+			Map<String, Double> initInspect = new HashMap<>();
 
-					itemsInspect.addAll(MaintenanceItem
-							.getUpcomingCustomItemNotInFirebase(
-									requireActivity(), itemsInspect, userVehicle,
-									CustomMaintenanceItemEntry.INSPECT_VALUE));
+			List<UpcomingMaintenanceItem> itemsReplace =
+					upcomingMaintenanceItems.get_replaceItems();
+			List<UpcomingMaintenanceItem> itemsInspect =
+					upcomingMaintenanceItems.get_inspectItems();
 
-					itemsReplace.addAll(MaintenanceItem
-							.getUpcomingCustomItemNotInFirebase(
-									requireActivity(), itemsReplace, userVehicle,
-									CustomMaintenanceItemEntry.REPLACE_VALUE));
+//			List<String> replaceItemsNames = new ArrayList<>();
+//			List<String> inspectItemsNames = new ArrayList<>();
+//
+//			for (UpcomingMaintenanceItem item : itemsReplace) {
+//				replaceItemsNames.add(item.getItem());
+//			}
+//			for (UpcomingMaintenanceItem item : itemsInspect) {
+//				inspectItemsNames.add(item.getItem());
+//			}
 
-					if (_currentUri != null) {
-						// if editing, get db items
-						initReplace = getDbItems(MaintenanceItemEntry.REPLACE_VALUE);
-						initInspect = getDbItems(MaintenanceItemEntry.INSPECT_VALUE);
+			if (_currentUri != null) {
+				// if editing, get db items
+				initReplace = getDbItems(MaintenanceItemEntry.REPLACE_VALUE);
+				initInspect = getDbItems(MaintenanceItemEntry.INSPECT_VALUE);
 
-						// remove item from list and put in another list
-						// re-add at beginning of array so that these items appear
-						// at top of list
-						for (int i = itemsReplace.size() - 1; i >= 0; i--) {
-							if (initReplace.containsKey(itemsReplace.get(i).getItem())) {
-								preCheckReplaceList.add(itemsReplace.get(i));
-								itemsReplace.remove(i);
-							}
-						}
-						for (int i = itemsInspect.size() - 1; i >= 0; i--) {
-							if (initInspect.containsKey(itemsInspect.get(i).getItem())) {
-								preCheckInspectList.add(itemsInspect.get(i));
-								itemsInspect.remove(i);
-							}
-						}
+				// remove item from list and put in another list
+				// re-add at beginning of array so that these items appear
+				// at top of list
+				for (int i = itemsReplace.size() - 1; i >= 0; i--) {
+					if (initReplace.containsKey(itemsReplace.get(i).getItem())) {
+						preCheckReplaceList.add(itemsReplace.get(i));
+						itemsReplace.remove(i);
 					}
-
-					Collections.sort(itemsInspect, new UpcomingMaintenanceItem.CustomComparator());
-					Collections.sort(itemsReplace, new UpcomingMaintenanceItem.CustomComparator());
-					Collections.sort(preCheckInspectList, new UpcomingMaintenanceItem.CustomComparator());
-					Collections.sort(preCheckReplaceList, new UpcomingMaintenanceItem.CustomComparator());
-
-					itemsInspect.addAll(0, preCheckInspectList);
-					itemsReplace.addAll(0, preCheckReplaceList);
-
-					_distanceIntervals = new ArrayList<>();
-					_durationIntervals = new ArrayList<>();
-
-					for (MaintenanceItem item : itemsInspect) {
-						if (!_distanceIntervals.contains(item.getDistance_interval())) {
-							_distanceIntervals.add(item.getDistance_interval());
-						}
-						if (!_durationIntervals.contains(item.getDuration_interval())) {
-							_durationIntervals.add(item.getDuration_interval());
-						}
-					}
-					for (MaintenanceItem item : itemsReplace) {
-						if (!_distanceIntervals.contains(item.getDistance_interval())) {
-							_distanceIntervals.add(item.getDistance_interval());
-						}
-						if (!_durationIntervals.contains(item.getDuration_interval())) {
-							_durationIntervals.add(item.getDuration_interval());
-						}
-					}
-
-					Collections.sort(_distanceIntervals);
-					Collections.sort(_durationIntervals);
-
-					// no need show 0
-					if (_distanceIntervals.contains(0)) {
-						_distanceIntervals.remove(0);
-					}
-					if (_durationIntervals.contains(0)) {
-						_durationIntervals.remove(0);
-					}
-
-					displayMaintenanceItems(itemsReplace,
-							itemsInspect,
-							initReplace,
-							initInspect);
-
-					_viewContent.setVisibility(View.VISIBLE);
-					_progressBar.setVisibility(View.GONE);
-
-					// as discussed, in 20200521, temporarily disable this first.
-					// Too confusing for users
-//					if (_isInit) {
-//						_isInit = false;
-//						// display template dialog only if adding new record
-//						if (_currentUri == null) {
-//							FragmentManager manager = requireActivity().getSupportFragmentManager();
-//							MaintenanceTemplateDialogFragment dialog =
-//									MaintenanceTemplateDialogFragment.newInstance(_distanceIntervals,
-//											MaintenanceTemplateDialogFragment.BY_DISTANCE);
-//							dialog.setTargetFragment(MaintenanceEditorFragment.this,
-//									DIALOG_TEMPLATE_RESULT);
-//							dialog.show(manager, DIALOG_TEMPLATE);
-//						}
-//					}
 				}
-			});
+				for (int i = itemsInspect.size() - 1; i >= 0; i--) {
+					if (initInspect.containsKey(itemsInspect.get(i).getItem())) {
+						preCheckInspectList.add(itemsInspect.get(i));
+						itemsInspect.remove(i);
+					}
+				}
+				itemsInspect.addAll(0, preCheckInspectList);
+				itemsReplace.addAll(0, preCheckReplaceList);
+			}
+			displayMaintenanceItems(itemsReplace,
+					itemsInspect,
+					initReplace,
+					initInspect);
+
+			_viewContent.setVisibility(View.VISIBLE);
+			_progressBar.setVisibility(View.GONE);
 		}
 		cursor.close();
 	}
@@ -637,11 +567,14 @@ public class MaintenanceEditorFragment extends Fragment {
 
 		long maintenanceId = ContentUris.parseId(_currentUri);
 		Cursor cursor = requireContext().getContentResolver().query(
-				ContentUris.withAppendedId(MaintenanceDetailsEntry.CONTENT_URI_MAINTENANCE,
-						maintenanceId),
-				null,
-				null,
-				new String[]{String.valueOf(maintenanceId), String.valueOf(inspectReplace)},
+				MaintenanceDetailsEntry.CONTENT_URI,
+				MaintenanceDetailsEntry.FULL_PROJECTION,
+				MaintenanceDetailsEntry.COLUMN_MAINTENANCE_ID + "= ? AND " +
+						MaintenanceDetailsEntry.COLUMN_INSPECT_REPLACE + "=?;",
+				new String[]{
+						String.valueOf(maintenanceId),
+						String.valueOf(inspectReplace)
+				},
 				null);
 
 		if (cursor == null) {
@@ -667,26 +600,36 @@ public class MaintenanceEditorFragment extends Fragment {
 		_llReplaceItems.removeAllViews();
 		_llInspectItems.removeAllViews();
 
-		if (itemsReplace.isEmpty()) {
-			_llReplace.setVisibility(View.GONE);
-		} else {
-			_llReplace.setVisibility(View.VISIBLE);
-		}
-		if (itemsInspect.isEmpty()) {
-			_llInspect.setVisibility(View.GONE);
-		} else {
-			_llInspect.setVisibility(View.VISIBLE);
-		}
+//		if (itemsReplace.isEmpty()) {
+//			_llReplace.setVisibility(View.GONE);
+//		} else {
+//			_llReplace.setVisibility(View.VISIBLE);
+//		}
+//		if (itemsInspect.isEmpty()) {
+//			_llInspect.setVisibility(View.GONE);
+//		} else {
+//			_llInspect.setVisibility(View.VISIBLE);
+//		}
 		addMaintenanceItemLayouts(_llReplaceItems, itemsReplace, initReplace);
 		addMaintenanceItemLayouts(_llInspectItems, itemsInspect, initInspect);
+
+		calculateTotal();
 	}
 
 	private void addMaintenanceItemLayouts(
-			LinearLayout linearLayout, List<UpcomingMaintenanceItem> maintenanceItems,
+			LinearLayout linearLayout,
+			List<UpcomingMaintenanceItem> maintenanceItems,
 			Map<String, Double> initPrice) {
+		// store names of all upcoming items
+		List<String> listUpcomingItems = new ArrayList<>();
+
 		for (UpcomingMaintenanceItem maintenanceItem : maintenanceItems) {
+			listUpcomingItems.add(maintenanceItem.getItem().toUpperCase());
+
 			View view = LayoutInflater.from(requireContext()).inflate(
-					R.layout.template_maintenance_editor_item, linearLayout, false);
+					R.layout.template_maintenance_editor_item,
+					linearLayout,
+					false);
 			TextView txtItem = view.findViewById(R.id.txt_item);
 			EditText editPrice = view.findViewById(R.id.edit_price);
 			CheckBox cbItem = view.findViewById(R.id.cb_item);
@@ -696,8 +639,13 @@ public class MaintenanceEditorFragment extends Fragment {
 			txtItem.setTag(R.string.by_distance_interval, maintenanceItem.getDistance_interval());
 			txtItem.setTag(R.string.by_duration_interval, maintenanceItem.getDuration_interval());
 
-			// display distance left only if adding record
-			if (_currentUri == null) {
+			// display distance left only if adding record,
+			// AND maintenance item has distance interval
+			// OR (item's first distance != 0 AND vehicle's latest odometer is lesser than item's first maintenance distance)
+			if (_currentUri == null && (maintenanceItem.getDistance_interval() != 0 ||
+					(maintenanceItem.getFirst_distance() != 0 &&
+							maintenanceItem.get_userVehicle().getLatestOdometer(requireContext()) <= maintenanceItem.getFirst_distance()))
+			) {
 				String strDistanceLeft = String.format(Locale.getDefault(), "%,d",
 						maintenanceItem.get_distanceLeft()) + " "
 						+ getString(R.string.kilometer) + " left";
@@ -720,6 +668,28 @@ public class MaintenanceEditorFragment extends Fragment {
 			setMaintenanceItemListeners(editPrice, cbItem);
 			linearLayout.addView(view);
 		}
+
+		// items that are not in maintenance_item db table
+		// yet are added in maintenance_details table
+		int insertIndex = 0;
+		for (Map.Entry<String, Double> entry : initPrice.entrySet()) {
+			if (!listUpcomingItems.contains(entry.getKey().toUpperCase())) {
+				View view = LayoutInflater.from(requireContext()).inflate(
+						R.layout.template_maintenance_editor_item,
+						linearLayout,
+						false);
+				TextView txtItem = view.findViewById(R.id.txt_item);
+				EditText editPrice = view.findViewById(R.id.edit_price);
+				CheckBox cbItem = view.findViewById(R.id.cb_item);
+
+				txtItem.setText(entry.getKey());
+				editPrice.setText(String.valueOf(entry.getValue()));
+				cbItem.setChecked(true);
+				setMaintenanceItemListeners(editPrice, cbItem);
+				linearLayout.addView(view, insertIndex);
+				insertIndex++;
+			}
+		}
 	}
 
 	private void setMaintenanceItemListeners(final EditText editPrice, final CheckBox cbItem) {
@@ -730,28 +700,10 @@ public class MaintenanceEditorFragment extends Fragment {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				double totalPrice = 0;
-
 				if (!TextUtils.isEmpty(editPrice.getText().toString())) {
 					cbItem.setChecked(true);
 				}
-
-				for (int i = 0, j = _llInspectItems.getChildCount(); i < j; i++) {
-					EditText editPrice = _llInspectItems.getChildAt(i)
-							.findViewById(R.id.edit_price);
-					if (!TextUtils.isEmpty(editPrice.getText().toString())) {
-						totalPrice += Double.parseDouble(editPrice.getText().toString());
-					}
-				}
-				for (int i = 0, j = _llReplaceItems.getChildCount(); i < j; i++) {
-					EditText editPrice = _llReplaceItems.getChildAt(i)
-							.findViewById(R.id.edit_price);
-					if (!TextUtils.isEmpty(editPrice.getText().toString())) {
-						totalPrice += Double.parseDouble(editPrice.getText().toString());
-					}
-				}
-
-				_editTotal.setText(_decimalFormat.format(totalPrice));
+				calculateTotal();
 			}
 
 			@Override
@@ -767,6 +719,26 @@ public class MaintenanceEditorFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	private void calculateTotal() {
+		double totalPrice = 0;
+		for (int i = 0, j = _llInspectItems.getChildCount(); i < j; i++) {
+			EditText editPrice = _llInspectItems.getChildAt(i)
+					.findViewById(R.id.edit_price);
+			if (!TextUtils.isEmpty(editPrice.getText().toString())) {
+				totalPrice += Double.parseDouble(editPrice.getText().toString());
+			}
+		}
+		for (int i = 0, j = _llReplaceItems.getChildCount(); i < j; i++) {
+			EditText editPrice = _llReplaceItems.getChildAt(i)
+					.findViewById(R.id.edit_price);
+			if (!TextUtils.isEmpty(editPrice.getText().toString())) {
+				totalPrice += Double.parseDouble(editPrice.getText().toString());
+			}
+		}
+
+		_editTotal.setText(_decimalFormat.format(totalPrice));
 	}
 
 	private void saveMaintenance() {
@@ -842,9 +814,11 @@ public class MaintenanceEditorFragment extends Fragment {
 		int maintenanceId = (int) ContentUris.parseId(newMaintenanceUri);
 
 		if (saveMaintenanceDetails(maintenanceId,
-				MaintenanceItemEntry.REPLACE_VALUE, _llReplaceItems) &&
+				MaintenanceItemEntry.REPLACE_VALUE,
+				_llReplaceItems) &&
 				saveMaintenanceDetails(maintenanceId,
-						MaintenanceItemEntry.INSPECT_VALUE, _llInspectItems)) {
+						MaintenanceItemEntry.INSPECT_VALUE,
+						_llInspectItems)) {
 
 			final Uri editOdoUri = _currentUri == null ?
 					getOdometerUri(requireContext(), vehicleId, maintenanceDate) :
@@ -900,8 +874,10 @@ public class MaintenanceEditorFragment extends Fragment {
 		}
 	}
 
-	private boolean saveMaintenanceDetails(int maintenanceId, int inspect_replace,
+	private boolean saveMaintenanceDetails(int maintenanceId,
+										   int inspectReplace,
 										   LinearLayout linearLayout) {
+
 		for (int i = 0, j = linearLayout.getChildCount(); i < j; i++) {
 			CheckBox cb = linearLayout.getChildAt(i).findViewById(R.id.cb_item);
 
@@ -918,47 +894,10 @@ public class MaintenanceEditorFragment extends Fragment {
 			double doublePrice = TextUtils.isEmpty(itemPrice) ?
 					0 : Math.round(Double.parseDouble(itemPrice) * 100.0) / 100.0;
 
-			Cursor itemCursor = requireContext().getContentResolver().query(
-					MaintenanceItemEntry.CONTENT_URI,
-					MaintenanceItemEntry.FULL_PROJECTION,
-					MaintenanceItemEntry.COLUMN_ITEM + "=? AND "
-							+ MaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=?",
-					new String[]{itemName, String.valueOf(inspect_replace)},
-					null);
-
-			long itemId = -1;
-
-			if (itemCursor != null) {
-				if (itemCursor.getCount() == 0) {
-					ContentValues itemValues = new ContentValues();
-					itemValues.put(MaintenanceItemEntry.COLUMN_ITEM, itemName);
-					itemValues.put(MaintenanceItemEntry.COLUMN_INSPECT_REPLACE,
-							inspect_replace);
-					Uri newItemUri = requireContext().getContentResolver()
-							.insert(MaintenanceItemEntry.CONTENT_URI, itemValues);
-
-					if (newItemUri != null) {
-						itemId = ContentUris.parseId(newItemUri);
-					}
-				} else if (itemCursor.moveToFirst()) {
-					itemId = itemCursor.getInt(itemCursor
-							.getColumnIndexOrThrow(MaintenanceItemEntry._ID));
-				}
-				itemCursor.close();
-			}
-
-			if (itemId == -1) {
-				// invalid item ID!!
-				UserDialog.showDialog(requireContext(),
-						getString(R.string.error_has_occurred),
-						getString(R.string.maintenance_item_save_failed),
-						null);
-				return false;
-			}
-
 			ContentValues values = new ContentValues();
 			values.put(MaintenanceDetailsEntry.COLUMN_MAINTENANCE_ID, maintenanceId);
-			values.put(MaintenanceDetailsEntry.COLUMN_ITEM, itemId);
+			values.put(MaintenanceDetailsEntry.COLUMN_ITEM, itemName);
+			values.put(MaintenanceDetailsEntry.COLUMN_INSPECT_REPLACE, inspectReplace);
 			values.put(MaintenanceDetailsEntry.COLUMN_PRICE, doublePrice);
 
 			Uri newUri = requireContext().getContentResolver()

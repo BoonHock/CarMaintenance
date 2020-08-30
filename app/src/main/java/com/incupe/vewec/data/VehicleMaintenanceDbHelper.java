@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 //	public static final String LOG_TAG = VehicleMaintenanceDbHelper.class.getSimpleName();
@@ -22,7 +23,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	/**
 	 * Database version. If you change the database schema, you must increment the database version.
 	 */
-	private static final int DATABASE_VERSION = 8;
+	private static final int DATABASE_VERSION = 9;
 
 	/**
 	 * Constructs a new instance of {@link VehicleMaintenanceDbHelper}.
@@ -60,12 +61,34 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 		if (oldVersion < 8) {
 			runQueryIgnoreException(db, RefuelContract.RefuelEntry.CREATE_TABLE);
 		}
+		// cannot run multiple sql command in one exec. so have to split
+		if (oldVersion < 9) {
+			runQueryIgnoreException(db,
+					UserVehicleContract.UserVehicleEntry.ALTER_TABLE_V9);
+			runQueryIgnoreException(db,
+					MaintenanceItemContract.MaintenanceItemEntry.ALTER_TABLE_V9);
+			runQueryIgnoreException(db,
+					MaintenanceItemContract.MaintenanceItemEntry.CREATE_TABLE);
+			runQueryIgnoreException(db,
+					MaintenanceItemContract.MaintenanceItemEntry.INSERT_FROM_TMP_V9);
+			runQueryIgnoreException(db,
+					MaintenanceItemContract.MaintenanceItemEntry.DROP_TMP_TABLE_V9);
+			runQueryIgnoreException(db,
+					CustomMaintenanceItemContract.CustomMaintenanceItemEntry.MIGRATE_DATA_V9);
+			runQueryIgnoreException(db,
+					CustomMaintenanceItemContract.CustomMaintenanceItemEntry.DROP_TABLE_V9);
+			runQueryIgnoreException(db,
+					MaintenanceDetailsContract.MaintenanceDetailsEntry.ALTER_TABLE_V9);
+			runQueryIgnoreException(db,
+					MaintenanceDetailsContract.MaintenanceDetailsEntry.INSERT_FROM_TMP_V9);
+		}
 	}
 
 	private void runQueryIgnoreException(SQLiteDatabase db, String query) {
 		try {
 			db.execSQL(query);
 		} catch (SQLException e) {
+			Log.e("DB ERROR", e.getMessage() == null ? "DB ERROR" : e.getMessage());
 			// ignore
 		}
 	}

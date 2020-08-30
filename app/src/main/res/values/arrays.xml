@@ -17,4 +17,9 @@
 		<item>@string/ron_97</item>
 		<item>@string/diesel</item>
 	</string-array>
+	<string-array name="array_custom_vehicle_variant">
+		<item>@string/auto_option</item>
+		<item>@string/hybrid_option</item>
+		<item>@string/manual_option</item>
+	</string-array>
 </resources>

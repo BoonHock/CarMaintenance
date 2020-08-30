@@ -2,6 +2,8 @@ package com.incupe.vewec.fragments;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,30 +17,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.incupe.vewec.CategoryAdapter;
-import com.incupe.vewec.CustomMaintenanceItemActivity;
 import com.incupe.vewec.MaintenanceEditorActivity;
+import com.incupe.vewec.MaintenanceItemEditorActivity;
 import com.incupe.vewec.OdometerEditorActivity;
 import com.incupe.vewec.R;
 import com.incupe.vewec.RefuelEditorActivity;
 import com.incupe.vewec.VehicleEditorActivity;
 import com.incupe.vewec.data.UserVehicleContract;
-import com.incupe.vewec.objects.FirebaseObj;
-import com.incupe.vewec.objects.VehicleTemplate;
-import com.incupe.vewec.utilities.Misc;
 
 import java.util.ArrayList;
 
@@ -54,11 +49,13 @@ public class HomeFragment extends Fragment {
 	private LinearLayout _llFabRefuel;
 	private LinearLayout _llFabOdometer;
 	private LinearLayout _llFabMaintenance;
-	private LinearLayout _llFabCustomItem;
+	private LinearLayout _llFabMaintenanceItem;
 
 	@Nullable
 	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater,
+							 @Nullable ViewGroup container,
+							 @Nullable Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_home, container, false);
 
 		final ProgressBar progressBar = root.findViewById(R.id.progress_bar);
@@ -69,33 +66,14 @@ public class HomeFragment extends Fragment {
 		_llFabRefuel = root.findViewById(R.id.ll_fab_refuel);
 		_llFabOdometer = root.findViewById(R.id.ll_fab_odometer);
 		_llFabMaintenance = root.findViewById(R.id.ll_fab_maintenance);
-		_llFabCustomItem = root.findViewById(R.id.ll_fab_custom_item);
+		_llFabMaintenanceItem = root.findViewById(R.id.ll_fab_maintenance_item);
 
 		_llMask.setVisibility(View.GONE);
 
 		setupFabMenu();
 
-		progressBar.setVisibility(View.VISIBLE);
-		rlContent.setVisibility(View.GONE);
-
-		FirebaseDatabase _firebaseDatabase = FirebaseDatabase.getInstance();
-		DatabaseReference _databaseReference =
-				_firebaseDatabase.getReference().child("vehicle_template");
-		_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-			@Override
-			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-				for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-					FirebaseObj._vehicleTemplates
-							.add(snapshot.getValue(VehicleTemplate.class));
-				}
-				progressBar.setVisibility(View.GONE);
-				rlContent.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onCancelled(@NonNull DatabaseError databaseError) {
-			}
-		});
+		progressBar.setVisibility(View.GONE);
+		rlContent.setVisibility(View.VISIBLE);
 
 		ViewPager viewPager = root.findViewById(R.id.viewpager);
 		CategoryAdapter categoryAdapter = new CategoryAdapter(requireContext(),
@@ -118,11 +96,49 @@ public class HomeFragment extends Fragment {
 				hideFabMenu();
 			}
 		});
-		Misc.startNoInternetActivityIfNoNetwork(requireContext());
 
-		getDeviceFirebaseToken();
+//		getDeviceFirebaseToken();
 
 		return root;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		// when activity is resumed, recheck if has vehicle registered to current session
+		if (getContext() != null) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+			if (prefs.getInt(getString(R.string.pref_session_vehicle), 0) == 0) {
+				Cursor cursor = getContext().getContentResolver().query(
+						UserVehicleContract.UserVehicleEntry.CONTENT_URI,
+						UserVehicleContract.UserVehicleEntry.FULL_PROJECTION,
+						null,
+						null,
+						null
+				);
+
+				if (cursor != null) {
+					if (cursor.moveToFirst()) {
+						prefs.edit()
+								.putInt(getString(R.string.pref_session_vehicle),
+										cursor.getInt(cursor.getColumnIndexOrThrow(
+												UserVehicleContract.UserVehicleEntry._ID)))
+								.apply();
+					}
+					cursor.close();
+				}
+
+				if (prefs.getInt(getString(R.string.pref_session_vehicle), 0) == 0) {
+					// if still no session vehicle set, do not display these
+					_llFabRefuel.setVisibility(View.GONE);
+					_llFabOdometer.setVisibility(View.GONE);
+					_llFabMaintenance.setVisibility(View.GONE);
+					_llFabMaintenanceItem.setVisibility(View.GONE);
+				}
+			}
+		}
 	}
 
 	private void getDeviceFirebaseToken() {
@@ -153,7 +169,7 @@ public class HomeFragment extends Fragment {
 		_fabButtons.add(_llFabRefuel);
 		_fabButtons.add(_llFabOdometer);
 		_fabButtons.add(_llFabMaintenance);
-		_fabButtons.add(_llFabCustomItem);
+		_fabButtons.add(_llFabMaintenanceItem);
 
 		for (View v : _fabButtons) {
 			v.setY(_fabMenu.getTop());
@@ -202,46 +218,41 @@ public class HomeFragment extends Fragment {
 				startActivity(intent);
 			}
 		});
-		_llFabCustomItem.setOnClickListener(new View.OnClickListener() {
+		_llFabMaintenanceItem.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				hideFabMenu();
-				Intent intent = new Intent(requireActivity(), CustomMaintenanceItemActivity.class);
-				intent.putExtra(CustomMaintenanceItemFragment.EXTRA_ADD_ITEM, true);
+				Intent intent = new Intent(requireActivity(), MaintenanceItemEditorActivity.class);
 				startActivity(intent);
 			}
 		});
 	}
 
 	private void showFabMenu() {
-		_llMask.setAlpha(0);
+		if (getContext() != null) {
+			_llMask.setAlpha(0);
 
-		_llMask.setVisibility(View.VISIBLE);
-		_llMask.animate().alpha((float) 0.5);
+			_llMask.setVisibility(View.VISIBLE);
+			_llMask.animate().alpha((float) 0.5);
 
-		for (View v : _fabButtons) {
-			if (v.getId() == R.id.ll_fab_vehicle) {
-				// TODO: temporary limit only one vehicle allowed
-				if (UserVehicleContract.UserVehicleEntry.getCount(requireContext()) > 0) {
-					_llFabVehicle.setVisibility(View.GONE);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+			for (View v : _fabButtons) {
+				if (v.getId() == R.id.ll_fab_vehicle) {
+					// TODO: temporary limit only one vehicle allowed
+					if (UserVehicleContract.UserVehicleEntry.getCount(requireContext()) > 0) {
+						_llFabVehicle.setVisibility(View.GONE);
+					} else {
+						showLinearLayoutFab(v);
+					}
 				} else {
-					showLinearLayoutFab(v);
+					if (prefs.getInt(getString(R.string.pref_session_vehicle), 0) != 0) {
+						showLinearLayoutFab(v);
+					}
 				}
-			} else {
-				showLinearLayoutFab(v);
 			}
+			_fabMenu.animate().rotation(45);
+			_isOpenFab = false;
 		}
-//		// TODO: temporary limit only one vehicle allowed
-//		if (UserVehicleContract.UserVehicleEntry.getCount(requireContext()) > 0) {
-//			requireActivity().findViewById(R.id.ll_fab_vehicle).setVisibility(View.GONE);
-//		} else {
-//			showLinearLayoutFab(_llFabVehicle);
-//		}
-//		showLinearLayoutFab(_llFabOdometer);
-//		showLinearLayoutFab(_llFabMaintenance);
-
-		_fabMenu.animate().rotation(45);
-		_isOpenFab = false;
 	}
 
 	private void hideFabMenu() {

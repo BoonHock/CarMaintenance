@@ -97,12 +97,14 @@ public class HistoryCursorAdapter extends CursorAdapter {
 											LinearLayout linearLayout, TextView textView) {
 		double totalPrice = 0;
 		Cursor cursor = context.getContentResolver().query(
-				ContentUris.withAppendedId(MaintenanceDetailsEntry
-						.CONTENT_URI_MAINTENANCE, maintenanceId),
-				null,
-				null,
-				new String[]{String.valueOf(maintenanceId),
-						String.valueOf(inspectReplace)},
+				MaintenanceDetailsEntry.CONTENT_URI,
+				MaintenanceDetailsEntry.FULL_PROJECTION,
+				MaintenanceDetailsEntry.COLUMN_MAINTENANCE_ID + "= ? AND " +
+						MaintenanceDetailsEntry.COLUMN_INSPECT_REPLACE + "=?;",
+				new String[]{
+						String.valueOf(maintenanceId),
+						String.valueOf(inspectReplace)
+				},
 				null);
 
 		if (cursor == null) {

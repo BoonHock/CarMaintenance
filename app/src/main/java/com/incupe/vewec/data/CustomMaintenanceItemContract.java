@@ -36,6 +36,23 @@ public class CustomMaintenanceItemContract {
 				+ "UNIQUE (" + COLUMN_ITEM + ", " + COLUMN_INSPECT_REPLACE + ")"
 				+ ");";
 
+		public static final String MIGRATE_DATA_V9 = "INSERT INTO " +
+				MaintenanceItemContract.MaintenanceItemEntry.TABLE_NAME +
+				" SELECT " + TABLE_NAME + "." + _ID + ", " +
+				COLUMN_ITEM + "," +
+				COLUMN_INSPECT_REPLACE + ", " +
+				"(SELECT " + UserVehicleContract.UserVehicleEntry._ID + " FROM " +
+				UserVehicleContract.UserVehicleEntry.TABLE_NAME + " LIMIT 1), " +
+				COLUMN_DISTANCE_INTERVAL + ", " +
+				COLUMN_DURATION_INTERVAL +
+				" FROM " + TABLE_NAME +
+				" JOIN " + UserVehicleContract.UserVehicleEntry.TABLE_NAME +
+				" ON 1 = 1;";
+
+		// in version 9, users can now customise all items. no more fixed items
+		// based on vehicle models. therefore this table will be
+		public static final String DROP_TABLE_V9 = "DROP TABLE " + TABLE_NAME + ";";
+
 		public static final String[] FULL_PROJECTION = {
 				_ID,
 				COLUMN_ITEM,

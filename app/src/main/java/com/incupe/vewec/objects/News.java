@@ -10,6 +10,7 @@ public class News {
 	private String url;
 	private String title;
 	private String img_url;
+	private String source;
 
 	public News() {
 	}
@@ -42,4 +43,7 @@ public class News {
 		return img_url;
 	}
 
+	public String getSource() {
+		return source;
+	}
 }

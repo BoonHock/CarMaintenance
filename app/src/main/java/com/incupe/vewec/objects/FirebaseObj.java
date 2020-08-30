@@ -1,6 +1,5 @@
 package com.incupe.vewec.objects;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,8 +10,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.incupe.vewec.data.FirebaseContract;
-import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
-import com.incupe.vewec.data.UserVehicleContract;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,56 +67,5 @@ public abstract class FirebaseObj {
 				}
 			});
 		}
-	}
-
-	public static List<List<MaintenanceItem>> getItemsByInspectReplace(
-			String firebaseVehicleId, int usage) {
-		List<List<MaintenanceItem>> items = new ArrayList<>();
-		items.add(new ArrayList<MaintenanceItem>()); // inspect
-		items.add(new ArrayList<MaintenanceItem>()); // replace
-
-		List<MaintenanceItem> firebaseItems = _maintenanceItems.get(firebaseVehicleId);
-
-		if (firebaseItems != null) {
-			for (MaintenanceItem item : firebaseItems) {
-				if (item.getUsage() == UserVehicleContract.UserVehicleEntry.USAGE_ALL
-						|| item.getUsage() == usage) {
-					if (item.getInspect_replace() == MaintenanceItemEntry.INSPECT_VALUE) {
-						items.get(0).add(item);
-					} else if (item.getInspect_replace() == MaintenanceItemEntry.REPLACE_VALUE) {
-						items.get(1).add(item);
-					}
-				}
-			}
-		}
-		return items;
-	}
-
-	/*
-	 * return list with 2 elements
-	 * results[0] = list of upcoming inspect items
-	 * results[1] = list of upcoming replace items
-	 * */
-	public static List<List<UpcomingMaintenanceItem>> getUpcomingItemsByInspectReplace(
-			Context context, String firebaseVehicleId, UserVehicle userVehicle) {
-		List<List<UpcomingMaintenanceItem>> items = new ArrayList<>();
-		items.add(new ArrayList<UpcomingMaintenanceItem>()); // inspect
-		items.add(new ArrayList<UpcomingMaintenanceItem>()); // replace
-
-		List<MaintenanceItem> firebaseItems = _maintenanceItems.get(firebaseVehicleId);
-
-		if (firebaseItems != null) {
-			for (MaintenanceItem item : firebaseItems) {
-				if (item.getUsage() == UserVehicleContract.UserVehicleEntry.USAGE_ALL
-						|| item.getUsage() == userVehicle.get_usage()) {
-					if (item.getInspect_replace() == MaintenanceItemEntry.INSPECT_VALUE) {
-						items.get(0).add(new UpcomingMaintenanceItem(context, item, userVehicle));
-					} else if (item.getInspect_replace() == MaintenanceItemEntry.REPLACE_VALUE) {
-						items.get(1).add(new UpcomingMaintenanceItem(context, item, userVehicle));
-					}
-				}
-			}
-		}
-		return items;
 	}
 }

@@ -2,31 +2,47 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
+	android:layout_height="100dp"
 	android:orientation="horizontal"
 	android:paddingStart="8dp"
 	android:paddingTop="12dp"
 	android:paddingEnd="8dp"
 	android:paddingBottom="12dp">
 
-	<TextView
-		android:id="@+id/txtNewsTitle"
+	<LinearLayout
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_weight="2"
-		android:textColor="@color/colorPrimary"
-		android:textStyle="bold"
-		tools:text="ARTICLE TITLE ARTICLE TITLE ARTICLE TITLE" />
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/txt_news_title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:maxLines="3"
+			android:textColor="@color/colorPrimary"
+			android:textStyle="bold"
+			tools:text="ARTICLE TITLE ARTICLE TITLE ARTICLE TITLE ARTICLE TITLE" />
+
+		<TextView
+			android:id="@+id/txt_news_source_name"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="2dp"
+			android:textAppearance="?android:textAppearanceSmall"
+			tools:text="WapCar" />
+	</LinearLayout>
 
 	<ImageView
-		android:id="@+id/imageNews"
+		android:id="@+id/image_news"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
 		android:adjustViewBounds="true"
 		android:contentDescription="@string/news_image"
-		android:maxHeight="100dp"
+		android:maxHeight="80dp"
 		android:scaleType="centerCrop"
+		tools:layout_height="80dp"
 		tools:src="@drawable/vehicle_back_saga_2019_manual" />
 
 </LinearLayout>

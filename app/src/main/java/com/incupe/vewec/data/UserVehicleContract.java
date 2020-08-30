@@ -25,10 +25,11 @@ public class UserVehicleContract {
 		public static final String COLUMN_VARIANT = "variant";
 		public static final String COLUMN_USAGE = "usage";
 		public static final String COLUMN_IS_NEW = "is_new";
+		public static final String COLUMN_USE_TEMPLATE = "use_template";
 		public static final String COLUMN_CREATED_ON = "created_on";
 
 		public static final int USAGE_ALL = -1;
-		static final int USAGE_NORMAL = 0;
+		public static final int USAGE_NORMAL = 0;
 		public static final int USAGE_SEVERE = 1;
 
 		// maximum input length for registration number
@@ -42,6 +43,7 @@ public class UserVehicleContract {
 				COLUMN_VARIANT,
 				COLUMN_USAGE,
 				COLUMN_IS_NEW,
+				COLUMN_USE_TEMPLATE,
 				COLUMN_CREATED_ON
 		};
 
@@ -53,11 +55,13 @@ public class UserVehicleContract {
 				+ COLUMN_VARIANT + " TEXT NOT NULL, "
 				+ COLUMN_USAGE + " INTEGER NOT NULL, "
 				+ COLUMN_IS_NEW + " INTEGER NOT NULL,"
+				+ COLUMN_USE_TEMPLATE + " INTEGER NOT NULL, "
 				+ COLUMN_CREATED_ON + " INTEGER NOT NULL)";
 
-		// no longer using this column
 		static final String ALTER_TABLE_V5 = "ALTER TABLE " + TABLE_NAME
 				+ " ADD COLUMN " + COLUMN_IS_NEW + " INTEGER NOT NULL DEFAULT 0;";
+		static final String ALTER_TABLE_V9 = "ALTER TABLE " + TABLE_NAME
+				+ " ADD COLUMN " + COLUMN_USE_TEMPLATE + " INTEGER NOT NULL DEFAULT 1;";
 
 		public static long getCount(Context context) {
 			VehicleMaintenanceDbHelper helper = new VehicleMaintenanceDbHelper(context);

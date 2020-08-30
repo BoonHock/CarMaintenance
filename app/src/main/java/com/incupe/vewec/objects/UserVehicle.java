@@ -16,6 +16,7 @@ public class UserVehicle {
 	private String _variant;
 	private int _usage;
 	private boolean _isNew;
+	private boolean _useTemplate;
 	private Date _addedOn = null;
 
 	// cursor is select data from user_vehicle table
@@ -37,6 +38,8 @@ public class UserVehicle {
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USAGE));
 		_isNew = cursor.getInt(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_IS_NEW)) == 1;
+		_useTemplate = cursor.getInt(cursor
+				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_USE_TEMPLATE)) == 1;
 		_addedOn = new Date(cursor.getLong(cursor
 				.getColumnIndexOrThrow(UserVehicleEntry.COLUMN_CREATED_ON)));
 	}
@@ -114,5 +117,9 @@ public class UserVehicle {
 
 	public boolean is_isNew() {
 		return _isNew;
+	}
+
+	public boolean is_useTemplate() {
+		return _useTemplate;
 	}
 }

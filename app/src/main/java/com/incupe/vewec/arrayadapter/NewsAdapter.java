@@ -33,12 +33,14 @@ public class NewsAdapter extends ArrayAdapter<News> {
 
 		News news = getItem(position);
 
-		TextView txtNewsTitle = convertView.findViewById(R.id.txtNewsTitle);
-		ImageView imageNews = convertView.findViewById(R.id.imageNews);
+		TextView txtNewsTitle = convertView.findViewById(R.id.txt_news_title);
+		ImageView imageNews = convertView.findViewById(R.id.image_news);
+		TextView txtSourceName = convertView.findViewById(R.id.txt_news_source_name);
 
 		if (news != null) {
 			txtNewsTitle.setText(news.getTitle());
 			Picasso.get().load(news.getImg_url()).into(imageNews);
+			txtSourceName.setText(news.getSource());
 		}
 		return convertView;
 	}

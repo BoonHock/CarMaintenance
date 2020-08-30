@@ -7,6 +7,7 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,16 +15,20 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,37 +37,50 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.incupe.vewec.data.MaintenanceItemContract.MaintenanceItemEntry;
 import com.incupe.vewec.data.UserVehicleContract;
 import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
 import com.incupe.vewec.objects.FirebaseObj;
+import com.incupe.vewec.objects.MaintenanceItem;
 import com.incupe.vewec.objects.UserVehicle;
 import com.incupe.vewec.objects.VehicleTemplate;
 import com.incupe.vewec.utilities.UserDialog;
 
 import java.util.Date;
+import java.util.List;
 
 public class VehicleEditorActivity extends AppCompatActivity
 		implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int EXISTING_RECORD_LOADER = 0;
 
 	private EditText _editRegNo;
+	private Switch _switchUseTemplate;
 	private Spinner _spinnerBrand;
 	private Spinner _spinnerModel;
 	private Spinner _spinnerVariant;
+	private Spinner _spinnerVariantCustom;
+	private EditText _editBrand;
+	private EditText _editModel;
 	private Spinner _spinnerUsage;
 	private LinearLayout _llNewVehicle;
 	private RadioButton _radIsNew;
 	private RadioButton _radIsNotNew;
 
+	private LinearLayout _llMask;
 	private ProgressBar _progressBar;
 
 	private Uri _currentUri;
 	private boolean _hasChanges = false;
-	private boolean _isEditing = false;
 	private boolean _initialising = true;
 	private UserVehicle _initUserVehicle = null;
 	private ArrayAdapter<String> _modelAdapter;
 	private ArrayAdapter<String> _variantAdapter;
+	private ArrayAdapter<CharSequence> _variantAdapter_custom;
 
 	final private DialogInterface.OnClickListener _discardButtonClickListener =
 			new DialogInterface.OnClickListener() {
@@ -104,12 +122,17 @@ public class VehicleEditorActivity extends AppCompatActivity
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 
+		_switchUseTemplate = findViewById(R.id.switch_use_template);
+		_editBrand = findViewById(R.id.edit_brand);
+		_editModel = findViewById(R.id.edit_model);
 		_spinnerBrand = findViewById(R.id.spinner_brand);
 		_spinnerModel = findViewById(R.id.spinner_model);
 		_spinnerVariant = findViewById(R.id.spinner_variant);
+		_spinnerVariantCustom = findViewById(R.id.spinner_variant_custom);
 		_spinnerUsage = findViewById(R.id.spinner_usage);
 
 		_editRegNo = findViewById(R.id.edit_reg_no);
+		_llMask = findViewById(R.id.ll_mask);
 		_progressBar = findViewById(R.id.indeterminateBar);
 		_llNewVehicle = findViewById(R.id.ll_is_new_vehicle);
 		_radIsNew = findViewById(R.id.rad_new);
@@ -122,13 +145,27 @@ public class VehicleEditorActivity extends AppCompatActivity
 				new InputFilter.LengthFilter(UserVehicleEntry.REG_NO_MAX_LENGTH),
 				new InputFilter.AllCaps()
 		});
+		_editBrand.setFilters(new InputFilter[]{
+				new InputFilter.AllCaps()
+		});
+		_editModel.setFilters(new InputFilter[]{
+				new InputFilter.AllCaps()
+		});
 
-		ArrayAdapter<CharSequence> usageSpinnerAdapter = ArrayAdapter.createFromResource(this,
-				R.array.array_usage_options, android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> usageSpinnerAdapter =
+				ArrayAdapter.createFromResource(this,
+						R.array.array_usage_options,
+						android.R.layout.simple_spinner_item);
+		_variantAdapter_custom =
+				ArrayAdapter.createFromResource(this,
+						R.array.array_custom_vehicle_variant,
+						android.R.layout.simple_spinner_item);
 		// Specify dropdown layout style - simple list view with 1 item per line
 		usageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 		// Apply the adapter to the spinner
 		_spinnerUsage.setAdapter(usageSpinnerAdapter);
+		_variantAdapter_custom.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+		_spinnerVariantCustom.setAdapter(_variantAdapter_custom);
 
 		if (_currentUri == null) {
 			setTitle(R.string.car_editor_title_add_vehicle);
@@ -212,7 +249,22 @@ public class VehicleEditorActivity extends AppCompatActivity
 				}
 			}
 		});
-		findViewById(R.id.txt_car_variant_help).setOnClickListener(
+
+		final TextView txtCarVariantHelp = findViewById(R.id.txt_car_variant_help);
+		TextView txtVariant = findViewById(R.id.txt_variant);
+		TextView txtUsage = findViewById(R.id.txt_usage);
+
+		txtVariant.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				UserDialog.showDialog(
+						VehicleEditorActivity.this,
+						getString(R.string.variant),
+						getString(R.string.variant_tip),
+						null);
+			}
+		});
+		txtCarVariantHelp.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -221,6 +273,38 @@ public class VehicleEditorActivity extends AppCompatActivity
 						startActivity(intent);
 					}
 				});
+
+		txtUsage.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				UserDialog.showDialog(
+						VehicleEditorActivity.this,
+						getString(R.string.usage),
+						getString(R.string.maintenance_may_vary),
+						null
+				);
+			}
+		});
+
+		_switchUseTemplate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				int useTemplateVisibility = _switchUseTemplate.isChecked() ?
+						View.VISIBLE : View.GONE;
+				int useCustomVisibility = _switchUseTemplate.isChecked() ?
+						View.GONE : View.VISIBLE;
+				_spinnerBrand.setVisibility(useTemplateVisibility);
+				_spinnerModel.setVisibility(useTemplateVisibility);
+				_spinnerVariant.setVisibility(useTemplateVisibility);
+
+				txtCarVariantHelp.setVisibility(useTemplateVisibility);
+
+				_editBrand.setVisibility(useCustomVisibility);
+				_editModel.setVisibility(useCustomVisibility);
+				_spinnerVariantCustom.setVisibility(useCustomVisibility);
+			}
+		});
+		_switchUseTemplate.setChecked(true);
 	}
 
 	@Override
@@ -339,9 +423,29 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 	private void saveVehicle() {
 		String regNo = _editRegNo.getText().toString().trim().toUpperCase();
-		String brand = _spinnerBrand.getSelectedItem().toString();
-		String model = _spinnerModel.getSelectedItem().toString();
-		String variant = _spinnerVariant.getSelectedItem().toString();
+		String brand = "";
+		String model = "";
+		String variant = "";
+		boolean insertingDefaultMaintenanceItems = false;
+
+		if (_switchUseTemplate.isChecked()) {
+			if (_spinnerBrand.getSelectedItem() == null ||
+					_spinnerModel.getSelectedItem() == null ||
+					_spinnerVariant.getSelectedItem() == null) {
+				UserDialog.showDialog(this, "",
+						"All information is required.", null);
+				return;
+			}
+
+			brand = _spinnerBrand.getSelectedItem().toString();
+			model = _spinnerModel.getSelectedItem().toString();
+			variant = _spinnerVariant.getSelectedItem().toString();
+		} else {
+			brand = _editBrand.getText().toString();
+			model = _editModel.getText().toString();
+			variant = _spinnerVariantCustom.getSelectedItem().toString();
+		}
+
 		int usage = _spinnerUsage.getSelectedItemPosition();
 		boolean isNew = _radIsNew.isChecked();
 
@@ -387,6 +491,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 		values.put(UserVehicleEntry.COLUMN_MODEL, model);
 		values.put(UserVehicleEntry.COLUMN_VARIANT, variant);
 		values.put(UserVehicleEntry.COLUMN_USAGE, usage);
+		values.put(UserVehicleEntry.COLUMN_USE_TEMPLATE, _switchUseTemplate.isChecked());
 		values.put(UserVehicleEntry.COLUMN_IS_NEW, isNew);
 
 		boolean saveSuccess;
@@ -395,6 +500,53 @@ public class VehicleEditorActivity extends AppCompatActivity
 			// insert new record
 			values.put(UserVehicleEntry.COLUMN_CREATED_ON, new Date().getTime());
 			Uri newUri = getContentResolver().insert(UserVehicleEntry.CONTENT_URI, values);
+			// if using template, get maintenance items template accordingly
+			if (newUri != null) {
+				Cursor cursor1 = getContentResolver().query(
+						newUri,
+						UserVehicleEntry.FULL_PROJECTION,
+						null,
+						null,
+						null
+				);
+				if (cursor1 != null) {
+					if (cursor1.moveToFirst()) {
+						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+						UserVehicle userVehicle = new UserVehicle(cursor1);
+						prefs.edit().putInt(getString(R.string.pref_session_vehicle),
+								userVehicle.get_vehicleId()).apply();
+						Log.v("CHECK_ME", String.valueOf(userVehicle.get_vehicleId()));
+						if (_switchUseTemplate.isChecked()) {
+							String vehicleId = VehicleTemplate.getFirebaseVehicleIdFromList(
+									userVehicle.get_brand(),
+									userVehicle.get_model(),
+									userVehicle.get_variant());
+							insertingDefaultMaintenanceItems = true;
+							createFirebaseItems(vehicleId,
+									userVehicle.get_vehicleId(),
+									userVehicle.get_usage());
+						} else {
+							String vehicleId = "";
+
+							if (variant.toUpperCase().equals(
+									getString(R.string.hybrid_option).toUpperCase())) {
+								vehicleId = "hybrid_general";
+							} else if (variant.toUpperCase().equals(
+									getString(R.string.manual_option).toUpperCase())) {
+								vehicleId = "manual_general";
+							} else {
+								vehicleId = "auto_general";
+							}
+
+							insertingDefaultMaintenanceItems = true;
+							createFirebaseItems(vehicleId,
+									userVehicle.get_vehicleId(),
+									userVehicle.get_usage());
+						}
+					}
+					cursor1.close();
+				}
+			}
 			saveSuccess = newUri != null;
 		} else {
 			// update existing record
@@ -410,7 +562,11 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 			Toast.makeText(this, getString(R.string.saved_successfully),
 					Toast.LENGTH_SHORT).show();
-			finish();
+
+
+			if (!insertingDefaultMaintenanceItems) {
+				finish();
+			}
 		} else {
 			Toast.makeText(this, getString(R.string.error_has_occurred),
 					Toast.LENGTH_SHORT).show();
@@ -452,10 +608,8 @@ public class VehicleEditorActivity extends AppCompatActivity
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		_isEditing = false;
 		if (data != null && data.getCount() > 0) {
 			if (data.moveToFirst()) {
-				_isEditing = true;
 				_initUserVehicle = new UserVehicle(data);
 
 				if (_initUserVehicle.get_usage() == UserVehicleEntry.USAGE_SEVERE) {
@@ -476,34 +630,74 @@ public class VehicleEditorActivity extends AppCompatActivity
 	}
 
 	private void initComponents() {
+		if (_initUserVehicle != null) {
+			_switchUseTemplate.setChecked(_initUserVehicle.is_useTemplate());
+		}
+		if (FirebaseObj._vehicleTemplates.size() == 0) {
+			// firebase vehicle templates not loaded yet. proceed to load first
+			FirebaseDatabase _firebaseDatabase = FirebaseDatabase.getInstance();
+			DatabaseReference _databaseReference =
+					_firebaseDatabase.getReference().child("vehicle_template");
+			_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+				@Override
+				public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+					for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+						FirebaseObj._vehicleTemplates
+								.add(snapshot.getValue(VehicleTemplate.class));
+					}
+					// init spinners here
+					initViewsAfterFirebase();
+				}
+
+				@Override
+				public void onCancelled(@NonNull DatabaseError databaseError) {
+				}
+			});
+		} else {
+			// already loaded firebase vehicle templates. proceed initialising views
+			initViewsAfterFirebase();
+		}
+	}
+
+	private void initViewsAfterFirebase() {
 		ArrayAdapter<String> _brandAdapter = new ArrayAdapter<>(VehicleEditorActivity.this,
 				android.R.layout.simple_spinner_item, VehicleTemplate.getBrands(FirebaseObj._vehicleTemplates));
 		_brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_spinnerBrand.setAdapter(_brandAdapter);
 
-		if (_isEditing) {
+		if (_initUserVehicle != null && _initUserVehicle.is_useTemplate()) {
 			_spinnerBrand.setSelection(_brandAdapter
 					.getPosition(_initUserVehicle.get_brand()));
 		}
 
 		setupSpinnerModel();
-		if (_isEditing) {
+		if (_initUserVehicle != null && _initUserVehicle.is_useTemplate()) {
 			_spinnerModel.setSelection(_modelAdapter
 					.getPosition(_initUserVehicle.get_model()));
 		}
 
 		setupSpinnerVariant();
-		if (_isEditing) {
+		if (_initUserVehicle != null && _initUserVehicle.is_useTemplate()) {
 			_spinnerVariant.setSelection(_variantAdapter
 					.getPosition(_initUserVehicle.get_variant()));
-			_llNewVehicle.setVisibility(View.GONE); // not editable
+		}
+
+		if (_initUserVehicle != null && !_initUserVehicle.is_useTemplate()) {
+			_editBrand.setText(_initUserVehicle.get_brand());
+			_editModel.setText(_initUserVehicle.get_model());
+			_spinnerVariantCustom.setSelection(_variantAdapter_custom
+					.getPosition(_initUserVehicle.get_variant()));
+		}
+
+		// if editing
+		if (_initUserVehicle != null) {
 			if (_initUserVehicle.is_isNew()) {
 				_radIsNew.setChecked(true);
 			} else {
 				_radIsNotNew.setChecked(true);
 			}
+			_llNewVehicle.setVisibility(View.GONE); // not editable
 		}
-
 		_progressBar.setVisibility(View.GONE);
 		findViewById(R.id.ll_content).setVisibility(View.VISIBLE);
 	}
@@ -527,5 +721,39 @@ public class VehicleEditorActivity extends AppCompatActivity
 						selectedBrand, selectedModel));
 		_variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_spinnerVariant.setAdapter(_variantAdapter);
+	}
+
+	private void createFirebaseItems(final String firebaseVehicleId,
+									 final int vehicleId,
+									 final int usage) {
+		_llMask.setVisibility(View.VISIBLE);
+		_progressBar.setVisibility(View.VISIBLE);
+
+		if (firebaseVehicleId.length() > 0) {
+			FirebaseObj.runCallbackMaintenanceDetails(firebaseVehicleId, new FirebaseObj() {
+				@Override
+				public void callback() {
+					List<MaintenanceItem> items = _maintenanceItems.get(firebaseVehicleId);
+					if (items != null) {
+						for (MaintenanceItem item : items) {
+							if (item.getUsage() == UserVehicleEntry.USAGE_ALL ||
+									item.getUsage() == usage) {
+								MaintenanceItemEntry.INSERT_MAINTENANCE_iTEM(
+										VehicleEditorActivity.this,
+										item.getItem(),
+										item.getInspect_replace(),
+										vehicleId,
+										item.getFirst_distance(),
+										item.getFirst_duration(),
+										item.getDistance_interval(),
+										item.getDuration_interval()
+								);
+							}
+						}
+					}
+					finish();
+				}
+			});
+		}
 	}
 }

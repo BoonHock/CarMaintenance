@@ -1,5 +1,8 @@
 package com.incupe.vewec;
 
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.incupe.vewec.fragments.NewsViewFragment;
@@ -12,5 +15,11 @@ public class NewsViewActivity extends SingleFragmentActivity {
 
 		return NewsViewFragment.newInstance(getIntent()
 				.getStringExtra(NewsViewFragment.EXTRA_NEWS_URL));
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+		finish();
+		return true;
 	}
 }

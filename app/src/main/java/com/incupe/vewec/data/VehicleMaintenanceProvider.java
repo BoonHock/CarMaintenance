@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,7 +14,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
+import com.incupe.vewec.R;
 import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
@@ -43,7 +46,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	private static final int MAINTENANCE_DETAILS = 40;
 	private static final int MAINTENANCE_DETAILS_ID = 41;
-	private static final int MAINTENANCE_DETAILS_MAINTENANCE_ID = 42;
 	private static final int LATEST_MAINTENANCE_DETAILS_BY_ITEM = 43;
 
 	private static final int MAINTENANCE_ITEM = 50;
@@ -90,9 +92,6 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				MaintenanceDetailsContract.PATH_MAINTENANCE_DETAILS + "/#",
 				MAINTENANCE_DETAILS_ID);
 		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
-				MaintenanceDetailsContract.PATH_MAINTENANCE_DETAILS + "/maintenance/#",
-				MAINTENANCE_DETAILS_MAINTENANCE_ID);
-		sUriMatcher.addURI(APP_MASTER_CONTRACT.CONTENT_AUTHORITY,
 				MaintenanceDetailsContract.PATH_MAINTENANCE_DETAILS + "/latest_by_item",
 				LATEST_MAINTENANCE_DETAILS_BY_ITEM);
 
@@ -131,8 +130,11 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 	@Nullable
 	@Override
-	public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
-						@Nullable String[] selectionArgs, @Nullable String sortOrder) {
+	public Cursor query(@NonNull Uri uri,
+						@Nullable String[] projection,
+						@Nullable String selection,
+						@Nullable String[] selectionArgs,
+						@Nullable String sortOrder) {
 
 		// Get readable database
 		SQLiteDatabase database = _DbHelper.getReadableDatabase();
@@ -216,17 +218,23 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 						null,
 						sortOrder);
 				break;
-			case MAINTENANCE_DETAILS_MAINTENANCE_ID:
-				cursor = database.rawQuery(
-						MaintenanceDetailsEntry.SELECT_JOIN_MAINTENANCE_ITEM_ID,
-						selectionArgs);
-				break;
 			case LATEST_MAINTENANCE_DETAILS_BY_ITEM:
 				cursor = database.rawQuery(
 						MaintenanceDetailsEntry.SELECT_LATEST_MAINTENANCE_DETAILS_BY_ITEM,
 						selectionArgs);
 				break;
 			case MAINTENANCE_ITEM:
+				cursor = database.query(MaintenanceItemEntry.TABLE_NAME,
+						projection,
+						selection,
+						selectionArgs,
+						null,
+						null,
+						sortOrder);
+				break;
+			case MAINTENANCE_ITEM_ID:
+				selection = MaintenanceItemEntry._ID + "=?";
+				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				cursor = database.query(MaintenanceItemEntry.TABLE_NAME,
 						projection,
 						selection,
@@ -309,7 +317,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	}
 
 	@Override
-	public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+	public int delete(@NonNull Uri uri,
+					  @Nullable String selection,
+					  @Nullable String[] selectionArgs) {
 		final int match = sUriMatcher.match(uri);
 		// Track the number of rows that were deleted
 		int rowsDeleted;
@@ -325,6 +335,9 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 			case MAINTENANCE_ID:
 				rowsDeleted = deleteMaintenance(uri);
 				break;
+			case MAINTENANCE_ITEM_ID:
+				rowsDeleted = deleteMaintenanceItem(uri);
+				break;
 			case CUSTOM_MAINTENANCE_ITEM_ID:
 				rowsDeleted = deleteCustomMaintenanceItem(uri);
 				break;
@@ -338,8 +351,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	}
 
 	@Override
-	public int update(@NonNull Uri uri, @Nullable ContentValues values,
-					  @Nullable String selection, @Nullable String[] selectionArgs) {
+	public int update(@NonNull Uri uri,
+					  @Nullable ContentValues values,
+					  @Nullable String selection,
+					  @Nullable String[] selectionArgs) {
 		final int match = sUriMatcher.match(uri);
 
 		if (values == null) {
@@ -355,6 +370,10 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 				selection = OdometerEntry._ID + "=?";
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 				return updateOdometer(values, selection, selectionArgs);
+			case MAINTENANCE_ITEM_ID:
+				selection = MaintenanceItemEntry._ID + "=?";
+				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+				return updateMaintenanceItem(values, selection, selectionArgs);
 			case CUSTOM_MAINTENANCE_ITEM_ID:
 				selection = CustomMaintenanceItemEntry._ID + "=?";
 				selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
@@ -492,6 +511,7 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 
 		if (getContext() != null) {
 			notifyUris(getContext(),
+					MaintenanceItemEntry.CONTENT_URI,
 					UserVehicleEntry.CONTENT_URI,
 					OdometerEntry.CONTENT_URI,
 					MaintenanceEntry.CONTENT_URI);
@@ -625,6 +645,29 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		return rowsUpdated;
 	}
 
+	private int updateMaintenanceItem(ContentValues values,
+									  String selection,
+									  String[] selectionArgs) {
+		if (values.size() == 0) {
+			return 0;
+		}
+		SQLiteDatabase database = _DbHelper.getWritableDatabase();
+		int rowsUpdated = database.update(
+				MaintenanceItemEntry.TABLE_NAME,
+				values,
+				selection,
+				selectionArgs);
+
+		if (rowsUpdated > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					MaintenanceItemEntry.CONTENT_URI,
+					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+		return rowsUpdated;
+	}
+
 	private int updateRefuel(ContentValues values, String selection,
 							 String[] selectionArgs) {
 		if (values.size() == 0
@@ -651,12 +694,41 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 	}
 
 	private int deleteUserVehicle(Uri uri) {
+		long vehicleId = ContentUris.parseId(uri);
 		int rowsDeleted = deleteById(uri, UserVehicleEntry._ID, UserVehicleEntry.TABLE_NAME);
 		if (rowsDeleted != 0 && getContext() != null) {
 			notifyUris(getContext(),
 					UserVehicleEntry.CONTENT_URI,
 					OdometerEntry.CONTENT_URI,
-					MaintenanceEntry.CONTENT_URI);
+					MaintenanceEntry.CONTENT_URI,
+					MaintenanceItemEntry.CONTENT_URI);
+		}
+
+		if (getContext() != null) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+			if (vehicleId == prefs.getInt(getContext()
+					.getString(R.string.pref_session_vehicle), 0)) {
+				Cursor cursor = getContext().getContentResolver().query(
+						UserVehicleEntry.CONTENT_URI,
+						UserVehicleEntry.FULL_PROJECTION,
+						null,
+						null,
+						null);
+
+				int newVehicleId = 0;
+				if (cursor != null) {
+					if (cursor.moveToFirst()) {
+						newVehicleId = cursor.getInt(cursor
+								.getColumnIndexOrThrow(UserVehicleEntry._ID));
+					}
+					cursor.close();
+				}
+				prefs.edit().putInt(
+						getContext().getString(R.string.pref_session_vehicle),
+						newVehicleId)
+						.apply();
+			}
 		}
 		return rowsDeleted;
 	}
@@ -679,6 +751,18 @@ public class VehicleMaintenanceProvider extends ContentProvider {
 		if (rowsDeleted > 0 && getContext() != null) {
 			notifyUris(getContext(),
 					UserVehicleEntry.CONTENT_URI,
+					OdometerEntry.CONTENT_URI,
+					MaintenanceEntry.CONTENT_URI);
+		}
+		return rowsDeleted;
+	}
+
+	private int deleteMaintenanceItem(Uri uri) {
+		int rowsDeleted = deleteById(uri, MaintenanceItemEntry._ID, MaintenanceItemEntry.TABLE_NAME);
+		if (rowsDeleted > 0 && getContext() != null) {
+			notifyUris(getContext(),
+					MaintenanceItemEntry.CONTENT_URI,
+					UserVehicleEntry.CONTENT_URI, // reload upcoming maintenance
 					OdometerEntry.CONTENT_URI,
 					MaintenanceEntry.CONTENT_URI);
 		}

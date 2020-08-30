@@ -117,7 +117,7 @@ public class CustomMaintenanceItemEditorFragment extends DialogFragment {
 					int duration = TextUtils.isEmpty(strDuration) ?
 							0 : Integer.parseInt(strDuration);
 
-					if (_spinnerInspectReplace.getSelectedItemPosition() == 1) {
+					if (_spinnerInspectReplace.getSelectedItemPosition() == 0) {
 						inspectReplace = CustomMaintenanceItemEntry.REPLACE_VALUE;
 					}
 
@@ -154,9 +154,9 @@ public class CustomMaintenanceItemEditorFragment extends DialogFragment {
 		_editName.setText(name);
 
 		if (inspectReplace == CustomMaintenanceItemEntry.INSPECT_VALUE) {
-			_spinnerInspectReplace.setSelection(0);
-		} else if (inspectReplace == CustomMaintenanceItemEntry.REPLACE_VALUE) {
 			_spinnerInspectReplace.setSelection(1);
+		} else if (inspectReplace == CustomMaintenanceItemEntry.REPLACE_VALUE) {
+			_spinnerInspectReplace.setSelection(0);
 		}
 
 		if (distance != 0)

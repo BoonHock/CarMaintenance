@@ -6,6 +6,7 @@
 	<string name="odometer">Odometer</string>
 	<string name="tab_vehicles">Vehicles</string>
 	<string name="tab_settings">Settings</string>
+	<string name="tab_maintenance_items">Maintenance items</string>
 
 	<string name="kilometer">KM</string>
 	<string name="myr">MYR</string>
@@ -105,12 +106,12 @@
 	<string name="nav_settings">Settings</string>
 
 	<!-- for testing -->
-		<string name="ad_app_id">ca-app-pub-3940256099942544~3347511713</string>
-		<string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>
+	<string name="ad_app_id">ca-app-pub-3940256099942544~3347511713</string>
+	<string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>
 	<!-- TODO: change to release version's ad ID before releases -->
 	<!-- for release	-->
-<!--	<string name="ad_app_id">ca-app-pub-7500841506634041~4064661189</string>-->
-<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>-->
+	<!--	<string name="ad_app_id">ca-app-pub-7500841506634041~4064661189</string>-->
+	<!--	<string name="ad_banner_id">ca-app-pub-7500841506634041/7273278453</string>-->
 
 	<string name="title_activity_settings">Settings</string>
 
@@ -134,8 +135,10 @@
 	<string name="item_name">Item name</string>
 	<string name="duration_interval_month">Duration interval (month)</string>
 	<string name="distance_interval_km">Distance interval (KM)</string>
+	<string name="first_distance">First distance</string>
+	<string name="first_duration">First duration</string>
 	<string name="months_cap">Months</string>
-	<string name="inspect_or_replace">Inspect / replace</string>
+	<string name="replace_or_inspect">Replace / Inspect</string>
 	<string name="all_inputs_required">All inputs are required.</string>
 	<string name="item_deleted">Item deleted</string>
 	<string name="select_by_template">Select by template</string>
@@ -174,6 +177,7 @@
 	<string name="pref_upcoming_intro">upcoming_intro</string>
 	<string name="pref_odo_update_notification_day">pref_odo_update_notification_day</string>
 	<string name="pref_odo_update_notification_time">pref_odo_update_notification_time</string>
+	<string name="pref_session_vehicle">pref_session_vehicle</string>
 
 	<string name="quit">Quit</string>
 	<string name="previous">Previous</string>
@@ -259,4 +263,15 @@
 	<string name="news">News</string>
 	<string name="news_image">News image</string>
 	<string name="no_news">No news to show</string>
+	<string name="no_maintenance_items_for_vehicle">You have not added any scheduled maintenance item for this vehicle.</string>
+	<string name="maintenance_item_interval_with_first">First: %1$d %2$s\tInterval: %3$d %2$s</string>
+	<string name="maintenance_item_interval">Interval: %1$d %2$s</string>
+	<string name="distance_interval">Distance interval</string>
+	<string name="duration_interval">Duration interval</string>
+	<string name="first_distance_explanation">Indicate if this item has specific first service distance. Optional field.</string>
+	<string name="first_duration_explanation">Indicate if this item has specific first service duration. Optional field.</string>
+	<string name="vehicle_editor_use_brand_model_variant_template">Use template</string>
+	<string name="manual_option">MANUAL</string>
+	<string name="hybrid_option">HYBRID</string>
+	<string name="auto_option">AUTO</string>
 </resources>

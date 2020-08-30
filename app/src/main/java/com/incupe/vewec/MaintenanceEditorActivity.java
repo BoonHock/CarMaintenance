@@ -9,7 +9,6 @@ public class MaintenanceEditorActivity extends SingleFragmentActivity {
 	public static final String EXTRA_VEHICLE_ID = "EXTRA_VEHICLE_ID";
 	@Override
 	protected Fragment createFragment() {
-		Misc.startNoInternetActivityIfNoNetwork(this);
 		return new MaintenanceEditorFragment();
 	}
 }

@@ -53,12 +53,23 @@
 		android:layout_gravity="center_horizontal" />
 
 	<TextView
+		android:id="@+id/no_maintenance_items_for_vehicle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/no_maintenance_items_for_vehicle"
+		android:textStyle="italic"
+		android:visibility="gone"
+		tools:visibility="visible" />
+
+	<TextView
 		android:id="@+id/txt_replace"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginTop="8dp"
 		android:text="@string/replace"
-		android:textStyle="bold" />
+		android:textStyle="bold"
+		android:visibility="gone"
+		tools:visibility="visible" />
 
 	<LinearLayout
 		android:id="@+id/ll_replace_items"
@@ -80,7 +91,9 @@
 		android:layout_height="wrap_content"
 		android:layout_marginTop="8dp"
 		android:text="@string/inspect"
-		android:textStyle="bold" />
+		android:textStyle="bold"
+		android:visibility="gone"
+		tools:visibility="visible" />
 
 	<LinearLayout
 		android:id="@+id/ll_inspect_items"

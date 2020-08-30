@@ -21,14 +21,6 @@
 		android:layout_above="@id/adView"
 		android:layout_below="@id/intro_msg">
 
-		<ProgressBar
-			android:id="@+id/indeterminateBar"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_centerInParent="true"
-			android:visibility="gone"
-			tools:visibility="visible" />
-
 		<ScrollView
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
@@ -78,6 +70,25 @@
 
 					<TextView
 						style="@style/CategoryStyle"
+						android:text="@string/vehicle_editor_use_brand_model_variant_template" />
+
+					<FrameLayout style="@style/EditorFieldStyle">
+
+						<Switch
+							android:id="@+id/switch_use_template"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content" />
+					</FrameLayout>
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:gravity="center_vertical"
+					android:orientation="horizontal">
+
+					<TextView
+						style="@style/CategoryStyle"
 						android:text="@string/brand" />
 
 					<Spinner
@@ -87,6 +98,14 @@
 						android:paddingStart="0dp"
 						android:paddingEnd="16dp"
 						android:spinnerMode="dropdown" />
+
+					<EditText
+						android:id="@+id/edit_brand"
+						style="@style/EditorFieldStyle"
+						android:hint="@string/brand"
+						android:importantForAutofill="no"
+						android:inputType="text"
+						android:maxLength="20" />
 				</LinearLayout>
 
 				<LinearLayout
@@ -107,6 +126,14 @@
 						android:paddingStart="0dp"
 						android:paddingEnd="16dp"
 						android:spinnerMode="dropdown" />
+
+					<EditText
+						android:id="@+id/edit_model"
+						style="@style/EditorFieldStyle"
+						android:hint="@string/model"
+						android:importantForAutofill="no"
+						android:inputType="text"
+						android:maxLength="30" />
 				</LinearLayout>
 
 				<LinearLayout
@@ -116,7 +143,9 @@
 					android:orientation="horizontal">
 
 					<TextView
+						android:id="@+id/txt_variant"
 						style="@style/CategoryStyle"
+						android:drawableEnd="@drawable/ic_help_grey_12"
 						android:text="@string/variant" />
 
 					<Spinner
@@ -127,12 +156,21 @@
 						android:paddingStart="0dp"
 						android:paddingEnd="16dp"
 						android:spinnerMode="dropdown" />
+
+					<Spinner
+						android:id="@+id/spinner_variant_custom"
+						style="@style/EditorFieldStyle"
+						android:layout_height="48dp"
+						android:clickable="false"
+						android:paddingStart="0dp"
+						android:paddingEnd="16dp"
+						android:spinnerMode="dropdown" />
 				</LinearLayout>
 
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/variant_tip" />
+				<!--				<TextView-->
+				<!--					android:layout_width="wrap_content"-->
+				<!--					android:layout_height="wrap_content"-->
+				<!--					android:text="@string/variant_tip" />-->
 
 				<TextView
 					android:id="@+id/txt_car_variant_help"
@@ -150,7 +188,9 @@
 					android:orientation="horizontal">
 
 					<TextView
+						android:id="@+id/txt_usage"
 						style="@style/CategoryStyle"
+						android:drawableEnd="@drawable/ic_help_grey_12"
 						android:text="@string/usage" />
 
 					<Spinner
@@ -163,11 +203,11 @@
 						android:spinnerMode="dropdown" />
 				</LinearLayout>
 
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp"
-					android:text="@string/maintenance_may_vary" />
+				<!--				<TextView-->
+				<!--					android:layout_width="match_parent"-->
+				<!--					android:layout_height="wrap_content"-->
+				<!--					android:layout_marginTop="8dp"-->
+				<!--					android:text="@string/maintenance_may_vary" />-->
 
 				<LinearLayout
 					android:id="@+id/ll_is_new_vehicle"
@@ -203,6 +243,26 @@
 				</LinearLayout>
 			</LinearLayout>
 		</ScrollView>
+
+		<LinearLayout
+			android:id="@+id/ll_mask"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:alpha="0.5"
+			android:background="@android:color/black"
+			android:clickable="true"
+			android:focusable="true"
+			android:orientation="horizontal"
+			android:visibility="gone"
+			tools:visibility="visible" />
+
+		<ProgressBar
+			android:id="@+id/indeterminateBar"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerInParent="true"
+			android:visibility="gone"
+			tools:visibility="visible" />
 	</RelativeLayout>
 
 	<com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"

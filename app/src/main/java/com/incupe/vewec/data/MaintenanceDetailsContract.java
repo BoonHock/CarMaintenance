@@ -16,10 +16,6 @@ public class MaintenanceDetailsContract {
 		public static final Uri CONTENT_URI = Uri
 				.withAppendedPath(APP_MASTER_CONTRACT.BASE_CONTENT_URI, PATH_MAINTENANCE_DETAILS);
 
-		// this is for selecting maintenance details via maintenance id
-		public static final Uri CONTENT_URI_MAINTENANCE = Uri
-				.withAppendedPath(CONTENT_URI, "maintenance");
-
 		public static final Uri CONTENT_URI_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
 				Uri.withAppendedPath(CONTENT_URI, "latest_by_item");
 
@@ -27,23 +23,51 @@ public class MaintenanceDetailsContract {
 		public static final String _ID = BaseColumns._ID;
 		public static final String COLUMN_MAINTENANCE_ID = "maintenance";
 		public static final String COLUMN_ITEM = "item";
+		public static final String COLUMN_INSPECT_REPLACE = "inspect_replace";
 		public static final String COLUMN_PRICE = "price";
 
 		// arbitrary value. if need to set higher in future then set lo
 		public static final int PRICE_MAX_LENGTH = 8;
 
+		//		static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
+//				+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+//				+ COLUMN_MAINTENANCE_ID + " INTEGER NOT NULL, "
+//				+ COLUMN_ITEM + " INTEGER NOT NULL, "
+//				+ COLUMN_PRICE + " REAL NOT NULL, "
+//				+ "FOREIGN KEY(" + COLUMN_MAINTENANCE_ID + ") REFERENCES "
+//				+ MaintenanceEntry.TABLE_NAME + "(" + MaintenanceEntry._ID
+//				+ ") ON DELETE CASCADE, "
+//				+ "FOREIGN KEY(" + COLUMN_ITEM + ") REFERENCES "
+//				+ MaintenanceItemEntry.TABLE_NAME + "(" + MaintenanceItemEntry._ID
+//				+ ") ON DELETE RESTRICT, UNIQUE (" + COLUMN_MAINTENANCE_ID + ", "
+//				+ COLUMN_ITEM + "));";
 		static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 				+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ COLUMN_MAINTENANCE_ID + " INTEGER NOT NULL, "
-				+ COLUMN_ITEM + " INTEGER NOT NULL, "
+				+ COLUMN_ITEM + " TEXT NOT NULL, "
 				+ COLUMN_PRICE + " REAL NOT NULL, "
+				+ COLUMN_INSPECT_REPLACE + " INTEGER NOT NULL,"
 				+ "FOREIGN KEY(" + COLUMN_MAINTENANCE_ID + ") REFERENCES "
 				+ MaintenanceEntry.TABLE_NAME + "(" + MaintenanceEntry._ID
-				+ ") ON DELETE CASCADE, "
-				+ "FOREIGN KEY(" + COLUMN_ITEM + ") REFERENCES "
-				+ MaintenanceItemEntry.TABLE_NAME + "(" + MaintenanceItemEntry._ID
-				+ ") ON DELETE RESTRICT, UNIQUE (" + COLUMN_MAINTENANCE_ID + ", "
-				+ COLUMN_ITEM + "));";
+				+ ") ON DELETE CASCADE, UNIQUE (" +
+				COLUMN_MAINTENANCE_ID + ", " +
+				COLUMN_ITEM + "," +
+				COLUMN_INSPECT_REPLACE + "));";
+
+		public static final String ALTER_TABLE_V9 = "ALTER TABLE " + TABLE_NAME +
+				" RENAME TO " + TABLE_NAME + "_TMP";
+
+		public static final String INSERT_FROM_TMP_V9 = "INSERT INTO " + TABLE_NAME +
+				" SELECT " + TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + "," +
+				MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_ITEM + "," +
+				TABLE_NAME + "." + COLUMN_PRICE + "," +
+				MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_INSPECT_REPLACE +
+				" FROM " + MaintenanceDetailsEntry.TABLE_NAME +
+				" JOIN " + MaintenanceItemEntry.TABLE_NAME +
+				" ON " + TABLE_NAME + "." + COLUMN_ITEM + "=" +
+				MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry._ID + ";";
+
+		public static final String DROP_TMP_TABLE_V9 = "DROP TABLE " + TABLE_NAME + "_TMP";
 
 		// select maintenance details and also its item name
 		static final String SELECT_LATEST_MAINTENANCE_DETAILS_BY_ITEM =
@@ -66,28 +90,12 @@ public class MaintenanceDetailsContract {
 						+ MaintenanceEntry.TABLE_NAME + "." + MaintenanceEntry.COLUMN_DATE
 						+ " DESC LIMIT 1;";
 
-		// select maintenance details and also its item name by maintenance id
-		static final String SELECT_JOIN_MAINTENANCE_ITEM_ID =
-				"SELECT " + TABLE_NAME + "." + _ID + ", "
-						+ TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + ", "
-						+ TABLE_NAME + "." + COLUMN_PRICE + ", "
-						+ MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_ITEM + ", "
-						+ MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_INSPECT_REPLACE
-						+ " FROM " + TABLE_NAME
-						+ " JOIN " + MaintenanceItemEntry.TABLE_NAME
-						+ " ON " + MaintenanceItemEntry.TABLE_NAME + "." + _ID
-						+ "=" + TABLE_NAME + "." + COLUMN_ITEM
-						+ " WHERE " + TABLE_NAME + "." + COLUMN_MAINTENANCE_ID + "=? AND "
-						+ MaintenanceItemEntry.TABLE_NAME + "."
-						+ MaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=? ORDER BY "
-						+ MaintenanceItemEntry.TABLE_NAME + "." + MaintenanceItemEntry.COLUMN_ITEM
-						+ ";";
-
 		public static final String[] FULL_PROJECTION = {
 				_ID,
 				COLUMN_MAINTENANCE_ID,
 				COLUMN_ITEM,
-				COLUMN_PRICE
+				COLUMN_PRICE,
+				COLUMN_INSPECT_REPLACE
 		};
 	}
 }

@@ -9,8 +9,8 @@ android {
 		applicationId "com.incupe.vewec"
 		minSdkVersion 23
 		targetSdkVersion 29
-		versionCode 13
-		versionName "1.4.0"
+		versionCode 16
+		versionName "2.0.1"
 		multiDexEnabled true
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

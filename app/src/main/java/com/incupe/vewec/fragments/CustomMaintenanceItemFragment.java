@@ -34,7 +34,6 @@ import com.incupe.vewec.cursoradapter.CustomMaintenanceItemCursorAdapter;
 import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.utilities.UserDialog;
 
-// TODO: fragment crashes when screen rotates!!!
 public class CustomMaintenanceItemFragment extends Fragment
 		implements LoaderManager.LoaderCallbacks<Cursor> {
 	public static final String EXTRA_ADD_ITEM = "EXTRA_ADD_ITEM";

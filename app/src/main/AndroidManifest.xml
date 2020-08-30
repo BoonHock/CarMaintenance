@@ -74,21 +74,22 @@
 		<activity
 			android:name=".NewsViewActivity"
 			android:parentActivityName=".NewsHomeActivity">
+
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value="com.incupe.vewec.NewsHomeActivity" />
-<!--			https://developer.android.com/training/app-links/deep-linking-->
-<!--			<intent-filter>-->
-<!--				<action android:name="android.intent.action.VIEW" />-->
-<!--				<category android:name="android.intent.category.DEFAULT" />-->
-<!--				<category android:name="android.intent.category.BROWSABLE" />-->
-<!--				&lt;!&ndash; Accepts URIs that begin with "http://www.example.com/gizmos” &ndash;&gt;-->
-<!--				<data android:scheme="http"-->
-<!--					android:host="www.example.com"-->
-<!--					android:pathPrefix="/gizmos" />-->
-<!--				&lt;!&ndash; note that the leading "/" is required for pathPrefix&ndash;&gt;-->
-<!--			</intent-filter>-->
+			<!-- https://developer.android.com/training/app-links/deep-linking -->
+			<!-- <intent-filter> -->
+			<!-- <action android:name="android.intent.action.VIEW" /> -->
+			<!-- <category android:name="android.intent.category.DEFAULT" /> -->
+			<!-- <category android:name="android.intent.category.BROWSABLE" /> -->
+			<!-- &lt;!&ndash; Accepts URIs that begin with "http://www.example.com/gizmos” &ndash;&gt; -->
+			<!-- <data android:scheme="http" -->
+			<!-- android:host="www.example.com" -->
+			<!-- android:pathPrefix="/gizmos" /> -->
+			<!-- &lt;!&ndash; note that the leading "/" is required for pathPrefix&ndash;&gt; -->
+			<!-- </intent-filter> -->
 		</activity>
 		<activity
 			android:name=".FuelPriceActivity"
@@ -119,6 +120,15 @@
 			android:parentActivityName=".Main2Activity"
 			android:windowSoftInputMode="adjustResize">
 
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.Main2Activity" />
+		</activity>
+		<activity
+			android:name=".UserVehicleActivity"
+			android:label="@string/vehicle"
+			android:parentActivityName=".Main2Activity">
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
@@ -165,6 +175,16 @@
 				android:value="com.incupe.vewec.Main2Activity" />
 		</activity>
 		<activity
+			android:name=".MaintenanceItemEditorActivity"
+			android:label="@string/maintenance_item"
+			android:parentActivityName=".Main2Activity">
+
+			<!-- Parent activity meta-data to support 4.0 and lower -->
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.incupe.vewec.Main2Activity" />
+		</activity>
+		<activity
 			android:name=".OdometerEditorActivity"
 			android:label="@string/odometer"
 			android:parentActivityName=".Main2Activity">
@@ -186,12 +206,12 @@
 		</activity>
 		<activity
 			android:name=".VehicleEditorActivity"
-			android:parentActivityName=".Main2Activity">
+			android:parentActivityName=".UserVehicleActivity">
 
 			<!-- Parent activity meta-data to support 4.0 and lower -->
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.incupe.vewec.Main2Activity" />
+				android:value="com.incupe.vewec.UserVehicleActivity" />
 		</activity>
 		<activity
 			android:name="com.google.android.gms.ads.AdActivity"

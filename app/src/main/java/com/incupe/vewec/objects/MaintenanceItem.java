@@ -6,12 +6,7 @@ import android.database.Cursor;
 
 import androidx.annotation.NonNull;
 
-import com.incupe.vewec.data.CustomMaintenanceItemContract.CustomMaintenanceItemEntry;
 import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
-import com.incupe.vewec.data.UserVehicleContract.UserVehicleEntry;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MaintenanceItem implements Comparable<MaintenanceItem> {
 	private String firebase_item_id;
@@ -28,12 +23,11 @@ public class MaintenanceItem implements Comparable<MaintenanceItem> {
 	}
 
 	public MaintenanceItem(String cFirebaseId, String cItem, int cInspectReplace,
-						   int cUsage, int cFirstDistance, int cDistanceInterval,
+						   int cFirstDistance, int cDistanceInterval,
 						   int cFirstDuration, int cDurationInterval) {
 		firebase_item_id = cFirebaseId;
 		item = cItem;
 		inspect_replace = cInspectReplace;
-		usage = cUsage;
 		first_distance = cFirstDistance;
 		distance_interval = cDistanceInterval;
 		first_duration = cFirstDuration;
@@ -56,13 +50,13 @@ public class MaintenanceItem implements Comparable<MaintenanceItem> {
 		return inspect_replace;
 	}
 
-	public int getUsage() {
-		return usage;
-	}
-
 	public int getFirst_distance() {
 		// if no first distance defined, return distance interval
-		return first_distance == 0 ? distance_interval : first_distance;
+		return first_distance;
+	}
+
+	public int getUsage() {
+		return usage;
 	}
 
 	public int getDistance_interval() {
@@ -125,98 +119,5 @@ public class MaintenanceItem implements Comparable<MaintenanceItem> {
 			compareResults = thisName.compareTo(compareName);
 		}
 		return compareResults;
-	}
-
-	public static List<MaintenanceItem> getCustomMaintenanceItemNotInFirebase(
-			Context context, List<MaintenanceItem> firebaseItems, int inspectReplace) {
-		List<MaintenanceItem> maintenanceItems = new ArrayList<>();
-
-		Cursor cursor = context.getContentResolver().query(
-				CustomMaintenanceItemEntry.CONTENT_URI,
-				CustomMaintenanceItemEntry.FULL_PROJECTION,
-				CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=?",
-				new String[]{String.valueOf(inspectReplace)},
-				null);
-
-		if (cursor != null) {
-			while (cursor.moveToNext()) {
-				String itemName = cursor.getString(cursor.getColumnIndexOrThrow(
-						CustomMaintenanceItemEntry.COLUMN_ITEM));
-				boolean add = true;
-
-				for (MaintenanceItem firebaseItem : firebaseItems) {
-					if (firebaseItem.getItem().equalsIgnoreCase(itemName)
-							&& firebaseItem.getInspect_replace() == inspectReplace) {
-						add = false;
-						break;
-					}
-				}
-				if (add) {
-					MaintenanceItem item = new MaintenanceItem("", itemName,
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE)),
-							UserVehicleEntry.USAGE_ALL,
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)),
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)));
-					maintenanceItems.add(item);
-				}
-			}
-			cursor.close();
-		}
-
-		return maintenanceItems;
-	}
-
-	public static List<UpcomingMaintenanceItem> getUpcomingCustomItemNotInFirebase(
-			Context context, List<UpcomingMaintenanceItem> firebaseItems,
-			UserVehicle userVehicle, int inspectReplace) {
-		List<UpcomingMaintenanceItem> upcomingItems = new ArrayList<>();
-
-		Cursor cursor = context.getContentResolver().query(
-				CustomMaintenanceItemEntry.CONTENT_URI,
-				CustomMaintenanceItemEntry.FULL_PROJECTION,
-				CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE + "=?",
-				new String[]{String.valueOf(inspectReplace)},
-				null);
-
-		if (cursor != null) {
-			while (cursor.moveToNext()) {
-				String itemName = cursor.getString(cursor.getColumnIndexOrThrow(
-						CustomMaintenanceItemEntry.COLUMN_ITEM));
-				boolean add = true;
-
-				for (UpcomingMaintenanceItem firebaseItem : firebaseItems) {
-					if (firebaseItem.getItem().equalsIgnoreCase(itemName)
-							&& firebaseItem.getInspect_replace() == inspectReplace) {
-						add = false;
-						break;
-					}
-				}
-				if (add) {
-					MaintenanceItem item = new MaintenanceItem("", itemName,
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_INSPECT_REPLACE)),
-							UserVehicleEntry.USAGE_ALL,
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DISTANCE_INTERVAL)),
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)),
-							cursor.getInt(cursor.getColumnIndexOrThrow(
-									CustomMaintenanceItemEntry.COLUMN_DURATION_INTERVAL)));
-					upcomingItems.add(new UpcomingMaintenanceItem(context,item,userVehicle));
-				}
-
-			}
-			cursor.close();
-		}
-		return upcomingItems;
 	}
 }

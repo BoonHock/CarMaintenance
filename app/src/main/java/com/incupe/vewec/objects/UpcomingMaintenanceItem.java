@@ -7,7 +7,6 @@ import com.incupe.vewec.data.MaintenanceContract.MaintenanceEntry;
 import com.incupe.vewec.data.MaintenanceDetailsContract.MaintenanceDetailsEntry;
 
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -29,16 +28,19 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 	private int _distanceLeft;
 	private long _durationDaysLeft = 0;
 
-	UpcomingMaintenanceItem(
+	private UserVehicle _userVehicle;
+
+	public UpcomingMaintenanceItem(
 			Context context, MaintenanceItem maintenanceItem, UserVehicle userVehicle) {
 		super(maintenanceItem.getFirebase_item_id(),
 				maintenanceItem.getItem(),
 				maintenanceItem.getInspect_replace(),
-				maintenanceItem.getUsage(),
 				maintenanceItem.getFirst_distance(),
 				maintenanceItem.getDistance_interval(),
 				maintenanceItem.getFirst_duration(),
 				maintenanceItem.getDuration_interval());
+
+		_userVehicle = userVehicle;
 
 		int nextDistance = 0;
 		int latestOdometer = userVehicle.getLatestOdometer(context);
@@ -52,7 +54,8 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 
 		if (_latestServiceDistance == 0) {
 			// if no service performed record
-			if (userVehicle.is_isNew() || latestOdometer < this.getFirst_distance()) {
+			if (this.getFirst_distance() != 0 &&
+					(userVehicle.is_isNew() || latestOdometer < this.getFirst_distance())) {
 				// if vehicle is brand new (no maintenance performed before
 				// or latest odometer less than first distance
 				// then set next distance as first service distance
@@ -148,32 +151,7 @@ public class UpcomingMaintenanceItem extends MaintenanceItem {
 		return URGENCY_NOT_URGENT;
 	}
 
-	public static class CustomComparator implements Comparator<UpcomingMaintenanceItem> {
-		@Override
-		public int compare(UpcomingMaintenanceItem o1, UpcomingMaintenanceItem o2) {
-			// positive value means @compareItem is before @this
-			int compareResults = o1.get_distanceLeft() - o2.get_distanceLeft();
-			// if both same urgency, and both items have distance intervals,
-			// then check distance left
-			// if either one doesn't have distance interval,
-			// the one without distance interval shall be placed after the ones with
-			if (compareResults == 0) {
-				if (o1.getDistance_interval() != 0
-						&& o2.getDistance_interval() != 0) {
-					compareResults = o1.get_distanceLeft() - o2.get_distanceLeft(); // ascending
-				} else if (o1.getDistance_interval() == 0) {
-					compareResults = 1;
-				} else if (o2.getDistance_interval() == 0) {
-					compareResults = -1;
-				}
-			}
-
-			// if still same, then arrange by name alphabetically
-			if (compareResults == 0) {
-				compareResults = o1.getItem().compareToIgnoreCase(o2.getItem());
-			}
-
-			return compareResults;
-		}
+	public UserVehicle get_userVehicle() {
+		return _userVehicle;
 	}
 }

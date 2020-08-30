@@ -2,7 +2,7 @@ package com.incupe.vewec;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.incupe.vewec.data.UserVehicleContract;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -46,6 +47,26 @@ public class Main2Activity extends AppCompatActivity {
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putBoolean("firstTime", true);
 			editor.apply();
+		}
+		// if no vehicle Id present in current session, get first vehicle in DB if available
+		if (!prefs.contains(getString(R.string.pref_session_vehicle))) {
+			Cursor cursor = getContentResolver().query(
+					UserVehicleContract.UserVehicleEntry.CONTENT_URI,
+					UserVehicleContract.UserVehicleEntry.FULL_PROJECTION,
+					null,
+					null,
+					null
+			);
+			if (cursor != null) {
+				if (cursor.moveToFirst()) {
+					prefs.edit().putInt(
+							getString(R.string.pref_session_vehicle),
+							cursor.getInt(cursor.getColumnIndexOrThrow(
+									UserVehicleContract.UserVehicleEntry._ID)))
+							.apply();
+				}
+				cursor.close();
+			}
 		}
 		if (PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.pref_get_started), true)) {
@@ -131,10 +152,6 @@ public class Main2Activity extends AppCompatActivity {
 						}
 					}
 				});
-
-		Intent intent = getIntent();
-		String action = intent.getAction();
-		Uri data = intent.getData();
 	}
 
 	@Override
@@ -161,9 +178,12 @@ public class Main2Activity extends AppCompatActivity {
 				startActivity(intent);
 				return true;
 			case R.id.action_clear_preferences:
-
 				PreferenceManager.getDefaultSharedPreferences(this).edit().clear().apply();
 //				getPreferences(MODE_PRIVATE).edit().clear().apply();
+				return true;
+			case R.id.action_vehicle:
+				intent = new Intent(this, UserVehicleActivity.class);
+				startActivity(intent);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
