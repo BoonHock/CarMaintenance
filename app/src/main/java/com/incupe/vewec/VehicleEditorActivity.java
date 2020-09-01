@@ -15,7 +15,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -485,7 +484,7 @@ public class VehicleEditorActivity extends AppCompatActivity
 			return;
 		}
 
-		ContentValues values = new ContentValues();
+		final ContentValues values = new ContentValues();
 		values.put(UserVehicleEntry.COLUMN_REG_NO, regNo);
 		values.put(UserVehicleEntry.COLUMN_BRAND, brand);
 		values.put(UserVehicleEntry.COLUMN_MODEL, model);
@@ -494,82 +493,50 @@ public class VehicleEditorActivity extends AppCompatActivity
 		values.put(UserVehicleEntry.COLUMN_USE_TEMPLATE, _switchUseTemplate.isChecked());
 		values.put(UserVehicleEntry.COLUMN_IS_NEW, isNew);
 
-		boolean saveSuccess;
-
 		if (_currentUri == null) {
 			// insert new record
 			values.put(UserVehicleEntry.COLUMN_CREATED_ON, new Date().getTime());
-			Uri newUri = getContentResolver().insert(UserVehicleEntry.CONTENT_URI, values);
-			// if using template, get maintenance items template accordingly
-			if (newUri != null) {
-				Cursor cursor1 = getContentResolver().query(
-						newUri,
-						UserVehicleEntry.FULL_PROJECTION,
-						null,
-						null,
-						null
-				);
-				if (cursor1 != null) {
-					if (cursor1.moveToFirst()) {
-						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-						UserVehicle userVehicle = new UserVehicle(cursor1);
-						prefs.edit().putInt(getString(R.string.pref_session_vehicle),
-								userVehicle.get_vehicleId()).apply();
-						Log.v("CHECK_ME", String.valueOf(userVehicle.get_vehicleId()));
-						if (_switchUseTemplate.isChecked()) {
-							String vehicleId = VehicleTemplate.getFirebaseVehicleIdFromList(
-									userVehicle.get_brand(),
-									userVehicle.get_model(),
-									userVehicle.get_variant());
-							insertingDefaultMaintenanceItems = true;
-							createFirebaseItems(vehicleId,
-									userVehicle.get_vehicleId(),
-									userVehicle.get_usage());
-						} else {
-							String vehicleId = "";
 
-							if (variant.toUpperCase().equals(
-									getString(R.string.hybrid_option).toUpperCase())) {
-								vehicleId = "hybrid_general";
-							} else if (variant.toUpperCase().equals(
-									getString(R.string.manual_option).toUpperCase())) {
-								vehicleId = "manual_general";
-							} else {
-								vehicleId = "auto_general";
-							}
+			if (_switchUseTemplate.isChecked()) {
+				insertVehicle(values, "");
+			} else {
+				String vehicleId = "";
 
-							insertingDefaultMaintenanceItems = true;
-							createFirebaseItems(vehicleId,
-									userVehicle.get_vehicleId(),
-									userVehicle.get_usage());
-						}
-					}
-					cursor1.close();
+				if (variant.toUpperCase().equals(
+						getString(R.string.hybrid_option).toUpperCase())) {
+					vehicleId = "hybrid_general";
+				} else if (variant.toUpperCase().equals(
+						getString(R.string.manual_option).toUpperCase())) {
+					vehicleId = "manual_general";
+				} else {
+					vehicleId = "auto_general";
 				}
+
+				final String finalVehicleId1 = vehicleId;
+				UserDialog.showDialog(this,
+						"Engine oil",
+						"Which type of engine oil are you using? " +
+								"If unsure, we recommend selecting synthetic oil " +
+								"as it is better for your engine. " +
+								"This can be changed later.",
+						getString(R.string.synthetic),
+						getString(R.string.non_synthetic),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								insertVehicle(values, finalVehicleId1 + "_synthetic");
+							}
+						},
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								insertVehicle(values, finalVehicleId1 + "_non_synthetic");
+							}
+						},
+						null);
 			}
-			saveSuccess = newUri != null;
 		} else {
-			// update existing record
-			int rowsAffected = getContentResolver().update(_currentUri,
-					values, null, null);
-			saveSuccess = rowsAffected != 0;
-		}
-		if (saveSuccess) {
-			// this is for if user is being guided by tutorial.
-			// used by main activity
-			// return save ok results.
-			setResult(RESULT_OK);
-
-			Toast.makeText(this, getString(R.string.saved_successfully),
-					Toast.LENGTH_SHORT).show();
-
-
-			if (!insertingDefaultMaintenanceItems) {
-				finish();
-			}
-		} else {
-			Toast.makeText(this, getString(R.string.error_has_occurred),
-					Toast.LENGTH_SHORT).show();
+			updateVehicle(values);
 		}
 	}
 
@@ -586,6 +553,84 @@ public class VehicleEditorActivity extends AppCompatActivity
 			}
 		}
 		finish();
+	}
+
+	/**
+	 *
+	 * @param values
+	 * @param firebaseVehicleId pass empty string to use template firebase vehicle id
+	 */
+	private void insertVehicle(ContentValues values, String firebaseVehicleId) {
+		boolean insertingDefaultMaintenanceItems = false;
+		Uri newUri = getContentResolver().insert(UserVehicleEntry.CONTENT_URI, values);
+
+		if (newUri != null) {
+			Cursor cursor1 = getContentResolver().query(
+					newUri,
+					UserVehicleEntry.FULL_PROJECTION,
+					null,
+					null,
+					null
+			);
+
+			if (cursor1 != null) {
+				if (cursor1.moveToFirst()) {
+					SharedPreferences prefs = PreferenceManager
+							.getDefaultSharedPreferences(this);
+					final UserVehicle userVehicle = new UserVehicle(cursor1);
+					prefs.edit().putInt(getString(R.string.pref_session_vehicle),
+							userVehicle.get_vehicleId()).apply();
+
+					if (firebaseVehicleId.trim().length() == 0) {
+						String vehicleId = VehicleTemplate.getFirebaseVehicleIdFromList(
+								userVehicle.get_brand(),
+								userVehicle.get_model(),
+								userVehicle.get_variant());
+						insertingDefaultMaintenanceItems = true;
+						createFirebaseItems(vehicleId,
+								userVehicle.get_vehicleId(),
+								userVehicle.get_usage());
+					} else {
+						insertingDefaultMaintenanceItems = true;
+
+						createFirebaseItems(
+								firebaseVehicleId,
+								userVehicle.get_vehicleId(),
+								userVehicle.get_usage());
+					}
+				}
+				cursor1.close();
+			}
+
+			setResult(RESULT_OK);
+
+			Toast.makeText(this, getString(R.string.saved_successfully),
+					Toast.LENGTH_SHORT).show();
+
+			if (!insertingDefaultMaintenanceItems) {
+				finish();
+			}
+		} else {
+			Toast.makeText(this, getString(R.string.error_has_occurred),
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private void updateVehicle(ContentValues values) {
+		// update existing record
+		int rowsAffected = getContentResolver().update(_currentUri,
+				values, null, null);
+		if (rowsAffected != 0) {
+			setResult(RESULT_OK);
+
+			Toast.makeText(this, getString(R.string.saved_successfully),
+					Toast.LENGTH_SHORT).show();
+
+			finish();
+		} else {
+			Toast.makeText(this, getString(R.string.error_has_occurred),
+					Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	private void showDuplicateRegNoDialog() {

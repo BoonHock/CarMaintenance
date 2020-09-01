@@ -23,7 +23,7 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 	/**
 	 * Database version. If you change the database schema, you must increment the database version.
 	 */
-	private static final int DATABASE_VERSION = 9;
+	private static final int DATABASE_VERSION = 10;
 
 	/**
 	 * Constructs a new instance of {@link VehicleMaintenanceDbHelper}.
@@ -81,6 +81,14 @@ public class VehicleMaintenanceDbHelper extends SQLiteOpenHelper {
 					MaintenanceDetailsContract.MaintenanceDetailsEntry.ALTER_TABLE_V9);
 			runQueryIgnoreException(db,
 					MaintenanceDetailsContract.MaintenanceDetailsEntry.INSERT_FROM_TMP_V9);
+		}
+		if (oldVersion < 10) {
+			runQueryIgnoreException(db,
+					MaintenanceDetailsContract.MaintenanceDetailsEntry.CREATE_TABLE);
+			runQueryIgnoreException(db,
+					MaintenanceDetailsContract.MaintenanceDetailsEntry.INSERT_FROM_TMP_V9);
+			runQueryIgnoreException(db,
+					MaintenanceDetailsContract.MaintenanceDetailsEntry.DROP_TMP_TABLE_V9);
 		}
 	}
 
