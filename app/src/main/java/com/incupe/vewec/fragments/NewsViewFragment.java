@@ -66,15 +66,15 @@ public class NewsViewFragment extends Fragment {
 		return rootView;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				requireActivity().finish();
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+//	@Override
+//	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//		switch (item.getItemId()) {
+//			case android.R.id.home:
+//				requireActivity().finish();
+//				return true;
+//		}
+//		return super.onOptionsItemSelected(item);
+//	}
 
 	private static class VewecWebViewClient extends WebViewClient {
 		private ProgressBar _progressBar;

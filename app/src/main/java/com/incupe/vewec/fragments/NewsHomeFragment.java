@@ -34,7 +34,6 @@ public class NewsHomeFragment extends Fragment {
 	private NewsAdapter _newsAdapter;
 
 	private DatabaseReference _databaseReference;
-	private ValueEventListener _valueEventListener;
 
 	private ProgressBar _progressBar;
 
@@ -47,10 +46,6 @@ public class NewsHomeFragment extends Fragment {
 				container, false);
 
 		_progressBar = rootView.findViewById(R.id.progress_bar);
-
-		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-		_databaseReference = firebaseDatabase.getReference()
-				.child(FirebaseContract.News.NEWS_KEY);
 
 		ListView listView = rootView.findViewById(R.id.item_list);
 		setupEmptyView(rootView, listView);
@@ -71,53 +66,30 @@ public class NewsHomeFragment extends Fragment {
 			}
 		});
 
-		return rootView;
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		detachDatabaseEventListener();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		_newsAdapter.clear();
-		attachDatabaseEventListener();
-	}
-
-	private void attachDatabaseEventListener() {
-		if (_valueEventListener == null) {
-			_valueEventListener = new ValueEventListener() {
-				@Override
-				public void onDataChange(@NonNull DataSnapshot snapshot) {
-					List<News> newsList = new ArrayList<>();
-					for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-						News news = dataSnapshot.getValue(News.class);
-						if (news != null) {
-							news.setFirebaseKey(dataSnapshot.getKey());
-							newsList.add(news);
-						}
+		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+		_databaseReference = firebaseDatabase.getReference()
+				.child(FirebaseContract.News.NEWS_KEY);
+		_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull DataSnapshot snapshot) {
+				List<News> newsList = new ArrayList<>();
+				for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+					News news = dataSnapshot.getValue(News.class);
+					if (news != null) {
+						news.setFirebaseKey(dataSnapshot.getKey());
+						newsList.add(news);
 					}
-					Collections.reverse(newsList);
-					_newsAdapter.clear();
-					_newsAdapter.addAll(newsList);
-					_progressBar.setVisibility(View.GONE);
 				}
+				Collections.reverse(newsList);
+				_newsAdapter.addAll(newsList);
+				_progressBar.setVisibility(View.GONE);
+			}
 
-				@Override
-				public void onCancelled(@NonNull DatabaseError error) {
-				}
-			};
-			_databaseReference.addValueEventListener(_valueEventListener);
-		}
-	}
-
-	private void detachDatabaseEventListener() {
-		if (_valueEventListener != null) {
-			_valueEventListener = null;
-		}
+			@Override
+			public void onCancelled(@NonNull DatabaseError error) {
+			}
+		});
+		return rootView;
 	}
 
 	private void setupEmptyView(View rootView, ListView listView) {
