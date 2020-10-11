@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -19,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.incupe.vewec.NewsViewActivity;
 import com.incupe.vewec.R;
@@ -33,9 +35,10 @@ import java.util.List;
 public class NewsHomeFragment extends Fragment {
 	private NewsAdapter _newsAdapter;
 
-	private DatabaseReference _databaseReference;
-
 	private ProgressBar _progressBar;
+	private long _lastSelectedUpdatedOn = 0;
+	private final int _selectNewsCount = 15;
+	private boolean _isQuerying = false;
 
 	@Nullable
 	@Override
@@ -67,26 +70,61 @@ public class NewsHomeFragment extends Fragment {
 		});
 
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-		_databaseReference = firebaseDatabase.getReference()
+		final DatabaseReference databaseReference = firebaseDatabase.getReference()
 				.child(FirebaseContract.News.NEWS_KEY);
-		_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+		listView.setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
-			public void onDataChange(@NonNull DataSnapshot snapshot) {
-				List<News> newsList = new ArrayList<>();
-				for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-					News news = dataSnapshot.getValue(News.class);
-					if (news != null) {
-						news.setFirebaseKey(dataSnapshot.getKey());
-						newsList.add(news);
-					}
-				}
-				Collections.reverse(newsList);
-				_newsAdapter.addAll(newsList);
-				_progressBar.setVisibility(View.GONE);
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+
 			}
 
 			@Override
-			public void onCancelled(@NonNull DatabaseError error) {
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				// if previous query still running, don't query anymore first
+				if (_isQuerying) {
+					return;
+				}
+
+				Query query = null;
+				if (totalItemCount == 0) {
+					query = databaseReference
+							.orderByChild(FirebaseContract.News.ITEM_UPDATED_ON)
+							.limitToLast(_selectNewsCount);
+				} else if (firstVisibleItem + visibleItemCount == totalItemCount - 4) {
+					query = databaseReference
+							.orderByChild(FirebaseContract.News.ITEM_UPDATED_ON)
+							.endAt(_lastSelectedUpdatedOn - 1)
+							.limitToLast(_selectNewsCount);
+				}
+				if (query != null) {
+					_isQuerying = true;
+					query.addListenerForSingleValueEvent(new ValueEventListener() {
+						@Override
+						public void onDataChange(@NonNull DataSnapshot snapshot) {
+							List<News> newsList = new ArrayList<>();
+							for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+								News news = dataSnapshot.getValue(News.class);
+								if (news != null) {
+									news.setFirebaseKey(dataSnapshot.getKey());
+									newsList.add(news);
+
+									if (_lastSelectedUpdatedOn == 0 ||
+											news.getUpdated_on() < _lastSelectedUpdatedOn) {
+										_lastSelectedUpdatedOn = news.getUpdated_on();
+									}
+								}
+							}
+							Collections.reverse(newsList);
+							_newsAdapter.addAll(newsList);
+							_progressBar.setVisibility(View.GONE);
+							_isQuerying = false;
+						}
+
+						@Override
+						public void onCancelled(@NonNull DatabaseError error) {
+						}
+					});
+				}
 			}
 		});
 		return rootView;
@@ -101,5 +139,4 @@ public class NewsHomeFragment extends Fragment {
 
 		listView.setEmptyView(emptyView);
 	}
-
 }

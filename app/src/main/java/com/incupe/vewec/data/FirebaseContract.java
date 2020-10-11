@@ -23,5 +23,7 @@ public class FirebaseContract {
 
 	public static final class News {
 		public static final String NEWS_KEY = "news";
+
+		public static final String ITEM_UPDATED_ON = "updated_on";
 	}
 }

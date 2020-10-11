@@ -39,7 +39,9 @@ public class NewsAdapter extends ArrayAdapter<News> {
 
 		if (news != null) {
 			txtNewsTitle.setText(news.getTitle());
-			Picasso.get().load(news.getImg_url()).into(imageNews);
+			if (news.getImg_url().length() > 0) {
+				Picasso.get().load(news.getImg_url()).into(imageNews);
+			}
 			txtSourceName.setText(news.getSource());
 		}
 		return convertView;
